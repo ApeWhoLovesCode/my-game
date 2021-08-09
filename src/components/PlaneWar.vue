@@ -5,6 +5,9 @@
     :playState="playState"
     :width="popWidth"
     :height="popHeight"
+    :isPx="isPx"
+    :smallBox="isPx ? smallBox : {}"
+    :outside="gameItem.outside"
     @popChange="popChange(arguments)"
     @alreadyClose="popClose"
     @small="small"
@@ -43,7 +46,7 @@
     <!-- 游戏结束弹出层 -->
     <GameOver
       ref="gameover"
-      :width="65"
+      :width="isPx ? 30 : 65"
       :height="35"
       :gameName="gameItem.name"
       @exit="exit"
@@ -79,6 +82,14 @@ export default {
       default() {
         return {};
       },
+    },
+    isPx: {
+      type: Boolean,
+      default: false,
+    },
+    smallBox: {
+      type: Object,
+      require: false,
     },
   },
   data() {
@@ -191,6 +202,11 @@ export default {
           ) {
             this.clearAll();
           }
+          // 遍历从缩小界面返回弹出层时，删除越界的臭虫
+          if (e[i].x && e[i].x >= this.windowWidth) {
+            e.splice(i, 1);
+            this.enemyCome();
+          }
         });
       },
       deep: true,
@@ -199,8 +215,18 @@ export default {
     score(val, oldval) {
       if (parseInt(val / 100) != parseInt(oldval / 100)) {
         this.enemySpeed++;
-        console.log(this.enemySpeed);
       }
+    },
+    gameItem: {
+      handler(val) {
+        // 监听到从缩小状态回到弹出层状态，重新获取弹出层信息
+        if (val.small == 2) {
+          setTimeout(() => {
+            this.getPopInfo();
+          }, 1100);
+        }
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -221,6 +247,14 @@ export default {
     // 缩小
     small() {
       this.$emit("small", this.gameItem);
+      setTimeout(() => {
+        // 获取弹出层容器的宽度高度
+        this.windowWidth = this.$refs.planeWarPop.$el.offsetWidth - 30;
+        this.windowHeight = this.$refs.planeWarPop.$el.offsetHeight - 30;
+        // 缩小的时候弹出层的 translate 50% 已经没有了
+        this.windowLeft = this.$refs.planeWarPop.$el.offsetLeft;
+        this.windowTop = this.$refs.planeWarPop.$el.offsetTop;
+      }, 1100);
     },
     // 弹出层在移动发出的事件
     popChange(arg) {
@@ -241,6 +275,7 @@ export default {
         this.$refs.planeWarPop.$el.offsetLeft * (1 - this.popWidth / 100);
       this.windowTop =
         this.$refs.planeWarPop.$el.offsetTop * (1 - this.popHeight / 100);
+      // console.log("this.windowLeft:", this.windowLeft);
     },
     // 点击判断是否是游戏状态
     getMouse() {
@@ -399,6 +434,7 @@ export default {
       for (let key of Object.keys(this.gOScore)) {
         this.gOScore[key] = 0;
       }
+      this.$emit("gameoverFn", this.gameItem.id);
     },
     // 重新开始游戏
     restart() {

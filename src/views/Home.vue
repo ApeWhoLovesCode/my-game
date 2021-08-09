@@ -37,6 +37,7 @@
           type="card"
           closable
           @tab-remove="removeTab"
+          @tab-click="tabClick"
         >
           <el-tab-pane
             v-for="(item, index) in gameTabsList"
@@ -44,7 +45,9 @@
             :label="item.name"
             :name="item.ref"
           >
-            {{ item.name }}
+            <div :ref="item.ref + 1" class="smallBox">
+              <!-- {{ item.name }} -->
+            </div>
           </el-tab-pane>
         </el-tabs>
       </el-main>
@@ -55,32 +58,64 @@
     <PlaneWar
       v-if="gamesList[0].begin"
       :ref="gamesList[0].ref"
-      :gameItem="gamesList[0]"
-      @small="small"
       :class="{
         small: gamesList[0].small == 1,
         nosmall: gamesList[0].small == 2,
       }"
+      :gameItem="gamesList[0]"
+      :isPx="gamesList[0].small == 1 && gamesList[0].delay"
+      :smallBox="gamesList[0].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @small="small"
+      @click.native="popClick(gamesList[0].id)"
     />
     <!-- 俄罗斯方块 -->
     <Tetris
       v-if="gamesList[1].begin"
       :ref="gamesList[1].ref"
-      :gameItem="gamesList[1]"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
       :class="{
         small: gamesList[1].small == 1,
         nosmall: gamesList[1].small == 2,
       }"
+      :gameItem="gamesList[1]"
+      :isPx="gamesList[1].small == 1 && gamesList[1].delay"
+      :smallBox="gamesList[1].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
+      @small="small"
+      @click.native="popClick(gamesList[1].id)"
     />
-    <!-- <myPop
-      v-for="item in gamePops"
-      :ref="item.popRef"
-      :outside="item.outside"
-      @click.native="popClick(item.popRef)"
-    /> -->
+    <!-- 贪吃蛇 -->
+    <Snake
+      v-if="gamesList[2].begin"
+      :ref="gamesList[2].ref"
+      :class="{
+        small: gamesList[2].small == 1,
+        nosmall: gamesList[2].small == 2,
+      }"
+      :gameItem="gamesList[2]"
+      :isPx="gamesList[2].small == 1 && gamesList[2].delay"
+      :smallBox="gamesList[2].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
+      @small="small"
+      @click.native="popClick(gamesList[2].id)"
+    />
+    <FlyingBrid
+      v-if="gamesList[3].begin"
+      :ref="gamesList[3].ref"
+      :class="{
+        small: gamesList[3].small == 1,
+        nosmall: gamesList[3].small == 2,
+      }"
+      :gameItem="gamesList[3]"
+      :isPx="gamesList[3].small == 1 && gamesList[3].delay"
+      :smallBox="gamesList[3].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
+      @small="small"
+      @click.native="popClick(gamesList[3].id)"
+    />
   </el-container>
 </template>
 
@@ -93,6 +128,8 @@ import GameItem from "@/components/gameItem/GameItem.vue";
 import myPop from "@/components/myPop/myPop.vue";
 import PlaneWar from "@/components/PlaneWar.vue";
 import Tetris from "@/components/Tetris.vue";
+import Snake from "@/components/Snake.vue";
+import FlyingBrid from "@/components/FlyingBrid.vue";
 export default {
   name: "home",
   components: {
@@ -101,6 +138,8 @@ export default {
     myPop,
     PlaneWar,
     Tetris,
+    Snake,
+    FlyingBrid,
   },
   props: {},
   data() {
@@ -115,38 +154,52 @@ export default {
       elTabsValue: "",
       // 游戏标签页的数据
       gameTabsList: [],
+      // 缩小盒子的宽高
+      smallBox: { width: 0, height: 0, left: 0, top: 0 },
+      // 点击的是缩小不是盒子
+      isSmall: false,
     };
   },
   computed: {},
   watch: {},
-  created() {},
+  mounted() {},
   methods: {
     // 点击了游戏
     gameItemClick(id) {
       for (let item of this.gamesList) {
         if (id == item.id) {
           item.begin = true;
+          item.outside = true;
           setTimeout(() => {
             this.$refs[item.ref].popshow();
           }, 100);
+        } else {
+          item.outside = false;
         }
       }
-
-      // if (this.gamePops.length != 0) {
-      //   this.gamePops.forEach((item) => (item.outside = false));
-      // }
-      // let popRef = "pop" + i;
-      // this.gamePops.push({ popRef: "pop" + i, outside: true });
-      // setTimeout(() => {
-      //   this.$refs[popRef][0].popshow();
-      // }, 100);
     },
     // 游戏结束的回调
     gameoverFn(id) {
-      console.log("游戏结束");
+      // 删除该游戏弹出层
       for (let item of this.gamesList) {
-        if (id == item.id) {
+        if (item.id == id) {
+          if (item.small == 1) {
+            // 删除对应的 tabs
+            let index;
+            for (let i in this.gameTabsList) {
+              if (this.gameTabsList[i].id == id) {
+                index = i;
+                break;
+              }
+            }
+            this.gameTabsList.splice(index, 1);
+          }
           item.begin = false;
+          item.delay = false;
+          item.outside = false;
+          this.$nextTick(() => {
+            item.small = 0;
+          });
         }
       }
     },
@@ -166,6 +219,8 @@ export default {
     },
     // 游戏缩小的回调
     small(gameItem) {
+      // 防止触发点击盒子的事件提高了优先级
+      this.isSmall = true;
       this.elTabsValue = gameItem.ref;
       // 往标签页添加缩小的游戏数据
       if (this.gameTabsList.indexOf(gameItem) == -1) {
@@ -174,16 +229,52 @@ export default {
 
       // 将对应的游戏隐藏
       for (let item of this.gamesList) {
-        if (gameItem.id == item.id) {
+        if (item.id == gameItem.id) {
           item.small = 1;
         }
       }
+
+      // 恢复点击盒子的事件
+      setTimeout(() => (this.isSmall = false), 50);
+      setTimeout(() => {
+        // 用于延迟动画
+        for (let item of this.gamesList) {
+          if (item.id == gameItem.id) {
+            item.delay = true;
+            item.outside = false;
+          }
+        }
+        this.getSmallBox(gameItem.ref);
+      }, 600);
     },
-    // 删除游戏缩小的标签页
+    // 获取缩小盒子的大小
+    getSmallBox(ref) {
+      ref = ref + 1;
+      this.smallBox.width = this.$refs[ref][0].offsetWidth;
+      this.smallBox.height = this.$refs[ref][0].offsetHeight;
+      // 获取距离屏幕边缘的距离
+      this.smallBox.left = this.$refs[ref][0].getBoundingClientRect().left;
+      this.smallBox.top = this.$refs[ref][0].getBoundingClientRect().top;
+    },
+    // 点击了标签
+    tabClick(e) {
+      for (let item of this.gamesList) {
+        if (item.name == e.label) {
+          item.outside = true;
+        } else {
+          item.outside = false;
+        }
+      }
+    },
+    // 将标签页面回到弹出层状态
     removeTab(targetName) {
       for (let item of this.gamesList) {
         if (item.ref == targetName) {
           item.small = 2;
+          item.delay = false;
+          item.outside = true;
+        } else {
+          item.outside = false;
         }
       }
       for (let i in this.gameTabsList) {
@@ -193,14 +284,15 @@ export default {
       }
     },
     // 点击了弹出层
-    popClick(ref) {
-      // this.gamePops.forEach((item, i, arr) => {
-      //   if (item.popRef == ref) {
-      //     arr[i].outside = true;
-      //   } else {
-      //     arr[i].outside = false;
-      //   }
-      // });
+    popClick(id) {
+      if (this.isSmall) return;
+      for (let item of this.gamesList) {
+        if (item.id == id) {
+          item.outside = true;
+        } else {
+          item.outside = false;
+        }
+      }
     },
   },
 };
@@ -310,9 +402,42 @@ export default {
 .el-main {
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   color: #fff;
+  ::v-deep .el-tabs {
+    height: 100%;
+    /* 游戏标签页 */
+    .el-tabs__item {
+      color: #fff;
+      // border-bottom: none;
+    }
+    /* 激活的颜色 */
+    .el-tabs__item.is-active {
+      color: #fff;
+      font-weight: bold;
+      background: linear-gradient(to bottom, #1f1b46, #28235f);
+      border-bottom: none;
+    }
+    .el-tabs__item:hover {
+      color: #fff;
+      font-weight: bold;
+    }
+    .el-tabs__content {
+      height: calc(98% - 43px);
+      overflow: visible;
+      .el-tab-pane {
+        height: 100%;
+        .smallBox {
+          width: 100%;
+          height: 100%;
+          // border: 1px solid #fff;
+          border-radius: 10px;
+        }
+      }
+    }
+  }
 }
 // 缩小的样式
 .small {
+  //  forwards
   animation: small 1s ease forwards;
 }
 .nosmall {
@@ -330,24 +455,29 @@ export default {
   50% {
     transform: translate(-50%, -50%) scale(1.05);
   }
-  100% {
+  80% {
     opacity: 0;
-    top: 20%;
-    visibility: hidden;
+    top: 30%;
+    // visibility: hidden;
     transform: translate(-50%, -50%) scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    // top: 50%;
+    transform: scale(1);
   }
 }
 @keyframes nosmall {
   0% {
     opacity: 0;
     top: 20%;
-    transform: translate(-50%, -50%) scale(0.3);
+    transform: translate(-50%, -50%) scale(0.1);
   }
-  50% {
+  65% {
     top: 50%;
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: translate(-50%, -50%) scale(1.1);
   }
-  75% {
+  80% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(0.9);
   }

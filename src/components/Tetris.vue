@@ -4,7 +4,10 @@
     class="tetrispop"
     :width="popWidth"
     :height="popHeight"
-    :minHeight="680"
+    :minHeight="650"
+    :isPx="isPx"
+    :smallBox="isPx ? smallBox : {}"
+    :outside="gameItem.outside"
     @small="small"
     @alreadyClose="exit"
   >
@@ -15,6 +18,8 @@
         <div>关卡: {{ level }}</div>
       </div>
       <div class="dotted_line"></div>
+      <!-- 暂停遮罩层 -->
+      <div v-show="isPause" class="paseMask">暂停中（可作弊§(*￣▽￣*)§）</div>
       <!-- 16宫格 4 * 4 -->
       <!-- 块元素 -->
       <div v-for="(item, index) in currentModel">
@@ -23,13 +28,11 @@
           :class="item[0].isFixed ? 'fixed_model' : 'activity_model'"
         ></div>
       </div>
-      <!-- 暂停遮罩层 -->
-      <div v-if="isPause" class="paseMask">暂停中（可作弊§(*￣▽￣*)§）</div>
     </div>
     <GameOver
       v-if="theGameOver"
       ref="gameover"
-      :width="90"
+      :width="isPx ? 30 : 90"
       :height="30"
       :gameName="gameItem.name"
       @exit="exit"
@@ -66,17 +69,25 @@ export default {
         return {};
       },
     },
+    isPx: {
+      type: Boolean,
+      default: false,
+    },
+    smallBox: {
+      type: Object,
+      require: false,
+    },
   },
   data() {
     return {
       // 弹出层的宽高 %
       popWidth: 30,
-      popHeight: 95,
+      popHeight: 90,
       // 常量 每次移动的距离 步长 24
       STEP: 24,
-      // 分割容器 336 * 600 -> 14 * 25
+      // 分割容器 336 * 576 -> 14 * 24
       COL_COUNT: 14,
-      ROW_COUNT: 25,
+      ROW_COUNT: 24,
       // 创建每个模型的数据源
       MODELS: [
         // 第一个模型数据源(L型)
@@ -225,6 +236,13 @@ export default {
         this.autoDown();
       },
     },
+    // 监听现在点的是哪个弹出层 就重新监听用户的键盘事件
+    gameItem: {
+      handler(val) {
+        if (val.outside) this.onKeyDown();
+      },
+      deep: true,
+    },
   },
   onLoad() {
     // this.init()
@@ -236,7 +254,7 @@ export default {
       (400 * 100) / document.documentElement.clientWidth
     );
     this.popHeight = parseInt(
-      (700 * 100) / document.documentElement.clientHeight
+      (630 * 100) / document.documentElement.clientHeight
     );
     this.init();
     // 监听浏览器窗口大小变化
@@ -249,7 +267,7 @@ export default {
         }
         if (e.currentTarget.outerHeight >= 833) {
           // console.log((700 * 100) / e.currentTarget.outerHeight);
-          that.popHeight = parseInt((700 * 100) / e.currentTarget.outerHeight);
+          that.popHeight = parseInt((630 * 100) / e.currentTarget.outerHeight);
         }
       }, 50);
     });
@@ -282,6 +300,9 @@ export default {
     init() {
       this.createModel();
       this.onKeyDown();
+      setTimeout(() => {
+        this.isPause = true;
+      }, 550);
     },
 
     // 根据模型的数据源来创建对应的块元素
@@ -311,36 +332,32 @@ export default {
 
       // 4.让模型自动下落
       this.autoDown();
-
-      setTimeout(() => {
-        this.isPause = true;
-      }, 550);
     },
 
     // 监听用户的键盘事件
     onKeyDown() {
       document.onkeydown = (e) => {
-        switch (e.keyCode) {
+        switch (e.code) {
+          // 左
+          case "ArrowLeft":
+            this.move(-1, 0);
+            break;
           // 上
-          case 38:
+          case "ArrowUp":
             // this.move(0, -1)
             this.rotate();
             break;
           // 右
-          case 39:
+          case "ArrowRight":
             this.move(1, 0);
             break;
           // 下
-          case 40:
+          case "ArrowDown":
             this.checkBound();
             this.move(0, 1);
             break;
-          // 左
-          case 37:
-            this.move(-1, 0);
-            break;
           // 空格键
-          case 32:
+          case "Space":
             this.pause();
             break;
         }
@@ -528,10 +545,11 @@ export default {
       this.$nextTick(function () {
         // 获取所有 块元素外面的 16 宫格
         let allNodes = document.querySelector("#container").childNodes;
+        console.log(allNodes);
         // 遍历该行中的所有列
         for (let i = 0; i < this.COL_COUNT; i++) {
           // 1.删除该行中所有的块元素
-          allNodes.forEach((item, index) => {
+          allNodes.forEach((item) => {
             for (let j = 0; j < item.children.length; j++) {
               // 如果删除了一个块元素就退出循环
               if (item.children[j] === this.fixedBlocks[line + "_" + i]) {
@@ -662,6 +680,10 @@ export default {
 $bgc-color: #cbe4f8;
 $bgc-deep-color: #8cb4b7;
 $base-color: #58b1b6;
+/* 游戏区域大小 */
+$game-width: 336px;
+$game-height: 576px;
+$game-item: 24px;
 .tetrispop {
   // background-color: #50a09d;
   background: linear-gradient(to right, #50a09d, #78d4d1, #50a09d);
@@ -671,8 +693,8 @@ $base-color: #58b1b6;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 336px;
-  height: 600px;
+  width: $game-width;
+  height: $game-height;
   border-radius: 10px;
   background-image: linear-gradient(to bottom, $bgc-color, $bgc-deep-color);
   // 虚线
@@ -699,8 +721,8 @@ $base-color: #58b1b6;
     top: 0;
     box-sizing: border-box;
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: $game-item;
+    height: $game-item;
     background-color: $base-color;
     border: 3px solid #f5f5f5;
     border-radius: 5px;
@@ -710,8 +732,8 @@ $base-color: #58b1b6;
     position: absolute;
     box-sizing: border-box;
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: $game-item;
+    height: $game-item;
     background-color: #fefefe;
     border: 3px solid #999999;
     border-radius: 5px;

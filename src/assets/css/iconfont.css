@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2724499 */
-  src: url('//at.alicdn.com/t/font_2724499_vpgw5r7mn8.woff2?t=1628148912670') format('woff2'),
-       url('//at.alicdn.com/t/font_2724499_vpgw5r7mn8.woff?t=1628148912670') format('woff'),
-       url('//at.alicdn.com/t/font_2724499_vpgw5r7mn8.ttf?t=1628148912670') format('truetype');
+  src: url('//at.alicdn.com/t/font_2724499_dtr5j1ybcw9.woff2?t=1628339397654') format('woff2'),
+       url('//at.alicdn.com/t/font_2724499_dtr5j1ybcw9.woff?t=1628339397654') format('woff'),
+       url('//at.alicdn.com/t/font_2724499_dtr5j1ybcw9.ttf?t=1628339397654') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,18 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-dan:before {
+  content: "\e689";
+}
+
+.icon-she:before {
+  content: "\e697";
+}
+
+.icon-snake:before {
+  content: "\e602";
 }
 
 .icon-game:before {
