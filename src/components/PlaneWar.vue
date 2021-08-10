@@ -203,7 +203,7 @@ export default {
             this.clearAll();
           }
           // 遍历从缩小界面返回弹出层时，删除越界的臭虫
-          if (e[i].x && e[i].x >= this.windowWidth) {
+          if (e[i] && e[i].x && e[i].x >= this.windowWidth) {
             e.splice(i, 1);
             this.enemyCome();
           }

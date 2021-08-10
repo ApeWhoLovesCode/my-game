@@ -101,6 +101,7 @@
       @small="small"
       @click.native="popClick(gamesList[2].id)"
     />
+    <!-- 飞翔的小鸟 -->
     <FlyingBrid
       v-if="gamesList[3].begin"
       :ref="gamesList[3].ref"
@@ -116,6 +117,22 @@
       @small="small"
       @click.native="popClick(gamesList[3].id)"
     />
+    <!-- 2048 -->
+    <TwoFour
+      v-if="gamesList[4].begin"
+      :ref="gamesList[4].ref"
+      :class="{
+        small: gamesList[4].small == 1,
+        nosmall: gamesList[4].small == 2,
+      }"
+      :gameItem="gamesList[4]"
+      :isPx="gamesList[4].small == 1 && gamesList[4].delay"
+      :smallBox="gamesList[4].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
+      @small="small"
+      @click.native="popClick(gamesList[4].id)"
+    />
   </el-container>
 </template>
 
@@ -130,6 +147,7 @@ import PlaneWar from "@/components/PlaneWar.vue";
 import Tetris from "@/components/Tetris.vue";
 import Snake from "@/components/Snake.vue";
 import FlyingBrid from "@/components/FlyingBrid.vue";
+import TwoFour from "@/components/2048.vue";
 export default {
   name: "home",
   components: {
@@ -140,6 +158,7 @@ export default {
     Tetris,
     Snake,
     FlyingBrid,
+    TwoFour,
   },
   props: {},
   data() {
