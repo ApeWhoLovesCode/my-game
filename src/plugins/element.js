@@ -9,7 +9,9 @@ import {
   MessageBox,
   Loading,
   Tabs,
-  TabPane
+  TabPane,
+  Tooltip,
+  Switch
 } from 'element-ui'
 
 Vue.use(Button)
@@ -19,6 +21,8 @@ Vue.use(Aside)
 Vue.use(Main)
 Vue.use(Tabs)
 Vue.use(TabPane)
+Vue.use(Tooltip)
+Vue.use(Switch)
 
 // 需要全局挂载 挂载到Vue的原型上
 Vue.prototype.$message = Message

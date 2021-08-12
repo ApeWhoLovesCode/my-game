@@ -11,7 +11,31 @@
         ></el-button>
       </div>
       <div class="headerRight">
-        <i class="iconfont icon-denglu"></i>
+        <el-tooltip
+          effect="dark"
+          content="开 / 关方向键位特效"
+          placement="bottom"
+        >
+          <el-switch
+            v-model="isKeyShow"
+            active-color="#7052db"
+            inactive-color="#aa9cc5"
+          >
+          </el-switch>
+        </el-tooltip>
+        <audio ref="audio" :src="musicUrl" autoplay></audio>
+        <el-tooltip effect="dark" content="播放 / 暂停歌曲" placement="bottom">
+          <span
+            class="iconfont music"
+            :class="
+              isMusic ? 'icon-mn_shengyin_fill' : 'icon-mn_shengyinwu_fill'
+            "
+            @click="getMusic"
+          ></span>
+        </el-tooltip>
+        <el-tooltip effect="light" content="登录" placement="bottom">
+          <i class="iconfont icon-denglu"></i>
+        </el-tooltip>
       </div>
     </el-header>
     <el-container>
@@ -23,12 +47,20 @@
           @click="isFold = !isFold"
         ></el-button>
         <vue-custom-scrollbar class="scroll-area">
-          <Game-item
+          <el-tooltip
+            placement="right"
             v-for="(item, i) in gamesList"
             :key="item.id"
-            :gameItem="item"
-            @click.native="gameItemClick(item.id)"
-          />
+          >
+            <!-- 鼠标移过去显示的游戏规则 -->
+            <div slot="content">
+              <div class="rules">规则：{{ item.rules }}</div>
+            </div>
+            <Game-item
+              :gameItem="item"
+              @click.native="gameItemClick(item.id)"
+            />
+          </el-tooltip>
         </vue-custom-scrollbar>
       </el-aside>
       <el-main>
@@ -45,9 +77,7 @@
             :label="item.name"
             :name="item.ref"
           >
-            <div :ref="item.ref + 1" class="smallBox">
-              <!-- {{ item.name }} -->
-            </div>
+            <div :ref="item.ref + 1" class="smallBox"></div>
           </el-tab-pane>
         </el-tabs>
       </el-main>
@@ -133,6 +163,42 @@
       @small="small"
       @click.native="popClick(gamesList[4].id)"
     />
+    <!-- 五子棋 -->
+    <GoBang
+      v-if="gamesList[5].begin"
+      :ref="gamesList[5].ref"
+      :class="{
+        small: gamesList[5].small == 1,
+        nosmall: gamesList[5].small == 2,
+      }"
+      :gameItem="gamesList[5]"
+      :isPx="gamesList[5].small == 1 && gamesList[5].delay"
+      :smallBox="gamesList[5].small == 1 ? smallBox : {}"
+      @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
+      @small="small"
+      @click.native="popClick(gamesList[5].id)"
+    />
+
+    <!-- 方向键位 -->
+    <template v-if="isKeyShow">
+      <span
+        v-show="currentKey == 'left'"
+        class="direction iconfont icon-103fangxiang_xiangzuo"
+      ></span>
+      <span
+        v-show="currentKey == 'up'"
+        class="direction iconfont icon-100fangxiang_xiangshang"
+      ></span>
+      <span
+        v-show="currentKey == 'right'"
+        class="direction iconfont icon-101fangxiang_xiangyou"
+      ></span>
+      <span
+        v-show="currentKey == 'down'"
+        class="direction iconfont icon-102fangxiang_xiangxia"
+      ></span>
+    </template>
   </el-container>
 </template>
 
@@ -140,6 +206,8 @@
 import gameData from "@/utils/gameData.js";
 import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
+import { mapState } from "vuex";
+import axios from "axios";
 
 import GameItem from "@/components/gameItem/GameItem.vue";
 import myPop from "@/components/myPop/myPop.vue";
@@ -148,6 +216,7 @@ import Tetris from "@/components/Tetris.vue";
 import Snake from "@/components/Snake.vue";
 import FlyingBrid from "@/components/FlyingBrid.vue";
 import TwoFour from "@/components/2048.vue";
+import GoBang from "@/components/GoBang.vue";
 export default {
   name: "home",
   components: {
@@ -159,6 +228,7 @@ export default {
     Snake,
     FlyingBrid,
     TwoFour,
+    GoBang,
   },
   props: {},
   data() {
@@ -177,10 +247,30 @@ export default {
       smallBox: { width: 0, height: 0, left: 0, top: 0 },
       // 点击的是缩小不是盒子
       isSmall: false,
+      // 方向键位特效的定时器
+      timer: null,
+      // 是否先方向键位的特效
+      isKeyShow: true,
+      // 是否放歌
+      isMusic: false,
+      musicUrl: "",
     };
   },
-  computed: {},
-  watch: {},
+  computed: {
+    ...mapState(["currentKey"]),
+  },
+  watch: {
+    currentKey: {
+      handler(val) {
+        if (val) {
+          clearTimeout(this.timer);
+          this.timer = setTimeout(() => {
+            this.$store.commit("setCurrentKey", "");
+          }, 1000);
+        }
+      },
+    },
+  },
   mounted() {},
   methods: {
     // 点击了游戏
@@ -313,6 +403,19 @@ export default {
         }
       }
     },
+    // 获取歌曲
+    async getMusic() {
+      this.isMusic = !this.isMusic;
+      if (this.isMusic) {
+        let { data } = await axios.get("https://api.uomg.com/api/rand.music", {
+          params: { sort: "热歌榜", format: "json" },
+        });
+        this.musicUrl = data.data.url;
+      } else {
+        // 暂停
+        this.$refs.audio.pause();
+      }
+    },
   },
 };
 </script>
@@ -323,6 +426,64 @@ export default {
   min-width: 1000px;
   min-height: 700px;
 }
+// 键盘方向键样式
+.direction {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: greenyellow;
+  z-index: 110;
+  opacity: 0;
+  animation: direction 1s ease-out;
+}
+.icon-103fangxiang_xiangzuo {
+  top: 50%;
+  left: 13%;
+  transform: translateY(-50%);
+}
+.icon-100fangxiang_xiangshang {
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+.icon-101fangxiang_xiangyou {
+  top: 50%;
+  right: 8%;
+  transform: translateY(-50%);
+}
+.icon-102fangxiang_xiangxia {
+  left: 50%;
+  bottom: 5%;
+  transform: translateX(-50%);
+}
+@keyframes direction {
+  0% {
+    opacity: 0;
+    font-size: 12px;
+  }
+
+  20% {
+    opacity: 1;
+    font-size: 40px;
+    text-shadow: 0 0 5px greenyellow;
+  }
+
+  100% {
+    opacity: 0;
+    font-size: 100px;
+    text-shadow: 0 0 20px greenyellow;
+  }
+}
+
+// 游戏规则
+.el-tooltip__popper {
+  .rules {
+    max-width: 120px;
+  }
+}
+
+// 头部样式
 .el-header {
   display: flex;
   align-items: center;
@@ -331,6 +492,7 @@ export default {
   color: #fff;
   padding: 0 30px;
   .headerLeft {
+    width: 200px;
     font-size: 22px;
     color: #4f03e0;
     font-weight: bold;
@@ -365,10 +527,18 @@ export default {
     }
   }
   .headerRight {
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     .iconfont {
+      margin-left: 20px;
       color: #aaa;
       font-size: 32px;
       cursor: pointer;
+    }
+    .music {
+      color: #7052db;
     }
   }
 }
@@ -426,7 +596,7 @@ export default {
     /* 游戏标签页 */
     .el-tabs__item {
       color: #fff;
-      // border-bottom: none;
+      user-select: none;
     }
     /* 激活的颜色 */
     .el-tabs__item.is-active {
@@ -456,7 +626,6 @@ export default {
 }
 // 缩小的样式
 .small {
-  //  forwards
   animation: small 1s ease forwards;
 }
 .nosmall {

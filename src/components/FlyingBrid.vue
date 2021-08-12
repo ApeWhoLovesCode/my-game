@@ -33,6 +33,9 @@
         得分: <i>{{ gOScore.score }}</i>
       </div>
       <div class="gameoverItem">
+        等级: <i>{{ level }}</i>
+      </div>
+      <div class="gameoverItem">
         总得分: <i>{{ gOScore.final }}</i>
       </div>
     </GameOver>
@@ -378,6 +381,7 @@ export default {
   background: linear-gradient(to bottom, #44a8b1, #cac586);
   #mycanvas {
     border-radius: 8px;
+    color: #aa9cc5;
   }
   .score {
     position: absolute;

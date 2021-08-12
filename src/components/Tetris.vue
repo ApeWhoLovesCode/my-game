@@ -4,7 +4,6 @@
     class="tetrispop"
     :width="popWidth"
     :height="popHeight"
-    :minHeight="650"
     :isPx="isPx"
     :smallBox="isPx ? smallBox : {}"
     :outside="gameItem.outside"
@@ -55,6 +54,7 @@
 // import { minxin } from "@/utils/minxins.js";
 import myPop from "@/components/myPop/myPop.vue";
 import GameOver from "@/components/GameOver.vue";
+import { mapState } from "vuex";
 export default {
   name: "tetris",
   components: {
@@ -82,10 +82,11 @@ export default {
     return {
       // 弹出层的宽高 %
       popWidth: 30,
-      popHeight: 90,
+      popHeight: 70,
       // 常量 每次移动的距离 步长 24
-      STEP: 24,
+      STEP: 20,
       // 分割容器 336 * 576 -> 14 * 24
+      // 分割容器 280 * 480 -> 14 * 24
       COL_COUNT: 14,
       ROW_COUNT: 24,
       // 创建每个模型的数据源
@@ -251,28 +252,25 @@ export default {
   mounted() {
     // 刚开始获取浏览器的宽高
     this.popWidth = parseInt(
-      (400 * 100) / document.documentElement.clientWidth
+      (300 * 100) / document.documentElement.clientWidth
     );
     this.popHeight = parseInt(
-      (630 * 100) / document.documentElement.clientHeight
+      (580 * 100) / document.documentElement.clientHeight
     );
     this.init();
     // 监听浏览器窗口大小变化
     let that = this;
     window.addEventListener("resize", function (e) {
       this.windowTime = setTimeout(() => {
-        if (e.currentTarget.outerWidth >= 1200) {
-          // console.log((400 * 100) / e.currentTarget.outerWidth);
-          that.popWidth = parseInt((400 * 100) / e.currentTarget.outerWidth);
-        }
-        if (e.currentTarget.outerHeight >= 833) {
-          // console.log((700 * 100) / e.currentTarget.outerHeight);
-          that.popHeight = parseInt((630 * 100) / e.currentTarget.outerHeight);
-        }
+        // if (e.currentTarget.outerWidth >= 1200) {
+        that.popWidth = parseInt((300 * 100) / e.currentTarget.innerWidth);
+        // if (e.currentTarget.outerHeight >= 833) {
+        that.popHeight = parseInt((580 * 100) / e.currentTarget.innerHeight);
       }, 50);
     });
   },
   computed: {
+    ...mapState(["currentKey"]),
     // 根据得分调节速度
     speed() {
       if (this.level >= 10) {
@@ -340,19 +338,22 @@ export default {
         switch (e.code) {
           // 左
           case "ArrowLeft":
+            this.$store.commit("setCurrentKey", "left");
             this.move(-1, 0);
             break;
           // 上
           case "ArrowUp":
-            // this.move(0, -1)
+            this.$store.commit("setCurrentKey", "up");
             this.rotate();
             break;
           // 右
           case "ArrowRight":
+            this.$store.commit("setCurrentKey", "right");
             this.move(1, 0);
             break;
           // 下
           case "ArrowDown":
+            this.$store.commit("setCurrentKey", "down");
             this.checkBound();
             this.move(0, 1);
             break;
@@ -545,7 +546,6 @@ export default {
       this.$nextTick(function () {
         // 获取所有 块元素外面的 16 宫格
         let allNodes = document.querySelector("#container").childNodes;
-        console.log(allNodes);
         // 遍历该行中的所有列
         for (let i = 0; i < this.COL_COUNT; i++) {
           // 1.删除该行中所有的块元素
@@ -599,20 +599,6 @@ export default {
     // 暂停
     pause() {
       this.isPause = !this.isPause;
-      // if (!this.isPause) {
-      //   this.isPause = !this.isPause;
-      //   clearInterval(this.mInterval);
-      //   // this.loading = this.$loading.service({
-      //   //   lock: true,
-      //   //   text: "作弊暂停中！！（可移动）",
-      //   //   spinner: "el-icon-loading",
-      //   //   background: "rgba(0, 0, 0, 0.7)",
-      //   // });
-      //   return;
-      // }
-      // // this.loading.close();
-      // this.isPause = !this.isPause;
-      // this.autoDown();
     },
 
     // 判断游戏结束
@@ -681,9 +667,9 @@ $bgc-color: #cbe4f8;
 $bgc-deep-color: #8cb4b7;
 $base-color: #58b1b6;
 /* 游戏区域大小 */
-$game-width: 336px;
-$game-height: 576px;
-$game-item: 24px;
+$game-width: 280px;
+$game-height: 480px;
+$game-item: 20px;
 .tetrispop {
   // background-color: #50a09d;
   background: linear-gradient(to right, #50a09d, #78d4d1, #50a09d);
@@ -752,6 +738,7 @@ $game-item: 24px;
     justify-content: center;
     border-radius: 10px;
     font-size: 14px;
+    user-select: none;
   }
 }
 </style>

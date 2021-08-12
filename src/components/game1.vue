@@ -85,7 +85,17 @@ export default {
       return this.score * this.level;
     },
   },
-  watch: {},
+  watch: {
+    // 判断游戏结束
+    gameOver(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.$refs.gameover.popshow();
+          this.scoreShow();
+        });
+      }
+    },
+  },
   mounted() {
     // 刚开始获取浏览器的宽高
     this.popWidth = parseInt(

@@ -28,6 +28,8 @@
         :class="throughWall.isTurn ? 'rotateX' : 'rotateY'"
         class="xuanzhuan"
       ></div>
+      <!-- 暂停遮罩层 -->
+      <div v-show="isPause" class="paseMask">暂停中 §(*￣▽￣*)§</div>
     </div>
     <div class="score">
       <span>得分: {{ score }}</span>
@@ -135,9 +137,9 @@ export default {
       isWall: true,
       // 定时开启墙的定时器
       wallTimer: null,
-      wallTime: 5,
+      wallTime: 10,
       // 控制墙的显示与隐藏的间隔时间
-      wallInterval: 5,
+      wallInterval: 10,
       // 蛇穿墙的位置
       throughWall: { x: 0, y: 0, isTurn: false },
       // 判断是否穿墙
@@ -338,7 +340,7 @@ export default {
     },
     // 画蛋
     drawEgg() {
-      this.ctx.fillStyle = "#a2ea99";
+      this.ctx.fillStyle = "#adff2f";
       this.ctx.fillRect(this.egg.x, this.egg.y, this.egg.size, this.egg.size);
     },
     // 更新蛇的位置
@@ -393,18 +395,22 @@ export default {
           case "ArrowLeft":
             // 判断不能反方向
             if (this.direction == "right") break;
+            this.$store.commit("setCurrentKey", "left");
             this.move(-this.size * 1, 0);
             break;
           case "ArrowUp":
             if (this.direction == "down") break;
+            this.$store.commit("setCurrentKey", "up");
             this.move(0, -this.size * 1);
             break;
           case "ArrowRight":
             if (this.direction == "left") break;
+            this.$store.commit("setCurrentKey", "right");
             this.move(this.size * 1, 0);
             break;
           case "ArrowDown":
             if (this.direction == "up") break;
+            this.$store.commit("setCurrentKey", "down");
             this.move(0, this.size * 1);
             break;
           case "Space":
@@ -514,6 +520,22 @@ export default {
   }
   .wallHide {
     animation: wallHide 0.5s ease forwards;
+  }
+  // 暂停遮罩层
+  .paseMask {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 14px;
+    user-select: none;
   }
 }
 .xuanzhuan {
