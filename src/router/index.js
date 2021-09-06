@@ -15,7 +15,11 @@ const routes = [
   },
   {
     path: '/home',
-    component: () => import('../views/Home.vue')
+    component: () => import('../views/Home.vue'),
+    children: [{
+      path: '/home/community',
+      component: () => import('../views/Community.vue'),
+    }]
   }
 ]
 

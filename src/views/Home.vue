@@ -38,6 +38,13 @@
             @click="getMusic"
           ></span>
         </el-tooltip>
+        <!-- 社区 -->
+        <el-tooltip effect="dark" content="社区" placement="bottom">
+          <span
+            @click="toCommunity"
+            class="community iconfont icon-menu_sqhd2"
+          ></span>
+        </el-tooltip>
         <!-- 登录 / 退出 -->
         <el-popover
           placement="top"
@@ -58,6 +65,7 @@
       </div>
     </el-header>
     <el-container>
+      <!-- 侧边栏 -->
       <el-aside :class="isFold ? 'asideNotFold' : 'asideFold'">
         <el-button
           class="foldingBtn"
@@ -83,7 +91,11 @@
           </el-tooltip>
         </vue-custom-scrollbar>
       </el-aside>
+      <!-- 主要内容区域 -->
       <el-main>
+        <!-- 评论区 -->
+        <router-view></router-view>
+
         <el-tabs
           v-model="elTabsValue"
           type="card"
@@ -103,96 +115,10 @@
       </el-main>
     </el-container>
 
-    <!-- 修改用户信息对话框 -->
-    <el-drawer
-      title="修改用户信息"
-      :visible.sync="isEditUserInfo"
-      direction="rtl"
-      :before-close="editUserInfoComplete"
-    >
-      <div class="editUserMain">
-        <div class="editUserItem">
-          <span>用户名：</span>
-          <div class="item-Input">
-            <el-input
-              v-model="userInfo.name"
-              placeholder="请输入用户名:"
-              @blur="reviseName"
-            ></el-input>
-            <p v-show="!userRules.name">用户名应在3-10位之间</p>
-          </div>
-          <el-button
-            type="primary"
-            :class="{ completeName: userRules.name }"
-            icon="el-icon-check"
-            size="mini"
-            plain
-            circle
-            @click="reviseNameOK"
-          ></el-button>
-        </div>
-        <div class="editUserItem">
-          <span>电子邮箱：</span>
-          <div class="item-Input">
-            <el-input
-              v-model="userInfo.email"
-              placeholder="请输入电子邮箱:"
-              @blur="reviseEmail"
-            ></el-input>
-            <p v-show="!userRules.email">请输入正确的电子邮箱</p>
-          </div>
-          <el-button
-            type="primary"
-            :class="{ completeName: userRules.email }"
-            icon="el-icon-check"
-            size="mini"
-            plain
-            circle
-            @click="reviseEmailOK"
-          ></el-button>
-        </div>
-        <div class="editUserItem">
-          <span>原密码：</span>
-          <div class="item-Input">
-            <el-input
-              v-model="userInfo.pass"
-              placeholder="请输入原密码:"
-              @blur="revisePass"
-            ></el-input>
-            <p v-show="!userRules.pass">原密码错误</p>
-          </div>
-          <el-button
-            type="primary"
-            :class="{ completeName: userRules.pass }"
-            icon="el-icon-check"
-            size="mini"
-            plain
-            circle
-            @click="revisePassOK"
-          ></el-button>
-        </div>
-        <div class="editUserItem">
-          <span>新密码：</span>
-          <div class="item-Input">
-            <el-input
-              v-model="userInfo.newPass"
-              placeholder="请输入新密码:"
-              @blur="newPassRules"
-            ></el-input>
-            <p v-show="!userRules.newPass">密码应在3到15位之间</p>
-          </div>
-          <el-button
-            type="primary"
-            :class="{ completeName: userRules.newPass }"
-            icon="el-icon-check"
-            size="mini"
-            plain
-            circle
-            @click="newPassOK"
-          ></el-button>
-        </div>
-      </div>
-    </el-drawer>
+    <EditUSerInfo
+      :isEditUserInfo.sync="isEditUserInfo"
+      @closeUserInfo="closeUserInfo"
+    />
 
     <!-- #region -->
     <!-- 飞机大战 -->
@@ -322,12 +248,15 @@ import axios from "axios";
 
 import GameItem from "@/components/gameItem/GameItem.vue";
 import myPop from "@/components/myPop/myPop.vue";
+import EditUSerInfo from "@/components/EditUserInfo.vue";
 import PlaneWar from "@/components/PlaneWar.vue";
 import Tetris from "@/components/Tetris.vue";
 import Snake from "@/components/Snake.vue";
 import FlyingBrid from "@/components/FlyingBrid.vue";
 import TwoFour from "@/components/2048.vue";
 import GoBang from "@/components/GoBang.vue";
+import test from "@/components/test.vue";
+import Community from "@/views/Community.vue";
 export default {
   name: "home",
   components: {
@@ -340,6 +269,9 @@ export default {
     FlyingBrid,
     TwoFour,
     GoBang,
+    EditUSerInfo,
+    Community,
+    test,
   },
   props: {},
   data() {
@@ -369,18 +301,6 @@ export default {
       musicUrl: "",
       // 修改用户信息弹出层
       isEditUserInfo: false,
-      userInfo: {
-        name: "",
-        email: "",
-        pass: "",
-        newPass: "",
-      },
-      userRules: {
-        name: true,
-        email: true,
-        pass: true,
-        newPass: true,
-      },
     };
   },
   computed: {
@@ -400,6 +320,7 @@ export default {
   },
   mounted() {},
   methods: {
+    //#region
     // 获取游戏数据
     getGameList() {},
     // 点击了游戏
@@ -545,6 +466,20 @@ export default {
         this.$refs.audio.pause();
       }
     },
+    //#endregion
+
+    // 跳转到社区
+    toCommunity() {
+      let curPath = this.$route.path;
+      let toPath = "";
+      if (curPath == "/home") {
+        toPath = "/home/community";
+      } else {
+        toPath = "/home";
+      }
+      this.$router.push(toPath);
+    },
+
     // 退出登录
     logout() {
       this.$confirm("确定要退出当前账号吗？", "退出登录", {
@@ -562,84 +497,15 @@ export default {
         })
         .catch(() => {});
     },
-    //#region
+
     // 点击了用户信息
     editUser() {
       this.isEditUserInfo = true;
     },
-    // 点击修改用户信息弹出层外部
-    editUserInfoComplete() {
-      this.$confirm("确认要保存修改吗？", "修改个人信息", {
-        center: true,
-        iconClass: "el-icon-user",
-      })
-        .then(() => {
-          this.isEditUserInfo = false;
-        })
-        .catch(() => {
-          this.isEditUserInfo = false;
-        });
+    // 关闭用户信息弹出层
+    closeUserInfo() {
+      this.isEditUserInfo = false;
     },
-    // 修改姓名
-    reviseName() {
-      let name = this.userInfo.name;
-      // 名字长度少于3位多于10位
-      if (name.length < 3 || name.length > 10) {
-        this.userRules.name = false;
-        return;
-      }
-      // 名字验证通过
-      this.userRules.name = true;
-    },
-    reviseNameOK() {
-      if (!this.userRules.name) {
-        return;
-      }
-      console.log("重命名");
-    },
-    // 修改电子邮箱
-    reviseEmail() {
-      //  \w 等价于 [^A-Za-z0-9_]
-      var myreg = /^([\w+\.])+@\w+([.]\w+)+$/;
-      // /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
-
-      if (!myreg.test(this.userInfo.email)) {
-        this.userRules.email = false;
-        return;
-      }
-      this.userRules.email = true;
-    },
-    reviseEmailOK() {
-      if (!this.userRules.email) {
-        return;
-      }
-      console.log("修改邮箱成功");
-    },
-    // 修改密码
-    revisePass() {},
-    revisePassOK() {
-      if (!this.userRules.pass) {
-        return;
-      }
-      console.log("修改密码成功");
-    },
-    // 新密码
-    newPassRules() {
-      let newPass = this.userInfo.newPass;
-      if (newPass.length < 3 || newPass.length > 15) {
-        this.userRules.newPass = false;
-        return;
-      }
-      this.userRules.newPass = true;
-    },
-    newPassOK() {
-      // 原密码 和 新密码 的验证规则通过后才可以修改
-      if (!this.userRules.pass || !this.userRules.newPass) {
-        return;
-      }
-      console.log("重置密码");
-    },
-    //#endregion
   },
 };
 </script>
@@ -776,9 +642,13 @@ export default {
     justify-content: flex-end;
     .iconfont {
       margin-left: 20px;
-      color: #aaa;
+      color: #c2c2c2;
       font-size: 32px;
       cursor: pointer;
+    }
+    .community {
+      font-size: 28px;
+      color: #957ee6;
     }
     .music {
       color: #7052db;
@@ -832,6 +702,7 @@ export default {
   }
 }
 .el-main {
+  position: relative;
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   color: #fff;
   ::v-deep .el-tabs {
@@ -914,44 +785,6 @@ export default {
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-// 修改用户信息对话框
-.editUserMain {
-  padding: 20px 25px;
-  .editUserItem {
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    span {
-      display: inline-block;
-      font-size: 16px;
-      white-space: nowrap;
-      color: #333;
-    }
-    .item-Input {
-      position: relative;
-      flex: 1;
-      margin-right: 10px;
-      p {
-        position: absolute;
-        left: 2px;
-        bottom: -16px;
-        font-size: 12px;
-        margin: 0;
-        color: red;
-      }
-    }
-    .el-button {
-      width: 28px;
-      height: 28px;
-    }
-    .completeName {
-      background: #409eff;
-      color: #fff;
-    }
   }
 }
 </style>
