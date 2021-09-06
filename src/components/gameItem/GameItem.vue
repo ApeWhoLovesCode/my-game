@@ -1,6 +1,7 @@
 <template>
   <div class="gameItem">
-    <img :src="gameItem.img" alt="" />
+    <!-- <img :src="gameItem.img" alt="" /> -->
+    <el-image :src="gameItem.img" fit="scale-down" />
     <div class="title">{{ gameItem.name }}</div>
   </div>
 </template>
@@ -31,7 +32,7 @@ $width: 100%; /* 声明宽度变量 */
   cursor: pointer;
   position: relative;
   width: $width;
-  height: 17%;
+  // height: 17%;
   /* 实现高度为宽度的75%: padding 是根据 width 来调整的 */
   // padding-bottom: 75%;
   overflow: hidden;
@@ -40,6 +41,10 @@ $width: 100%; /* 声明宽度变量 */
     display: inline-block;
     width: 100%;
     height: 100%;
+    object-fit: contain;
+  }
+  .el-image {
+    width: 100%;
   }
   .title {
     position: absolute;

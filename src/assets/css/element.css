@@ -1,0 +1,24 @@
+/* 退出登录的样式 */
+.el-popover {
+  width: 100px !important;
+  min-width: 100px;
+  opacity: 0.9;
+  padding: 10px 0;
+}
+.logout-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.userInfo {
+  margin-bottom: 10px;
+}
+.logout {
+  margin-left: 0 !important;
+}
+
+/* 登录成功的弹窗 */
+.loginNotify {
+  width: 250px;
+}

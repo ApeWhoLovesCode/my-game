@@ -83,30 +83,24 @@ export default {
   computed: {
     popWidth() {
       if (this.isPx) {
-        // setTimeout(() => {
         return this.smallBox.width + "px";
-        // }, 1000);
       } else {
         return this.width + "%";
       }
     },
     popHeight() {
       if (this.isPx) {
-        // setTimeout(() => {
         return this.smallBox.height + "px";
-        // }, 1000);
       } else {
         return this.height + "%";
       }
     },
     popPosition() {
       if (this.isPx) {
-        // setTimeout(() => {
         return {
           left: this.smallBox.left + "px",
           top: this.smallBox.top + "px",
         };
-        // }, 1000);
       } else {
         return { top: 50 + "%", left: 50 + "%" };
       }

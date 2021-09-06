@@ -7,6 +7,10 @@
 <script>
 export default {
   name: "app",
+  mounted() {
+    // 获取当前的时间段
+    this.$store.commit("getTime");
+  },
 };
 </script>
 

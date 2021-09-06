@@ -85,6 +85,21 @@ export default {
       boxWidth: 0,
       // 盒子间的间距
       boxMargin: 0,
+      // 盒子的颜色
+      boxColor: {
+        0: "#e9f8fe",
+        2: "#aae6fd",
+        4: "#81d6f8",
+        8: "#40bff1",
+        16: "#00b2f8",
+        32: "#0393cc",
+        64: "#2a88f3",
+        128: "#0c67cf",
+        256: "#0453ad",
+        512: "#042bad",
+        1024: "#780ef1",
+        2048: "#8409d6",
+      },
       // 二维数组对应里面的盒子数据
       boxArr: [],
       // 当前的按键
@@ -190,44 +205,7 @@ export default {
       // 遍历数组 辨认数组的当前值 并赋上颜色
       for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 4; j++) {
-          switch (this.boxArr[i][j]) {
-            case 0:
-              color = "#e9f8fe";
-              break;
-            case 2:
-              color = "#aae6fd";
-              break;
-            case 4:
-              color = "#81d6f8";
-              break;
-            case 8:
-              color = "#40bff1";
-              break;
-            case 16:
-              color = "#00b2f8";
-              break;
-            case 32:
-              color = "#0393cc";
-              break;
-            case 64:
-              color = "#2a88f3";
-              break;
-            case 128:
-              color = "#0c67cf";
-              break;
-            case 256:
-              color = "#0453ad";
-              break;
-            case 512:
-              color = "#042bad";
-              break;
-            case 1024:
-              color = "#780ef1";
-              break;
-            case 2048:
-              color = "#8409d6";
-              break;
-          }
+          color = this.boxColor[this.boxArr[i][j]];
           x = this.boxMargin + j * (this.boxWidth + this.boxMargin);
           y = this.boxMargin + i * (this.boxWidth + this.boxMargin);
           this.drawRect(x, y, color);

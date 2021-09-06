@@ -1,7 +1,10 @@
 <template>
   <el-container class="home">
     <el-header>
-      <div class="headerLeft">MY-GAME</div>
+      <div class="headerLeft">
+        <span class="gameName">MY-GAME</span>
+        <span class="userName">{{ timeHello }}，刘德华</span>
+      </div>
       <div class="headerCenter">
         <input class="searchInp" type="text" placeholder="Search..." />
         <el-button
@@ -11,6 +14,7 @@
         ></el-button>
       </div>
       <div class="headerRight">
+        <!-- 开 / 关方向键位特效 -->
         <el-tooltip
           effect="dark"
           content="开 / 关方向键位特效"
@@ -23,6 +27,7 @@
           >
           </el-switch>
         </el-tooltip>
+        <!-- 背景音乐 -->
         <audio ref="audio" :src="musicUrl" autoplay></audio>
         <el-tooltip effect="dark" content="播放 / 暂停歌曲" placement="bottom">
           <span
@@ -33,9 +38,23 @@
             @click="getMusic"
           ></span>
         </el-tooltip>
-        <el-tooltip effect="light" content="登录" placement="bottom">
-          <i class="iconfont icon-denglu"></i>
-        </el-tooltip>
+        <!-- 登录 / 退出 -->
+        <el-popover
+          placement="top"
+          width="160"
+          v-model="islogout"
+          trigger="hover"
+        >
+          <div class="logout-wrap">
+            <el-button class="userInfo" size="small" @click="editUser"
+              >个人信息</el-button
+            >
+            <el-button class="logout" @click="logout" size="small"
+              >退出登录</el-button
+            >
+          </div>
+          <i slot="reference" class="iconfont icon-denglu"></i>
+        </el-popover>
       </div>
     </el-header>
     <el-container>
@@ -57,6 +76,7 @@
               <div class="rules">规则：{{ item.rules }}</div>
             </div>
             <Game-item
+              :style="{ height: isFold ? '' : '17%' }"
               :gameItem="item"
               @click.native="gameItemClick(item.id)"
             />
@@ -83,8 +103,99 @@
       </el-main>
     </el-container>
 
+    <!-- 修改用户信息对话框 -->
+    <el-drawer
+      title="修改用户信息"
+      :visible.sync="isEditUserInfo"
+      direction="rtl"
+      :before-close="editUserInfoComplete"
+    >
+      <div class="editUserMain">
+        <div class="editUserItem">
+          <span>用户名：</span>
+          <div class="item-Input">
+            <el-input
+              v-model="userInfo.name"
+              placeholder="请输入用户名:"
+              @blur="reviseName"
+            ></el-input>
+            <p v-show="!userRules.name">用户名应在3-10位之间</p>
+          </div>
+          <el-button
+            type="primary"
+            :class="{ completeName: userRules.name }"
+            icon="el-icon-check"
+            size="mini"
+            plain
+            circle
+            @click="reviseNameOK"
+          ></el-button>
+        </div>
+        <div class="editUserItem">
+          <span>电子邮箱：</span>
+          <div class="item-Input">
+            <el-input
+              v-model="userInfo.email"
+              placeholder="请输入电子邮箱:"
+              @blur="reviseEmail"
+            ></el-input>
+            <p v-show="!userRules.email">请输入正确的电子邮箱</p>
+          </div>
+          <el-button
+            type="primary"
+            :class="{ completeName: userRules.email }"
+            icon="el-icon-check"
+            size="mini"
+            plain
+            circle
+            @click="reviseEmailOK"
+          ></el-button>
+        </div>
+        <div class="editUserItem">
+          <span>原密码：</span>
+          <div class="item-Input">
+            <el-input
+              v-model="userInfo.pass"
+              placeholder="请输入原密码:"
+              @blur="revisePass"
+            ></el-input>
+            <p v-show="!userRules.pass">原密码错误</p>
+          </div>
+          <el-button
+            type="primary"
+            :class="{ completeName: userRules.pass }"
+            icon="el-icon-check"
+            size="mini"
+            plain
+            circle
+            @click="revisePassOK"
+          ></el-button>
+        </div>
+        <div class="editUserItem">
+          <span>新密码：</span>
+          <div class="item-Input">
+            <el-input
+              v-model="userInfo.newPass"
+              placeholder="请输入新密码:"
+              @blur="newPassRules"
+            ></el-input>
+            <p v-show="!userRules.newPass">密码应在3到15位之间</p>
+          </div>
+          <el-button
+            type="primary"
+            :class="{ completeName: userRules.newPass }"
+            icon="el-icon-check"
+            size="mini"
+            plain
+            circle
+            @click="newPassOK"
+          ></el-button>
+        </div>
+      </div>
+    </el-drawer>
+
+    <!-- #region -->
     <!-- 飞机大战 -->
-    <!-- v-show="gamesList[0].display" -->
     <PlaneWar
       v-if="gamesList[0].begin"
       :ref="gamesList[0].ref"
@@ -179,7 +290,7 @@
       @small="small"
       @click.native="popClick(gamesList[5].id)"
     />
-
+    <!-- #endregion -->
     <!-- 方向键位 -->
     <template v-if="isKeyShow">
       <span
@@ -233,6 +344,8 @@ export default {
   props: {},
   data() {
     return {
+      // 退出的弹出层
+      islogout: false,
       // 是否是折叠状态
       isFold: false,
       // 游戏的弹出层
@@ -254,10 +367,24 @@ export default {
       // 是否放歌
       isMusic: false,
       musicUrl: "",
+      // 修改用户信息弹出层
+      isEditUserInfo: false,
+      userInfo: {
+        name: "",
+        email: "",
+        pass: "",
+        newPass: "",
+      },
+      userRules: {
+        name: true,
+        email: true,
+        pass: true,
+        newPass: true,
+      },
     };
   },
   computed: {
-    ...mapState(["currentKey"]),
+    ...mapState(["currentKey", "timeHello"]),
   },
   watch: {
     currentKey: {
@@ -273,6 +400,8 @@ export default {
   },
   mounted() {},
   methods: {
+    // 获取游戏数据
+    getGameList() {},
     // 点击了游戏
     gameItemClick(id) {
       for (let item of this.gamesList) {
@@ -416,6 +545,101 @@ export default {
         this.$refs.audio.pause();
       }
     },
+    // 退出登录
+    logout() {
+      this.$confirm("确定要退出当前账号吗？", "退出登录", {
+        confirmButtonText: "确定",
+        cancelButtonText: "不退了",
+        center: true,
+      })
+        .then(() => {
+          this.$router.push("/login");
+          this.$message({
+            type: "info",
+            message: "已退出登录",
+            duration: 1000,
+          });
+        })
+        .catch(() => {});
+    },
+    //#region
+    // 点击了用户信息
+    editUser() {
+      this.isEditUserInfo = true;
+    },
+    // 点击修改用户信息弹出层外部
+    editUserInfoComplete() {
+      this.$confirm("确认要保存修改吗？", "修改个人信息", {
+        center: true,
+        iconClass: "el-icon-user",
+      })
+        .then(() => {
+          this.isEditUserInfo = false;
+        })
+        .catch(() => {
+          this.isEditUserInfo = false;
+        });
+    },
+    // 修改姓名
+    reviseName() {
+      let name = this.userInfo.name;
+      // 名字长度少于3位多于10位
+      if (name.length < 3 || name.length > 10) {
+        this.userRules.name = false;
+        return;
+      }
+      // 名字验证通过
+      this.userRules.name = true;
+    },
+    reviseNameOK() {
+      if (!this.userRules.name) {
+        return;
+      }
+      console.log("重命名");
+    },
+    // 修改电子邮箱
+    reviseEmail() {
+      //  \w 等价于 [^A-Za-z0-9_]
+      var myreg = /^([\w+\.])+@\w+([.]\w+)+$/;
+      // /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+
+      if (!myreg.test(this.userInfo.email)) {
+        this.userRules.email = false;
+        return;
+      }
+      this.userRules.email = true;
+    },
+    reviseEmailOK() {
+      if (!this.userRules.email) {
+        return;
+      }
+      console.log("修改邮箱成功");
+    },
+    // 修改密码
+    revisePass() {},
+    revisePassOK() {
+      if (!this.userRules.pass) {
+        return;
+      }
+      console.log("修改密码成功");
+    },
+    // 新密码
+    newPassRules() {
+      let newPass = this.userInfo.newPass;
+      if (newPass.length < 3 || newPass.length > 15) {
+        this.userRules.newPass = false;
+        return;
+      }
+      this.userRules.newPass = true;
+    },
+    newPassOK() {
+      // 原密码 和 新密码 的验证规则通过后才可以修改
+      if (!this.userRules.pass || !this.userRules.newPass) {
+        return;
+      }
+      console.log("重置密码");
+    },
+    //#endregion
   },
 };
 </script>
@@ -492,19 +716,38 @@ export default {
   color: #fff;
   padding: 0 30px;
   .headerLeft {
-    width: 200px;
-    font-size: 22px;
-    color: #4f03e0;
-    font-weight: bold;
-    user-select: none;
-    cursor: pointer;
-  }
-  .headerCenter {
-    height: 35px;
+    width: 280px;
     display: flex;
     align-items: center;
+    .gameName {
+      width: 120px;
+      font-size: 21px;
+      color: #4f03e0;
+      font-weight: bold;
+      user-select: none;
+      cursor: pointer;
+    }
+    .userName {
+      padding-left: 10px;
+      width: 160px;
+      color: #f1f1f1;
+      font-size: 14px;
+      font-weight: bold;
+      user-select: none;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  .headerCenter {
+    flex: 1;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .searchInp {
-      width: 400px;
+      width: 60%;
+      min-width: 300px;
       color: #fff;
       padding: 0 15px;
       height: 100%;
@@ -527,7 +770,7 @@ export default {
     }
   }
   .headerRight {
-    width: 200px;
+    width: 280px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -671,6 +914,44 @@ export default {
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// 修改用户信息对话框
+.editUserMain {
+  padding: 20px 25px;
+  .editUserItem {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    span {
+      display: inline-block;
+      font-size: 16px;
+      white-space: nowrap;
+      color: #333;
+    }
+    .item-Input {
+      position: relative;
+      flex: 1;
+      margin-right: 10px;
+      p {
+        position: absolute;
+        left: 2px;
+        bottom: -16px;
+        font-size: 12px;
+        margin: 0;
+        color: red;
+      }
+    }
+    .el-button {
+      width: 28px;
+      height: 28px;
+    }
+    .completeName {
+      background: #409eff;
+      color: #fff;
+    }
   }
 }
 </style>
