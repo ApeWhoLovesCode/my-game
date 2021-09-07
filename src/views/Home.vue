@@ -94,8 +94,7 @@
       <!-- 主要内容区域 -->
       <el-main>
         <!-- 评论区 -->
-        <router-view></router-view>
-
+        <router-view :isCommunityShow="isCommunityShow"></router-view>
         <el-tabs
           v-model="elTabsValue"
           type="card"
@@ -255,7 +254,6 @@ import Snake from "@/components/Snake.vue";
 import FlyingBrid from "@/components/FlyingBrid.vue";
 import TwoFour from "@/components/2048.vue";
 import GoBang from "@/components/GoBang.vue";
-import test from "@/components/test.vue";
 import Community from "@/views/Community.vue";
 export default {
   name: "home",
@@ -271,7 +269,6 @@ export default {
     GoBang,
     EditUSerInfo,
     Community,
-    test,
   },
   props: {},
   data() {
@@ -301,6 +298,10 @@ export default {
       musicUrl: "",
       // 修改用户信息弹出层
       isEditUserInfo: false,
+      // 用于控制社区出来的动画
+      isCommunityShow: true,
+      // 隐藏社区路径跳转的定时器
+      hideCommunityTime: null,
     };
   },
   computed: {
@@ -325,6 +326,9 @@ export default {
     getGameList() {},
     // 点击了游戏
     gameItemClick(id) {
+      // if (this.$route.path == "/home/community") {
+      //   this.hideCommunity();
+      // }
       for (let item of this.gamesList) {
         if (id == item.id) {
           item.begin = true;
@@ -471,13 +475,20 @@ export default {
     // 跳转到社区
     toCommunity() {
       let curPath = this.$route.path;
-      let toPath = "";
       if (curPath == "/home") {
-        toPath = "/home/community";
+        this.isCommunityShow = true;
+        this.$router.push("/home/community");
       } else {
-        toPath = "/home";
+        this.isCommunityShow = false;
+        this.hideCommunity();
       }
-      this.$router.push(toPath);
+    },
+    //隐藏社区
+    hideCommunity() {
+      clearTimeout(this.hideCommunityTime);
+      this.hideCommunityTime = setTimeout(() => {
+        this.$router.push("/home");
+      }, 800);
     },
 
     // 退出登录
@@ -705,6 +716,7 @@ export default {
   position: relative;
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   color: #fff;
+  overflow: hidden;
   ::v-deep .el-tabs {
     height: 100%;
     /* 游戏标签页 */

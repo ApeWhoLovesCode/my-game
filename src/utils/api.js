@@ -8,5 +8,9 @@ export default {
   // 登录
   login(params) {
     return http.post(`/api/user/login/${params.name}/${params.pass}`)
+  },
+  // 获取评论数据
+  getCommentList() {
+    return http.get(`/api/games/listComment`)
   }
 }

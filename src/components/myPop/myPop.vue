@@ -1,5 +1,4 @@
 <template>
-  <!-- <div v-if="isShow" class="pop-wrap"> -->
   <div
     v-if="isShow"
     v-show="!isHide"
@@ -7,7 +6,7 @@
     :style="{
       width: popWidth,
       height: popHeight,
-      zIndex: outside ? '101' : '100',
+      zIndex: outside ? '101' : '90',
       minHeight: minHeight + 'px',
       top: popPosition.top,
       left: popPosition.left,
@@ -29,7 +28,6 @@
     </div>
     <slot></slot>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>
@@ -121,11 +119,11 @@ export default {
       this.$nextTick(() => {
         // var pop = document.querySelector(".popContent"); // 先获取飞机会获取错误
         var pop = this.$refs.mypop;
-        // console.log(pop);
         // 1.当我们鼠标按下，就获得鼠标在盒子内的坐标
         var currentPageX;
         var currentPageY;
         pop.addEventListener("mousedown", (e) => {
+          console.log("myPop mousedown");
           // 处于游戏状态 和 缩小状态无法移动
           if (this.playState || this.isPx) {
             return;
@@ -159,10 +157,7 @@ export default {
         });
       });
     },
-    // 弹出层移动的方法
-
     small() {
-      // this.isHide = true;
       this.$emit("small");
     },
     popshow() {

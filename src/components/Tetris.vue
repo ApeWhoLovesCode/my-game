@@ -335,6 +335,7 @@ export default {
     // 监听用户的键盘事件
     onKeyDown() {
       document.onkeydown = (e) => {
+        console.log(e);
         switch (e.code) {
           // 左
           case "ArrowLeft":

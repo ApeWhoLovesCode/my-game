@@ -22,8 +22,8 @@
       <div
         v-show="isThroughWall"
         :style="{
-          top: throughWall.y - 10 + 'px',
-          left: throughWall.x - 10 + 'px',
+          top: throughWall.y - 9 + 'px',
+          left: throughWall.x - 9 + 'px',
         }"
         :class="throughWall.isTurn ? 'rotateX' : 'rotateY'"
         class="xuanzhuan"
