@@ -651,11 +651,23 @@ export default {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    .el-switch {
+      padding: 5px;
+      border-radius: 8px;
+    }
+    .el-switch:hover {
+      background: rgba(#84828d, 0.3);
+    }
     .iconfont {
-      margin-left: 20px;
+      margin-left: 12px;
       color: #c2c2c2;
       font-size: 32px;
       cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 5px;
+    }
+    .iconfont:hover {
+      background: rgba(#84828d, 0.3);
     }
     .community {
       font-size: 28px;

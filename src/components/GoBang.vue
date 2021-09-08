@@ -284,33 +284,55 @@ export default {
     },
     // 检查是否胜利了
     checkChess(i, j, chess) {
-      let x = 1,
-        y = 1,
-        z = 1,
-        z2 = 1;
+      let x = { sum: 1, isL: true, isR: true },
+        y = { sum: 1, isL: true, isR: true },
+        z = { sum: 1, isL: true, isR: true },
+        z2 = { sum: 1, isL: true, isR: true };
       for (let a = 1; a < 5; a++) {
         // 处理行
-        j + a < 15 && this.chessArr[i][j + a] == chess ? x++ : "";
-        j - a >= 0 && this.chessArr[i][j - a] == chess ? x++ : "";
+        x.isL && j + a < 15 && this.chessArr[i][j + a] == chess
+          ? x.sum++
+          : (x.isL = false);
+        x.isR && j - a >= 0 && this.chessArr[i][j - a] == chess
+          ? x.sum++
+          : (x.isR = false);
+
         // 处理列
-        i + a < 15 && this.chessArr[i + a][j] == chess ? y++ : "";
-        i - a >= 0 && this.chessArr[i - a][j] == chess ? y++ : "";
+        y.isL && i + a < 15 && this.chessArr[i + a][j] == chess
+          ? y.sum++
+          : (y.isL = false);
+        y.isR && i - a >= 0 && this.chessArr[i - a][j] == chess
+          ? y.sum++
+          : (y.isR = false);
         // 处理斜边1 '\'
-        i + a < 15 && j + a < 15 && this.chessArr[i + a][j + a] == chess
-          ? z++
-          : "";
-        i - a >= 0 && j - a >= 0 && this.chessArr[i - a][j - a] == chess
-          ? z++
-          : "";
+        z.isL &&
+        i + a < 15 &&
+        j + a < 15 &&
+        this.chessArr[i + a][j + a] == chess
+          ? z.sum++
+          : (z.isL = false);
+        z.isR &&
+        i - a >= 0 &&
+        j - a >= 0 &&
+        this.chessArr[i - a][j - a] == chess
+          ? z.sum++
+          : (z.isR = false);
         // 处理斜边2 '/'
-        i + a < 15 && j + a < 15 && this.chessArr[i + a][j - a] == chess
-          ? z2++
-          : "";
-        i - a >= 0 && j - a >= 0 && this.chessArr[i - a][j + a] == chess
-          ? z2++
-          : "";
+        z2.isL &&
+        i + a < 15 &&
+        j - a >= 0 &&
+        this.chessArr[i + a][j - a] == chess
+          ? z2.sum++
+          : (z2.isL = false);
+        z2.isR &&
+        i - a >= 0 &&
+        j + a < 15 &&
+        this.chessArr[i - a][j + a] == chess
+          ? z2.sum++
+          : (z2.isR = false);
       }
-      if (x >= 5 || y >= 5 || z >= 5 || z2 >= 5) return true;
+      // console.log("x: ", x.sum, "y: ", y.sum, "z: ", z.sum, "z2: ", z2.sum);
+      if (x.sum >= 5 || y.sum >= 5 || z.sum >= 5 || z2.sum >= 5) return true;
       return false;
     },
     // 弹出层移动的回调

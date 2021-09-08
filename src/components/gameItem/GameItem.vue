@@ -36,7 +36,7 @@ $width: 100%; /* 声明宽度变量 */
   /* 实现高度为宽度的75%: padding 是根据 width 来调整的 */
   // padding-bottom: 75%;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   img {
     display: inline-block;
     width: 100%;
@@ -53,12 +53,12 @@ $width: 100%; /* 声明宽度变量 */
     left: 0;
     height: 20px;
     line-height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     // background: rgba(0, 0, 0, 0.5);
     background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.8),
-      rgba(0, 0, 0, 0.05)
+      rgba(0, 0, 0, 0.9),
+      rgba(0, 0, 0, 0.01)
     );
     text-align: center;
     text-overflow: ellipsis;
