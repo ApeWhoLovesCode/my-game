@@ -123,7 +123,7 @@ export default {
         var currentPageX;
         var currentPageY;
         pop.addEventListener("mousedown", (e) => {
-          console.log("myPop mousedown");
+          // console.log("myPop mousedown");
           // 处于游戏状态 和 缩小状态无法移动
           if (this.playState || this.isPx) {
             return;

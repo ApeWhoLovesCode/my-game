@@ -12,6 +12,9 @@
         <el-form-item label="用户名：" prop="username">
           <el-input v-model="registerForm.username"></el-input>
         </el-form-item>
+        <el-form-item label="手机号：" prop="phone">
+          <el-input type="phone" v-model="registerForm.phone"></el-input>
+        </el-form-item>
         <el-form-item label="密码：" prop="pass">
           <el-input type="password" v-model="registerForm.pass"></el-input>
         </el-form-item>
@@ -33,6 +36,15 @@ export default {
   name: "",
   props: {},
   data() {
+    var validatePhone = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入手机号"));
+      } else if (!/^1(3|4|5|6|7|8|9)\d{9}$/.test(value)) {
+        callback(new Error("手机号码格式错误"));
+      } else {
+        callback();
+      }
+    };
     var validatePass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入密码"));
@@ -56,6 +68,7 @@ export default {
       // 注册的数据表单
       registerForm: {
         username: "",
+        phone: "",
         pass: "",
         checkPass: "",
       },
@@ -71,6 +84,7 @@ export default {
             trigger: "blur",
           },
         ],
+        phone: [{ validator: validatePhone, trigger: "blur" }],
         // 验证密码是否合法
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
@@ -85,19 +99,20 @@ export default {
     determine() {
       this.$refs.registerForm.validate(async (valid) => {
         if (valid) {
-          let name = this.registerForm.username;
-          let pass = this.registerForm.pass;
-          const { data } = await api.register({ name, pass });
+          let username = this.registerForm.username;
+          let password = this.registerForm.pass;
+          let phone = this.registerForm.phone;
+          const { data } = await api.register({ username, password, phone });
           if (data.code == 200) {
             this.$message({
-              message: "注册成功",
+              type: "success",
+              message: data.data.message,
               duration: "2000",
             });
             this.$router.push("/login");
-          }
-          if (data.code == 0) {
+          } else {
             this.$message({
-              message: data.message,
+              message: data.data.message,
               duration: "2000",
             });
           }
@@ -147,7 +162,7 @@ export default {
     height: 60%;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 40%;
     transform: translate(-50%, -40%);
     // 用户名和密码样式
     .el-form-item__label {

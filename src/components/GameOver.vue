@@ -1,59 +1,73 @@
 <template>
-  <myPop
+  <fixedPop
     class="gameoverPop"
     ref="gameoverPop"
-    :close="false"
-    :width="width"
-    :height="height"
   >
     <div class="title">{{ gameName }}&emsp;游戏结束</div>
     <div class="content">
-      <slot></slot>
-      <!-- <div class="contentItem">
-          消灭敌军: <i>{{ gOScore.score }}</i>
-        </div>
-        <div v-if="this.gOScore.score == this.score" class="contentItem">
-          逃脱敌军: <i>{{ gOScore.bugNum }}</i>
-        </div>
-        <div v-if="this.gOScore.bugNum == this.bugNum" class="contentItem">
-          总得分: <i>{{ gOScore.final }}</i>
-        </div> -->
+      <div class="gameOverScore">
+        <slot></slot>
+      </div>
+      <!-- 排行榜 -->
+      <div class="rankList">
+        <div class="rankName">排行榜</div>
+        <vue-custom-scrollbar class="scrollRank">
+          <div class="rankItem" v-for="item in rankList" :key="item.id">
+            <img :src="item.avatar"></img>
+            <div class="rankItemData">
+              <div class="rankUser">{{item.name}}</div>
+              <div class="rankScore">得分：{{item["g" + gameId]}}</div>
+            </div>
+          </div>
+        </vue-custom-scrollbar>
+      </div>
     </div>
     <div class="bottom">
       <el-button class="cancel" @click="exit">退出游戏</el-button>
       <el-button class="confirm" @click="restart">重新开始</el-button>
     </div>
-  </myPop>
+  </fixedPop>
 </template>
 
 <script>
-import myPop from "@/components/myPop/myPop.vue";
+import fixedPop from "@/components/fixedPop/fixedPop.vue";
+import vueCustomScrollbar from "vue-custom-scrollbar";
+import "vue-custom-scrollbar/dist/vueScrollbar.css";
+import api from "../utils/api.js";
 export default {
   name: "gameover",
   components: {
-    myPop,
+    fixedPop,
+    vueCustomScrollbar,
   },
   props: {
-    width: {
-      type: Number,
-      defalut: 50,
-    },
-    height: {
-      type: Number,
-      defalut: 50,
-    },
     gameName: {
       type: String,
       defalut: "小游戏",
     },
+    gameId: {
+      type: Number,
+      require: true,
+    },
   },
   data() {
-    return {};
+    return {
+      // 排行榜数据
+      rankList: [],
+    };
   },
   computed: {},
   watch: {},
-  created() {},
+  mounted() {
+    this.getRankList();
+  },
   methods: {
+    // 发起网络请求，获取排行榜数据
+    async getRankList() {
+      let gameId = "g" + this.gameId;
+      const { data } = await api.getRankList({ gameId });
+      this.rankList = data.data;
+    },
     popshow() {
       this.$refs.gameoverPop.popshow();
     },
@@ -73,35 +87,72 @@ export default {
 /* 这里不要 scoped 因为插槽的样式要用到 */
 .gameoverPop {
   .title {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    text-align: center;
+    margin-top: 10px;
     font-size: 15px;
     font-weight: bold;
   }
   .content {
-    position: absolute;
-    left: 10%;
-    top: 50%;
-    transform: translateY(-50%);
-    .gameoverItem {
-      opacity: 0;
-      font-size: 14px;
-      margin-bottom: 5px;
-      animation: score 0.3s linear forwards;
-      i {
-        color: #e9e932;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    .gameOverScore {
+      flex: 2;
+      .gameoverItem {
+        opacity: 0;
+        font-size: 15px;
+        margin-bottom: 10px;
+        animation: score 0.4s linear 0.3s forwards;
+        i {
+          color: #e9e932;
+        }
+      }
+      .gameoverItem:last-child {
+        margin-bottom: 0;
+      }
+    }
+    .rankList {
+      flex: 3;
+      user-select: none;
+      .rankName {
+        user-select: none;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+      .scrollRank {
+        margin: auto;
+        width: 100%;
+        height: 200px;
+      }
+      .rankItem {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        img {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          overflow: hidden;
+          margin-right: 10px;
+        }
+        .rankItemData {
+          font-size: 13px;
+        }
+      }
+      .rankItem:last-child {
+        margin-bottom: 0;
       }
     }
   }
   .bottom {
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
+    margin: 10px 30px;
+    text-align: right;
     .cancel {
       padding: 10px;
       font-size: 13px;
+      margin-right: 10px;
     }
     .confirm {
       padding: 10px;
@@ -118,11 +169,11 @@ export default {
 @keyframes score {
   0% {
     opacity: 0;
-    transform: translateX(-50%);
+    transform: translateX(-50px);
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(30px);
   }
 }
 </style>

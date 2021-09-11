@@ -31,9 +31,8 @@
     <GameOver
       v-if="theGameOver"
       ref="gameover"
-      :width="isPx ? 30 : 90"
-      :height="30"
       :gameName="gameItem.name"
+      :gameId="gameItem.id"
       @exit="exit"
       @restart="restart"
     >
@@ -335,7 +334,6 @@ export default {
     // 监听用户的键盘事件
     onKeyDown() {
       document.onkeydown = (e) => {
-        console.log(e);
         switch (e.code) {
           // 左
           case "ArrowLeft":
@@ -625,6 +623,8 @@ export default {
       this.$nextTick(() => {
         // 2.弹出游戏结束对话框
         this.$refs.gameover.popshow();
+        // 发送游戏结束事件，上传最高分到数据库
+        this.$emit("updateScore", this.gameItem.id, this.score);
         this.scoreShow();
       });
     },

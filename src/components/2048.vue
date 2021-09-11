@@ -17,8 +17,8 @@
     <GameOver
       v-if="gameOver"
       ref="gameover"
-      :width="isPx ? 30 : 65"
-      :height="35"
+      :gameName="gameItem.name"
+      :gameId="gameItem.id"
       @exit="exit"
       @restart="restart"
     >
@@ -143,6 +143,8 @@ export default {
       if (val) {
         this.$nextTick(() => {
           this.$refs.gameover.popshow();
+          // 发送游戏结束事件，上传最高分到数据库
+          this.$emit("updateScore", this.gameItem.id, this.score);
           this.scoreShow();
         });
       }

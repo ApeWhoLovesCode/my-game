@@ -46,9 +46,8 @@
     <!-- 游戏结束弹出层 -->
     <GameOver
       ref="gameover"
-      :width="isPx ? 30 : 65"
-      :height="35"
       :gameName="gameItem.name"
+      :gameId="gameItem.id"
       @exit="exit"
       @restart="restart"
     >
@@ -397,6 +396,8 @@ export default {
       document.removeEventListener("mousemove", this.mouseMove, false);
 
       this.$refs.gameover.popshow();
+      // 发送游戏结束事件，上传最高分到数据库
+      this.$emit("updateScore", this.gameItem.id, this.score);
       this.scoreShow();
     },
     // 得分分段式显示

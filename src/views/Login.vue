@@ -37,7 +37,7 @@ export default {
     return {
       loginForm: {
         username: "admin",
-        password: "123456",
+        password: "123",
       },
       // 表单验证规则
       rules: {
@@ -88,13 +88,15 @@ export default {
     // 登录
     login() {
       this.$refs.loginForm.validate(async (valid) => {
-        let name = this.loginForm.username;
-        let pass = this.loginForm.password;
-        const { data } = await api.login({ name, pass });
+        let username = this.loginForm.username;
+        let password = this.loginForm.password;
+        const { data } = await api.login({ username, password });
+        // 将用户信息保存到 vuex 和本地中
+        this.$store.commit("setUserInfo", data.data);
         if (data.code == 200) {
           this.$notify({
             title: "登录成功",
-            message: `${this.timeHello}，刘德华`,
+            message: `${this.timeHello}，${data.data.name}`,
             type: "success",
             duration: 1500,
             customClass: "loginNotify",

@@ -3,14 +3,30 @@ import http from "./http.js"
 export default {
   // 注册
   register(params) {
-    return http.get(`/api/user/register/${params.name}/${params.pass}`)
+    return http.post(`/api/users/register`, params)
   },
   // 登录
   login(params) {
-    return http.post(`/api/user/login/${params.name}/${params.pass}`)
+    return http.post(`/api/users/login`, params)
   },
-  // 获取评论数据
-  getCommentList() {
-    return http.get(`/api/games/listComment`)
+  // 修改用户信息
+  editUser(params) {
+    return http.post(`/api/users/editUser`, params)
+  },
+  // 修改密码
+  editPass(params) {
+    return http.post(`/api/users/editPassword`, params)
+  },
+  // 获取游戏数据
+  getGameData() {
+    return http.get('api/games/gameData')
+  },
+  // 上传得分
+  updateScore(params) {
+    return http.post(`/api/games/setScore`, params)
+  },
+  // 获取排行榜数据
+  getRankList(gameId) {
+    return http.get('api/games/rankList', gameId)
   }
 }

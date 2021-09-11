@@ -18,7 +18,8 @@ import {
   Popover,
   Notification,
   Drawer,
-  Image
+  Image,
+  Avatar
 } from 'element-ui'
 
 Vue.use(Button)
@@ -36,6 +37,7 @@ Vue.use(FormItem)
 Vue.use(Popover)
 Vue.use(Drawer)
 Vue.use(Image)
+Vue.use(Avatar)
 
 // 需要全局挂载 挂载到Vue的原型上
 Vue.prototype.$message = Message

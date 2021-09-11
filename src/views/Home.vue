@@ -3,7 +3,7 @@
     <el-header>
       <div class="headerLeft">
         <span class="gameName">MY-GAME</span>
-        <span class="userName">{{ timeHello }}，刘德华</span>
+        <span class="userName">{{ timeHello }}，{{ gameUser.name }}</span>
       </div>
       <div class="headerCenter">
         <input class="searchInp" type="text" placeholder="Search..." />
@@ -134,6 +134,7 @@
       @gameoverFn="gameoverFn"
       @small="small"
       @click.native="popClick(gamesList[0].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- 俄罗斯方块 -->
     <Tetris
@@ -150,6 +151,7 @@
       @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[1].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- 贪吃蛇 -->
     <Snake
@@ -166,6 +168,7 @@
       @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[2].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- 飞翔的小鸟 -->
     <FlyingBrid
@@ -182,6 +185,7 @@
       @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[3].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- 2048 -->
     <TwoFour
@@ -198,6 +202,7 @@
       @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[4].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- 五子棋 -->
     <GoBang
@@ -214,6 +219,7 @@
       @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[5].id)"
+      @updateScore="updateScore(arguments)"
     />
     <!-- #endregion -->
     <!-- 方向键位 -->
@@ -244,6 +250,7 @@ import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
 import { mapState } from "vuex";
 import axios from "axios";
+import api from "../utils/api";
 
 import GameItem from "@/components/gameItem/GameItem.vue";
 import myPop from "@/components/myPop/myPop.vue";
@@ -280,6 +287,7 @@ export default {
       // 游戏的弹出层
       gamePops: [],
       // 游戏的渲染
+      // gamesList: gameData,
       gamesList: gameData,
       // 游戏标签页的值
       elTabsValue: "",
@@ -305,7 +313,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["currentKey", "timeHello"]),
+    ...mapState(["gameUser", "currentKey", "timeHello"]),
   },
   watch: {
     currentKey: {
@@ -319,11 +327,21 @@ export default {
       },
     },
   },
-  mounted() {},
+  mounted() {
+    this.getGameList();
+  },
   methods: {
     //#region
     // 获取游戏数据
-    getGameList() {},
+    async getGameList() {
+      const { data: gameData } = await api.getGameData();
+      gameData.data.forEach((item) => {
+        item.begin = false;
+        item.delay = false;
+        item.outside = false;
+      });
+      this.gamesList = gameData.data;
+    },
     // 点击了游戏
     gameItemClick(id) {
       // if (this.$route.path == "/home/community") {
@@ -468,6 +486,18 @@ export default {
       } else {
         // 暂停
         this.$refs.audio.pause();
+      }
+    },
+    // 游戏结束上传得分
+    async updateScore(params) {
+      let userId = this.gameUser.id;
+      let gameId = "g" + params[0];
+      let score = params[1];
+      const { data } = await api.updateScore({ userId, gameId, score });
+      if (data.code == 200) {
+        console.log("最高分");
+      } else {
+        console.log("不是最高分");
       }
     },
     //#endregion

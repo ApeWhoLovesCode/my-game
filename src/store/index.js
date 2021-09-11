@@ -1,14 +1,24 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { getStorage, setStorage } from '@/utils/storage'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 当前登录用户的登录状态 (token等数据) 从本地读取 
+    gameUser: getStorage('gameUser'),
+    // 键盘事件
     currentKey: '',
-    timeHello: '你好'
+    timeHello: '你好',
   },
   mutations: {
+    setUserInfo(state, data) {
+      state.gameUser = data
+      // 为了防止页面刷新数据丢失 我们还需要把数据放到本地存储中 是为了持久化数据
+      setStorage('gameUser', data)
+    },
+    // 用于键盘事件特效
     setCurrentKey(state, key) {
       state.currentKey = key
     },
