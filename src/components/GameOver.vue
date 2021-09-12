@@ -9,7 +9,7 @@
         <slot></slot>
       </div>
       <!-- 排行榜 -->
-      <div class="rankList">
+      <div class="rankList" v-if="isRankList">
         <div class="rankName">排行榜</div>
         <vue-custom-scrollbar class="scrollRank">
           <div class="rankItem" v-for="item in rankList" :key="item.id">
@@ -43,11 +43,15 @@ export default {
   props: {
     gameName: {
       type: String,
-      defalut: "小游戏",
+      default: "小游戏",
     },
     gameId: {
       type: Number,
       require: true,
+    },
+    isRankList: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

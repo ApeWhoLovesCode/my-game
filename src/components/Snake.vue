@@ -386,7 +386,7 @@ export default {
         // 2.弹出游戏结束对话框
         this.$refs.gameover.popshow();
         // 发送游戏结束事件，上传最高分到数据库
-        this.$emit("updateScore", this.gameItem.id, this.score);
+        this.$emit("updateScore", this.gameItem.id, this.finalScore);
         this.scoreShow();
       });
     },

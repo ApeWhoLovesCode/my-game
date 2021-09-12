@@ -27,6 +27,7 @@
       ref="gameover"
       :gameName="gameItem.name"
       :gameId="gameItem.id"
+      :isRankList="false"
       @exit="exit"
       @restart="restart"
     >
@@ -120,7 +121,7 @@ export default {
         this.$nextTick(() => {
           this.$refs.gameover.popshow();
           // 发送游戏结束事件，上传最高分到数据库
-          this.$emit("updateScore", this.gameItem.id, this.score);
+          // this.$emit("updateScore", this.gameItem.id, this.score);
           this.scoreShow();
         });
       }
@@ -430,10 +431,11 @@ export default {
   }
   // 游戏结束里面的图片
   .gameover-img {
-    position: relative;
-    left: 50%;
     display: flex;
+    justify-content: center;
     align-content: center;
+    transform: translateX(-30px);
+    margin: 15px 0;
     img {
       width: 40px;
       height: 40px;

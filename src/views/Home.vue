@@ -60,7 +60,10 @@
               >退出登录</el-button
             >
           </div>
-          <i slot="reference" class="iconfont icon-denglu"></i>
+          <!-- <i slot="reference" class="iconfont icon-denglu"></i> -->
+          <div slot="reference" class="avatar">
+            <img :src="gameUser.avatar" />
+          </div>
         </el-popover>
       </div>
     </el-header>
@@ -528,7 +531,10 @@ export default {
         cancelButtonText: "不退了",
         center: true,
       })
-        .then(() => {
+        .then(async () => {
+          // 清除用户 后端和前端的 登录状态
+          await api.logout(); // 后端
+          this.$store.commit("setUserInfo", null); // 前端
           this.$router.push("/login");
           this.$message({
             type: "info",
@@ -705,6 +711,23 @@ export default {
     }
     .music {
       color: #7052db;
+    }
+    .avatar {
+      display: inline-block;
+      margin-left: 12px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 5px;
+    }
+    .avatar:hover {
+      background: rgba(#84828d, 0.3);
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
     }
   }
 }

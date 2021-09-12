@@ -9,6 +9,9 @@ export default {
   login(params) {
     return http.post(`/api/users/login`, params)
   },
+  logout() {
+    return http.get(`/api/users/logout`)
+  },
   // 修改用户信息
   editUser(params) {
     return http.post(`/api/users/editUser`, params)

@@ -176,7 +176,7 @@ export default {
         this.$nextTick(() => {
           this.$refs.gameover.popshow();
           // 发送游戏结束事件，上传最高分到数据库
-          this.$emit("updateScore", this.gameItem.id, this.score);
+          this.$emit("updateScore", this.gameItem.id, this.finalScore);
           this.scoreShow();
         });
       }
@@ -230,7 +230,7 @@ export default {
             }
           })();
         });
-      }, 500);
+      }, 300);
     },
     run(imgObj) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

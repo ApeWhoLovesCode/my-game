@@ -24,6 +24,7 @@
         <el-form-item>
           <el-button type="primary" @click="determine">确认注册</el-button>
           <el-button @click="resetForm">重置</el-button>
+          <el-button @click="back">返回登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -119,6 +120,10 @@ export default {
         }
       });
     },
+    // 返回登录页面
+    back() {
+      this.$router.push("/login");
+    },
     // 点击重置按钮，重置表单
     resetForm() {
       this.$refs.registerForm.resetFields();
@@ -138,7 +143,7 @@ export default {
 @media screen and (min-width: 1000px) {
   .content {
     width: 600px;
-    height: 600px;
+    height: 550px;
   }
 }
 .register {
@@ -182,9 +187,11 @@ export default {
     .el-form-item__content {
       display: flex;
       justify-content: center;
-      margin-left: 0 !important;
+      margin-left: 50 !important;
+      .el-button {
+        margin-right: 15px;
+      }
       .el-button:first-child {
-        margin-right: 50px;
         background: #4c44a5;
         border-color: #4c44a5;
       }

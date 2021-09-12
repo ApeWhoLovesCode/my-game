@@ -39,7 +39,11 @@ export default {
   computed: {},
   watch: {},
   mounted() {
-    this.getCommentList();
+    // this.getCommentList();
+    this.$message({
+      message: "后端不太会弄",
+      duration: "2000",
+    });
   },
   methods: {
     async getCommentList() {
