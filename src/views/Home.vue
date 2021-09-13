@@ -135,6 +135,7 @@
       :isPx="gamesList[0].small == 1 && gamesList[0].delay"
       :smallBox="gamesList[0].small == 1 ? smallBox : {}"
       @gameoverFn="gameoverFn"
+      @restartFn="restartFn"
       @small="small"
       @click.native="popClick(gamesList[0].id)"
       @updateScore="updateScore(arguments)"
@@ -244,6 +245,8 @@
         class="direction iconfont icon-102fangxiang_xiangxia"
       ></span>
     </template>
+
+    <EnterTx v-if="isEnterTx" />
   </el-container>
 </template>
 
@@ -265,6 +268,7 @@ import FlyingBrid from "@/components/FlyingBrid.vue";
 import TwoFour from "@/components/2048.vue";
 import GoBang from "@/components/GoBang.vue";
 import Community from "@/views/Community.vue";
+import EnterTx from "@/components/EnterTx.vue";
 export default {
   name: "home",
   components: {
@@ -279,6 +283,7 @@ export default {
     GoBang,
     EditUSerInfo,
     Community,
+    EnterTx,
   },
   props: {},
   data() {
@@ -313,6 +318,8 @@ export default {
       isCommunityShow: true,
       // 隐藏社区路径跳转的定时器
       hideCommunityTime: null,
+      // 进入界面的特效
+      isEnterTx: true,
     };
   },
   computed: {
@@ -332,6 +339,10 @@ export default {
   },
   mounted() {
     this.getGameList();
+    // 1s 后销毁 进入界面的特效
+    setTimeout(() => {
+      this.isEnterTx = false;
+    }, 1000);
   },
   methods: {
     //#region
@@ -498,9 +509,9 @@ export default {
       let score = params[1];
       const { data } = await api.updateScore({ userId, gameId, score });
       if (data.code == 200) {
-        console.log("最高分");
+        // console.log("最高分");
       } else {
-        console.log("不是最高分");
+        // console.log("不是最高分");
       }
     },
     //#endregion

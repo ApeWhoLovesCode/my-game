@@ -45,6 +45,7 @@
     </div>
     <!-- 游戏结束弹出层 -->
     <GameOver
+      v-if="theGameOver"
       ref="gameover"
       :gameName="gameItem.name"
       :gameId="gameItem.id"
@@ -100,6 +101,7 @@ export default {
       playState: false,
       // 游戏结束
       playGameOver: true,
+      theGameOver: false,
       // 子弹
       allBullet: [],
       // 子弹速度
@@ -387,6 +389,7 @@ export default {
     },
     // 双击游戏结束
     clearAll() {
+      this.theGameOver = true;
       clearTimeout(this.clickTime);
       this.stopBulletShot();
       this.playState = false;
@@ -395,10 +398,12 @@ export default {
       // 移除飞机跟随鼠标移动事件
       document.removeEventListener("mousemove", this.mouseMove, false);
 
-      this.$refs.gameover.popshow();
-      // 发送游戏结束事件，上传最高分到数据库
-      this.$emit("updateScore", this.gameItem.id, this.finalScore);
-      this.scoreShow();
+      this.$nextTick(() => {
+        this.$refs.gameover.popshow();
+        // 发送游戏结束事件，上传最高分到数据库
+        this.$emit("updateScore", this.gameItem.id, this.finalScore);
+        this.scoreShow();
+      });
     },
     // 得分分段式显示
     scoreShow() {
@@ -429,6 +434,7 @@ export default {
     },
     // 退出游戏
     exit() {
+      this.stopBulletShot();
       this.$refs.planeWarPop.popclose();
       this.score = 0;
       this.bugNum = 0;
@@ -439,12 +445,14 @@ export default {
     },
     // 重新开始游戏
     restart() {
-      this.$refs.gameover.popclose();
+      this.stopBulletShot();
+      this.$emit("restartFn", this.gameItem.id);
+      /* this.$refs.gameover.popclose();
       this.score = 0;
       this.bugNum = 0;
       for (let key of Object.keys(this.gOScore)) {
         this.gOScore[key] = 0;
-      }
+      } */
     },
     // 点击了关闭按钮的回调
     popClose() {

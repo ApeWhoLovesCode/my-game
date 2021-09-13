@@ -11,13 +11,16 @@
       <!-- 排行榜 -->
       <div class="rankList" v-if="isRankList">
         <div class="rankName">排行榜</div>
-        <vue-custom-scrollbar class="scrollRank">
-          <div class="rankItem" v-for="item in rankList" :key="item.id">
+        <vue-custom-scrollbar class="scrollRank" :settings="settings" >
+          <div class="scorllWrap">
+          <div class="rankItem" v-for="(item,index) in rankList" :key="item.id">
+            <div class="ranking">{{index + 1}}</div>
             <img :src="item.avatar"></img>
             <div class="rankItemData">
-              <div class="rankUser">{{item.name}}</div>
-              <div class="rankScore">得分：{{item["g" + gameId]}}</div>
+              <div class="rankUser rankItemText">{{item.name}}</div>
+              <div class="rankScore rankItemText">得分：{{item["g" + gameId]}}</div>
             </div>
+          </div>
           </div>
         </vue-custom-scrollbar>
       </div>
@@ -58,12 +61,19 @@ export default {
     return {
       // 排行榜数据
       rankList: [],
+      settings: {
+        suppressScrollY: false,
+        suppressScrollX: true,
+        wheelPropagation: false,
+      },
     };
   },
   computed: {},
   watch: {},
   mounted() {
-    this.getRankList();
+    setTimeout(() => {
+      this.getRankList();
+    }, 100);
   },
   methods: {
     // 发起网络请求，获取排行榜数据
@@ -125,15 +135,25 @@ export default {
         margin-bottom: 5px;
         text-align: center;
       }
+
       .scrollRank {
         margin: auto;
         width: 100%;
         height: 200px;
       }
+      .scorllWrap {
+        animation: rank 0.7s linear forwards;
+      }
       .rankItem {
         display: flex;
         align-items: center;
         height: 40px;
+        .ranking {
+          width: 20px;
+          font-size: 14px;
+          text-align: center;
+          margin-right: 5px;
+        }
         img {
           width: 30px;
           height: 30px;
@@ -143,6 +163,16 @@ export default {
         }
         .rankItemData {
           font-size: 13px;
+        }
+        .rankItemText {
+          width: 150px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          margin-bottom: 2px;
+        }
+        .rankItemText:last-child {
+          margin-bottom: 0;
         }
       }
       .rankItem:last-child {
@@ -178,6 +208,16 @@ export default {
   100% {
     opacity: 1;
     transform: translateX(30px);
+  }
+}
+@keyframes rank {
+  0% {
+    opacity: 0;
+    transform: translateX(150px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
   }
 }
 </style>
