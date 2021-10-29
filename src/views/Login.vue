@@ -14,10 +14,10 @@
         class="login_form"
       >
         <el-form-item label="用户名：" prop="username">
-          <el-input v-model="loginForm.username"></el-input>
+          <el-input ref="username" v-model="loginForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码：" prop="password">
-          <el-input type="password" v-model="loginForm.password"></el-input>
+          <el-input ref="password" type="password" v-model="loginForm.password" @keyup.enter.native="login"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="login()">登录</el-button>
@@ -72,6 +72,11 @@ export default {
   },
   watch: {},
   mounted() {
+    if(this.loginForm.username === '') {
+      this.$refs.username.focus()
+    } else if(this.loginForm.password === '') {
+      this.$refs.password.focus()
+    }
     setTimeout(() => {
       this.canvasOperation();
     }, 100);
