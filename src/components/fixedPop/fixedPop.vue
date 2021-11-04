@@ -38,6 +38,7 @@ export default {
         var pop = this.$refs.fixedPop;
         // 1.当我们鼠标按下，就获得鼠标在盒子内的坐标
         pop.addEventListener("mousedown", (e) => {
+          e.stopPropagation()
           // 处于游戏状态 和 缩小状态无法移动
           if (this.playState || this.isPx) {
             return;

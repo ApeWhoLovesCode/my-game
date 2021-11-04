@@ -62,7 +62,8 @@
           </div>
           <!-- <i slot="reference" class="iconfont icon-denglu"></i> -->
           <div slot="reference" class="avatar">
-            <img :src="gameUser.avatar" />
+            <img v-if="gameUser.avatar" :src="gameUser.avatar" />
+            <img v-else src="@/assets/img/user.png" alt="">
           </div>
         </el-popover>
       </div>

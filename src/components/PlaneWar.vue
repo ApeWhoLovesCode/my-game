@@ -214,8 +214,17 @@ export default {
     },
     // 监听得分，增加臭虫和子弹
     score(val, oldval) {
-      if (parseInt(val / 100) != parseInt(oldval / 100)) {
-        this.enemySpeed++;
+      if (parseInt(val / 30) !== parseInt(oldval / 30)) {
+        if(this.enemyComeTime <= 100) return
+        this.enemySpeed++
+        this.enemyComeTime -= 50
+      } 
+      if (parseInt(val / 50) !== parseInt(oldval / 50)) {
+        if(this.bulletMoveTime <= 50) return
+        this.bulletMoveTime -= 50
+      } 
+      if(parseInt(val / 100) !== parseInt(oldval / 100)) {
+        this.bulletSpeed++
       }
     },
     gameItem: {
@@ -290,14 +299,11 @@ export default {
           this.mouseEvent.y = event.pageY - this.windowTop;
           this.addBullet();
           this.addEnemy();
-
           // 添加飞机跟随鼠标移动事件
           document.addEventListener("mousemove", this.mouseMove);
-
           // 开启增加子弹、增加敌人定时器
           this.addBulletNumTimer();
           this.addEnemyNumTimer();
-
           this.playState = true;
           this.playGameOver = false;
         } else {

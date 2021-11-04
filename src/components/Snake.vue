@@ -114,7 +114,7 @@ export default {
         size: 0,
       },
       // 设置游戏的暂停
-      isPause: false,
+      isPause: true,
       // 游戏的定时器
       gameTimer: null,
       // canvas 对象
@@ -277,7 +277,7 @@ export default {
         this.drawSnake();
         // 监听键盘事件
         this.onKeyDown();
-        this.startGame();
+        if(!this.isPause) this.startGame();
       }, 200);
     },
     // 开启游戏
