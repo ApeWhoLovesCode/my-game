@@ -19,7 +19,12 @@ import {
   Notification,
   Drawer,
   Image,
-  Avatar
+  Avatar,
+  Table,
+  TableColumn,
+  Pagination,
+  Carousel,
+  CarouselItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -38,6 +43,11 @@ Vue.use(Popover)
 Vue.use(Drawer)
 Vue.use(Image)
 Vue.use(Avatar)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Pagination)
+Vue.use(Carousel)
+Vue.use(CarouselItem)
 
 // 需要全局挂载 挂载到Vue的原型上
 Vue.prototype.$message = Message

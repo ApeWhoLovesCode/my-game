@@ -25,6 +25,9 @@
         </el-form-item>
       </el-form>
     </div>
+    <el-tooltip effect="light" content="管理员端" placement="bottom">
+      <div class="el-icon-user-solid admin" @click="$router.push('/admin/Home')"></div>
+    </el-tooltip>
   </div>
 </template>
 
@@ -250,6 +253,14 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
+}
+.admin {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 30px;
+  color: #e6e6e6;
+  cursor: pointer;
 }
 .content {
   position: absolute;

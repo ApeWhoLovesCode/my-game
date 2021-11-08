@@ -22,3 +22,19 @@
 .loginNotify {
   width: 250px;
 }
+.el-pagination.is-background .el-pager li:not(.disabled):hover {
+  color: #a387df;
+}
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  color: #fff !important;
+  background: #8ea0f3 !important;
+}
+.el-pagination__jump {
+  color: #fff;
+}
+
+/* switch 开关 */
+.el-switch.is-checked .el-switch__core {
+  border-color: #8ea0f3;
+  background-color: #8ea0f3;
+}

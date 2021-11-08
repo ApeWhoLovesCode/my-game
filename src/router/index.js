@@ -25,6 +25,41 @@ const routes = [
       path: '/home/community',
       component: () => import('../views/Community.vue'),
     }]
+  },
+  // 管理员端
+  { path: '/admin/Login', component: () => import('../views/admin/Login.vue') },
+  {
+    path: '/admin/Home',
+    name: 'Home',
+    component: () => import('../views/admin/Home.vue'),
+    redirect: '/admin/user',
+    children: [
+      {
+        path: '/admin/welcome',
+        name: 'Welcome',
+        component: () => import('../views/admin/Welcome.vue')
+      },
+      {
+        path: '/admin/user',
+        name: 'User',
+        component: () => import('../views/admin/User.vue')
+      },
+      {
+        path: '/admin/game',
+        name: 'Game',
+        component: () => import('../views/admin/Game.vue')
+      },
+      {
+        path: '/admin/comment',
+        name: 'Comment',
+        component: () => import('../views/admin/Comment.vue')
+      },
+      {
+        path: '/admin/score',
+        name: 'Score',
+        component: () => import('../views/admin/Score.vue')
+      },
+    ]
   }
 ]
 
