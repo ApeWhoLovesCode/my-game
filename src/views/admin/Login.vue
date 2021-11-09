@@ -17,7 +17,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="login">登录</el-button>
-          <el-button @click="back">返回登录</el-button>
+          <el-button @click="back">返回用户端</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -84,7 +84,7 @@ export default {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: #332d77;
+  background: linear-gradient(to right, #24243e, #332d77, #24243e);
   min-width: 1000px;
   min-height: 600px;
 }

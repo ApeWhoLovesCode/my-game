@@ -9,9 +9,12 @@
             <div class="name">{{ scope.row.id }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="姓名" header-align="center" align="center">
+        <el-table-column label="用户信息" header-align="center" align="center">
           <template slot-scope="scope">
-            <div class="name">{{ scope.row.name }}</div>
+            <div class="userInfo">
+              <img class="user-img" :src="scope.row.avatar" />
+              <div class="name">{{ scope.row.name }}</div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="手机号" header-align="center" align="center">
@@ -81,6 +84,7 @@
 </template>
 
 <script>
+import api from "@/utils/adminApi";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
@@ -126,22 +130,15 @@ export default {
     this.getUserList()
   },
   methods: {
-    getUserList() {
-      let data = [
-        { id: 101, name: '李白1', phone: '13245678998', isBan: false },
-        { id: 102, name: '李白2', phone: '13245678998', isBan: true },
-        { id: 103, name: '李白3', phone: '13245678998', isBan: true },
-        { id: 104, name: '李白4', phone: '13245678998', isBan: false },
-        { id: 105, name: '李白5', phone: '13245678998', isBan: false },
-        { id: 106, name: '李白6', phone: '13245678998', isBan: false },
-        { id: 107, name: '李白7', phone: '13245678998', isBan: false },
-        { id: 108, name: '李白8', phone: '13245678998', isBan: false },
-        { id: 109, name: '李白9', phone: '13245678998', isBan: false },
-        { id: 110, name: '李白10', phone: '13245678998', isBan: false },
-        { id: 111, name: '李白11', phone: '13245678998', isBan: false }
-      ]
-      this.userList = data.slice(0, this.pageSize)
-      this.userListCopy = JSON.parse(JSON.stringify(data))
+    async getUserList() {
+      const {data: res} = await api.getAllUser()
+      const list = res.data
+      list.forEach(item => {
+        if(item.isBan) item.isBan = true
+        else item.isBan = false
+      })
+      this.userList = list.slice(0, this.pageSize)
+      this.userListCopy = JSON.parse(JSON.stringify(list))
     },
     // 编辑用户
     editUser(isEdit, id) {
@@ -174,7 +171,9 @@ export default {
 
     },
     // 封禁用户
-    banUser(user) {
+    async banUser(user) {
+      let isBan = user.isBan ? 1 : 0
+      await api.editUser({id: user.id, isBan})
       if(user.isBan) {
         this.messageShow(true, `${user.name}已被封号`)
       } else {
@@ -213,6 +212,19 @@ export default {
   .scroll-area {
     flex: 1;
     width: 100%;
+    .userInfo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .user-img {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+      .name {
+        font-weight: bold;
+      }
+    }
   }
   .pagination {
     text-align: center;

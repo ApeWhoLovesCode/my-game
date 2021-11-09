@@ -26,7 +26,7 @@
       </el-form>
     </div>
     <el-tooltip effect="light" content="管理员端" placement="bottom">
-      <div class="el-icon-user-solid admin" @click="$router.push('/admin/Home')"></div>
+      <div class="el-icon-user-solid admin" @click="$router.push('/admin/Login')"></div>
     </el-tooltip>
   </div>
 </template>
