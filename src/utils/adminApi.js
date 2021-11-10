@@ -15,6 +15,10 @@ export default {
   getAllUser() {
     return http.get(`/${api}/admin/users/getAllUser`)
   },
+  // 获取单个用户信息
+  getUser(params) {
+    return http.post(`/${api}/admin/users/getUser`,params)
+  },
   // 修改用户信息
   editUser(params) {
     return http.post(`/${api}/admin/users/editUser`, params)

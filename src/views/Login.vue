@@ -96,27 +96,29 @@ export default {
     // 登录
     login() {
       this.$refs.loginForm.validate(async (valid) => {
-        let username = this.loginForm.username;
-        let password = this.loginForm.password;
-        const { data } = await api.login({ username, password });
-        // 将用户信息保存到 vuex 和本地中
-        this.$store.commit("setUserInfo", data.data);
-        if (data.code == 200) {
-          this.$notify({
-            title: "登录成功",
-            message: `${this.timeHello}，${data.data.name}`,
-            type: "success",
-            duration: 1500,
-            customClass: "loginNotify",
-          });
-          this.$router.push("/home");
-        } else {
-          this.$message({
-            type: "error",
-            message: "用户名或密码错误",
-            duration: "2000",
-          });
-        }
+        if(valid) {
+          let username = this.loginForm.username;
+          let password = this.loginForm.password;
+          const { data } = await api.login({ username, password });
+          // 将用户信息保存到 vuex 和本地中
+          this.$store.commit("setUserInfo", data.data);
+          if (data.code == 200) {
+            this.$notify({
+              title: "登录成功",
+              message: `${this.timeHello}，${data.data.name}`,
+              type: "success",
+              duration: 1500,
+              customClass: "loginNotify",
+            });
+            this.$router.push("/home");
+          } else {
+            this.$message({
+              type: "error",
+              message: "用户名或密码错误",
+              duration: "2000",
+            });
+          }
+        } else {}
       });
     },
     // 注册

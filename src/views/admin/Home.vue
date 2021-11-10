@@ -16,6 +16,7 @@
 <script>
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
+import {mapState} from 'vuex'
 export default {
   components: {
     vueCustomScrollbar
@@ -25,8 +26,14 @@ export default {
       tabsList: [{tab: '用户管理', path: '/admin/user'},{tab: '游戏管理', path: '/admin/game'},{tab: '评论管理', path: '/admin/comment'},{tab: '得分管理', path: '/admin/score'}],
     }
   },
-  computed: {},
-  created() {},
+  computed: {
+    ...mapState(['adminUser'])
+  },
+  created() {
+    if(this.adminUser.token !== 'lhh_token_07') {
+      this.$router.push('/admin/login')
+    }
+  },
   mounted() {},
   methods: {},
 }
