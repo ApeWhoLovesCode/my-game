@@ -1,19 +1,12 @@
 <template>
   <div class="page-admin">
     <div class="content">
-      <el-form
-        :model="adminForm"
-        status-icon
-        :rules="rules"
-        ref="adminForm"
-        label-width="110px"
-        class="register_from"
-      >
+      <el-form :model="adminForm" status-icon :rules="rules" ref="adminForm" label-width="110px" class="register_from">
         <el-form-item label="用户名：" prop="username">
           <el-input v-model="adminForm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码：" prop="pass">
-          <el-input type="password" v-model="adminForm.pass"></el-input>
+        <el-form-item label="密码：" prop="password">
+          <el-input type="password" v-model="adminForm.password"  @keyup.enter.native="login"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="login">登录</el-button>
@@ -25,59 +18,75 @@
 </template>
 
 <script>
+import adminApi from '@/utils/adminApi'
 export default {
-  name: "",
+  name: '',
   props: {},
   data() {
     return {
-      // 注册的数据表单
+      // 登录
       adminForm: {
-        username: "",
-        phone: "",
-        pass: "",
-        checkPass: "",
+        username: '',
+        password: '',
       },
       // 表单验证规则
       rules: {
         // 验证用户名是否合法
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
+          { required: true, message: '请输入用户名', trigger: 'blur' },
           {
             min: 3,
             max: 10,
-            message: "用户名应在3-10位之间",
-            trigger: "blur",
+            message: '用户名应在3-10位之间',
+            trigger: 'blur',
           },
         ],
-        pass: [
-          { required: true, message: "请输入登录密码", trigger: "blur" },
+        password: [
+          { required: true, message: '请输入登录密码', trigger: 'blur' },
           {
             min: 3,
             max: 15,
-            message: "密码应在3到15位之间",
-            trigger: "blur",
+            message: '密码应在3到15位之间',
+            trigger: 'blur',
           },
         ],
       },
-    };
+    }
   },
   computed: {},
   watch: {},
   mounted() {},
   methods: {
     login() {
-      this.$router.push('/admin/home')
+      this.$refs.adminForm.validate(async (valid) => {
+        if (valid) {
+          try {
+            const { username, password } = this.adminForm
+            const { data: res } = await adminApi.login({ username, password })
+            console.log(res)
+            if (res.code === 200) {
+              this.$message({ type: 'success', message: '登录成功' })
+              this.$store.commit('setAdminUser', res.data)
+              this.$router.push('/admin/home')
+            } else {
+              this.$message({ type: 'error', message: res.data })
+            }
+          } catch (error) {
+            console.log('error', error)
+          }
+        } else {}
+      })
     },
     // 返回登录页面
     back() {
-      this.$router.push("/login");
+      this.$router.push('/login')
     },
     // 点击重置按钮，重置表单
     resetForm() {
-      this.$refs.adminForm.resetFields();
+      this.$refs.adminForm.resetFields()
     },
   },
-};
+}
 </script>
 <style lang='scss' scoped>
 .page-admin {
@@ -113,7 +122,7 @@ export default {
       color: #525157;
     }
     .el-form-item__label::before {
-      content: "";
+      content: '';
     }
     // 错误提示
     .el-form-item__error {

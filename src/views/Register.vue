@@ -15,8 +15,8 @@
         <el-form-item label="手机号：" prop="phone">
           <el-input type="phone" v-model="registerForm.phone"></el-input>
         </el-form-item>
-        <el-form-item label="密码：" prop="pass">
-          <el-input type="password" v-model="registerForm.pass"></el-input>
+        <el-form-item label="密码：" prop="password">
+          <el-input type="password" v-model="registerForm.password"></el-input>
         </el-form-item>
         <el-form-item label="确认密码：" prop="checkPass">
           <el-input type="password" v-model="registerForm.checkPass"></el-input>
@@ -59,7 +59,7 @@ export default {
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.registerForm.pass) {
+      } else if (value !== this.registerForm.password) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -70,7 +70,7 @@ export default {
       registerForm: {
         username: "",
         phone: "",
-        pass: "",
+        password: "",
         checkPass: "",
       },
       // 表单验证规则
@@ -87,7 +87,7 @@ export default {
         ],
         phone: [{ validator: validatePhone, trigger: "blur" }],
         // 验证密码是否合法
-        pass: [{ validator: validatePass, trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
       },
     };
@@ -100,9 +100,7 @@ export default {
     determine() {
       this.$refs.registerForm.validate(async (valid) => {
         if (valid) {
-          let username = this.registerForm.username;
-          let password = this.registerForm.pass;
-          let phone = this.registerForm.phone;
+          const {username, password, phone} = this.registerForm;
           const { data } = await api.register({ username, password, phone });
           if (data.code == 200) {
             this.$message({

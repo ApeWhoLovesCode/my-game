@@ -12,7 +12,7 @@
         <el-table-column label="用户信息" header-align="center" align="center">
           <template slot-scope="scope">
             <div class="userInfo">
-              <img class="user-img" :src="scope.row.avatar" />
+              <!-- <img class="user-img" :src="scope.row.avatar" /> -->
               <div class="name">{{ scope.row.name }}</div>
             </div>
           </template>
@@ -54,7 +54,7 @@
         <el-form
           ref="UserForm"
           :model="addUserList"
-          :rules="userRule"
+          :rules="addUserRule"
           label-width="90px"
           hide-required-asterisk
           class="addUserListForm"
@@ -66,11 +66,11 @@
             <el-input v-model="addUserList.phone" class="popInput" maxlength="11" show-word-limit placeholder="请输入手机号" />
           </el-form-item>
           <template v-if="!isEdit">
-            <el-form-item label="密码：" prop="pass">
-              <el-input v-model="addUserList.pass" type="password" class="popInput" maxlength="15"  placeholder="请输入用户姓名" />
+            <el-form-item label="密码：" prop="password">
+              <el-input v-model="addUserList.password" type="password" class="popInput" maxlength="15"  placeholder="请输入用户密码" />
             </el-form-item>
             <el-form-item label="确认密码：" prop="checkPass">
-              <el-input v-model="addUserList.checkPass" type="password" class="popInput" maxlength="15"  placeholder="请输入手机号" />
+              <el-input v-model="addUserList.checkPass" type="password" class="popInput" maxlength="15"  placeholder="请再次确认密码" />
             </el-form-item>
           </template>
           <el-form-item>
@@ -84,7 +84,8 @@
 </template>
 
 <script>
-import api from "@/utils/adminApi";
+import adminApi from "@/utils/adminApi";
+import api from "@/utils/api";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
@@ -108,8 +109,8 @@ export default {
       userListCopy: [],
       pageNum: 1,
       pageSize: 10,
-      addUserList: [],
-      userRule: {
+      addUserList: {},
+      addUserRule: {
         name: [
             { required: true, message: '请输入名字', trigger: 'blur' },
             { min: 3, max: 10, message: '名字长度应在3 - 10位之间', trigger: 'blur' }
@@ -131,14 +132,19 @@ export default {
   },
   methods: {
     async getUserList() {
-      const {data: res} = await api.getAllUser()
-      const list = res.data
-      list.forEach(item => {
-        if(item.isBan) item.isBan = true
-        else item.isBan = false
-      })
-      this.userList = list.slice(0, this.pageSize)
-      this.userListCopy = JSON.parse(JSON.stringify(list))
+      try {
+        const {data: res} = await adminApi.getAllUser()
+        const list = res.data
+        list.forEach(item => {
+          if(item.isBan) item.isBan = true
+          else item.isBan = false
+        })
+        let num = (this.pageNum - 1) * this.pageSize
+        this.userList = list.slice(num, this.pageSize + num)
+        this.userListCopy = JSON.parse(JSON.stringify(list))
+      } catch (error) {
+        console.log('error', error)
+      }
     },
     // 编辑用户
     editUser(isEdit, id) {
@@ -157,11 +163,49 @@ export default {
       })
     },
     // 获取单个用户的信息
-    getEditUset(id) {
-      this.addUserList = {name: 'aaa', phone: '123456'}
+    async getEditUset(id) {
+      try {
+        const {data:res} = await adminApi.getUser({id})
+        if(res.code === 200) {
+          this.addUserList = res.data
+        }
+      } catch (error) {
+        this.messageShow(false, `获取该用户失败`)
+      }
     },
     save() {
-
+      this.$refs.UserForm.validate(async (valid) => {
+        if(valid) {
+          if(!this.isEdit) {
+            try {
+              const {name: username, password, phone} = this.addUserList;
+              const {data:res} = await api.register({ username, password, phone })
+              if(res.code === 200) {
+                this.messageShow(true, `用户新增成功`)
+                this.pageNum = 1
+                this.pageSize = 10
+                this.getUserList()
+              }
+            } catch (error) {
+              this.messageShow(false, `用户新增失败`)
+            }
+          } else {
+            try {
+              const {id, name: username, phone} = this.addUserList
+              const {data: res} = await adminApi.editUser({id, username, phone})
+              console.log(res)
+              if(res.code === 200) {
+                this.messageShow(true, `修改成功`)
+                this.getUserList()
+              }
+            } catch (error) {
+              this.messageShow(false, `修改失败`)
+            }
+          }
+          console.log('save')
+          this.$refs.myPopRef.popclose()
+        }
+      })
     },
     cancel() {
       this.$refs.myPopRef.popclose()
@@ -173,7 +217,7 @@ export default {
     // 封禁用户
     async banUser(user) {
       let isBan = user.isBan ? 1 : 0
-      await api.editUser({id: user.id, isBan})
+      await adminApi.editUser({id: user.id, isBan})
       if(user.isBan) {
         this.messageShow(true, `${user.name}已被封号`)
       } else {
@@ -194,10 +238,10 @@ export default {
     },
     messageShow(isSuccess, msg) {
       if (isSuccess) {
-        this.$message({ type: 'success', message: `${msg}` })
+        this.$message({ type: 'success', message: `${msg}`, duration: 1000 })
         // this.getUserList()
       } else {
-        this.$message({ type: 'error', message: `${msg}` })
+        this.$message({ type: 'error', message: `${msg}`, duration: 1000 })
       }
     },
   },
