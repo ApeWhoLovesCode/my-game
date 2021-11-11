@@ -85,7 +85,7 @@ service.interceptors.response.use(response => {
     if (JSON.stringify(error).includes('timeout')) {
       Message.error('服务器响应超时，请刷新当前页')
     }
-    error.message = '用户不存在'
+    error.message = '服务器出现了点问题，请稍后再试吧'
   }
 
   Message.error(error.message)

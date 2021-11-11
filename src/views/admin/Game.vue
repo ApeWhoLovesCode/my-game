@@ -13,14 +13,14 @@
             <div class="name">{{ scope.row.name }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="游戏介绍" header-align="center" align="center">
+        <el-table-column label="游戏规则" header-align="center" align="center">
           <template slot-scope="scope">
-            <div class="name">{{ scope.row.introduction }}</div>
+            <div class="rules">{{ scope.row.rules }}</div>
           </template>
         </el-table-column>
         <el-table-column label="上架 / 下架" header-align="center" align="center">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.isBan" @change="banGame(scope.row)" />
+            <el-switch v-model="scope.row.isban" @change="banGame(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="修改游戏信息" header-align="center" align="center">
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import adminApi from "@/utils/adminApi";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
@@ -80,7 +81,7 @@ export default {
       gameList: [],
       gameListCopy: [],
       pageNum: 1,
-      pageSize: 5,
+      pageSize: 10,
       editGameList: {},
       gameRule: {
         name: [
@@ -101,18 +102,21 @@ export default {
     this.getGameList()
   },
   methods: {
-    getGameList() {
-      let data = [
-        { id: 101, introduction: '阿达哒哒哒', name: '贪吃蛇', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 102, introduction: '阿达哒哒哒', name: '俄罗斯方块', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 103, introduction: '阿达哒哒哒', name: '2048', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 104, introduction: '阿达哒哒哒', name: '五子棋', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 105, introduction: '阿达哒哒哒', name: '飞翔的小鸟', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 106, introduction: '阿达哒哒哒', name: '飞机大战', img: require('@/assets/img/logo.png'), isBan: true },
-        { id: 107, introduction: '阿达哒哒哒', name: '英雄联盟', img: require('@/assets/img/logo.png'), isBan: false }
-      ]
-      this.gameList = data.slice(0, this.pageSize)
-      this.gameListCopy = JSON.parse(JSON.stringify(data))
+    async getGameList() {
+      try {
+        const {data: res} = await adminApi.getGameList()
+        const list = res.data
+        list.forEach(item => {
+          if(item.isban) item.isban = true
+          else item.isban = false
+        })
+        let num = (this.pageNum - 1) * this.pageSize
+        console.log(res)
+        this.gameList = list.slice(num, this.pageSize + num)
+        this.gameListCopy = JSON.parse(JSON.stringify(list))
+      } catch (error) {
+        console.log("error", error)
+      }
     },
     banGame() {
 
@@ -163,12 +167,10 @@ export default {
   flex-direction: column;
   height: 100%;
   .scroll-area {
-    display: flex;
-    align-items: center;
     flex: 1;
     width: 100%;
     .game-img {
-      width: 50px;
+      width: auto;
       height: 50px;
     }
     .name {

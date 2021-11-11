@@ -31,7 +31,7 @@
           <template slot-scope="scope">
             <div class="delete">
               <el-button type="primary" icon="el-icon-edit" @click="editUser(true, scope.row.id)" circle></el-button>
-              <el-button type="danger" icon="el-icon-delete" @click="deleteUser(scope.row.id)" circle></el-button>
+              <el-button type="danger" icon="el-icon-delete" @click="deleteUser(scope.row)" circle></el-button>
             </div>
           </template>
         </el-table-column>
@@ -104,6 +104,25 @@ export default {
         callback()
       }
     }
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.addUserList.checkPass !== "") {
+          this.$refs.UserForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.addUserList.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       userList: [],
       userListCopy: [],
@@ -115,7 +134,9 @@ export default {
             { required: true, message: '请输入名字', trigger: 'blur' },
             { min: 3, max: 10, message: '名字长度应在3 - 10位之间', trigger: 'blur' }
           ],
-        phone: [{ validator: phoneValidator, trigger: 'blur' }]
+        phone: [{ validator: phoneValidator, trigger: 'blur' }],
+        password: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
       },
       // 用于判断是 "编辑状态" 还是 "新增状态" 使用弹出层
       isEdit: false
@@ -211,8 +232,20 @@ export default {
       this.$refs.myPopRef.popclose()
     },
     // 删除用户
-    deleteUser() {
-
+    deleteUser(user) {
+      this.$confirm('您确定要删除该用户吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async() => {
+          const {data: res} = await adminApi.deleteUser({id: user.id})
+          if(res.code === 200) {
+            this.messageShow(true, `${user.name}已被删除`)
+            this.pageNum = 1
+            this.pageSize = 10
+            this.getUserList()
+          }
+        }).catch(() => {});
     },
     // 封禁用户
     async banUser(user) {
