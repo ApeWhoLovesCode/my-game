@@ -20,7 +20,14 @@
         </el-table-column>
         <el-table-column label="上架 / 下架" header-align="center" align="center">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.isban" @change="banGame(scope.row)" />
+            <el-switch 
+              v-model="scope.row.isban" 
+              active-text="下架" 
+              inactive-text="上架"  
+              active-color="#b18ef3" 
+              inactive-color="#8ea0f3" 
+              @change="banGame(scope.row)" 
+            />
           </template>
         </el-table-column>
         <el-table-column label="修改游戏信息" header-align="center" align="center">
@@ -40,7 +47,7 @@
         @current-change="curSizeChange"
       />
     </div>
-    <adminPop ref="myPopRef" title="编辑游戏信息" >
+    <adminPop ref="myPopRef" title="编辑游戏信息" :height="1" >
       <div class="gamepop-wrap">
         <el-form
           ref="gameForm"
@@ -51,10 +58,10 @@
           class="editgameListForm"
         >
           <el-form-item label="游戏名称：" prop="name">
-            <el-input v-model="editGameList.name" class="popInput" maxlength="10" show-word-limit placeholder="请输入用户姓名" />
+            <el-input v-model="editGameList.name" class="popInput" maxlength="10" show-word-limit placeholder="请输入游戏名称" />
           </el-form-item>
-          <el-form-item label="游戏介绍：" prop="introduction">
-            <el-input v-model="editGameList.introduction" maxlength="100" show-word-limit type="textarea" class="popInput" placeholder="请输入手机号" />
+          <el-form-item label="游戏规则：" prop="rules">
+            <el-input v-model="editGameList.rules" :rows="3" maxlength="255" show-word-limit type="textarea" class="popInput" placeholder="请输入游戏规则" />
           </el-form-item>
           <el-form-item>
             <el-button @click="cancel">取消</el-button>
@@ -85,12 +92,12 @@ export default {
       editGameList: {},
       gameRule: {
         name: [
-            { required: true, message: '请输入游戏名字', trigger: 'blur' },
+            { required: true, message: '游戏名称不能为空', trigger: 'blur' },
             { min: 1, max: 15, message: '名字长度应在1 - 15位之间', trigger: 'blur' }
         ],
-        introduction:[
+        rules:[
           { required: true, message: '请输入游戏简介', trigger: 'blur' },
-          { min: 1, max: 100, message: '游戏简介长度不得超过100', trigger: 'blur' }
+          { min: 1, max: 255, message: '游戏简介长度不得超过255', trigger: 'blur' }
         ]
       }
     };
@@ -111,18 +118,23 @@ export default {
           else item.isban = false
         })
         let num = (this.pageNum - 1) * this.pageSize
-        console.log(res)
         this.gameList = list.slice(num, this.pageSize + num)
         this.gameListCopy = JSON.parse(JSON.stringify(list))
       } catch (error) {
         console.log("error", error)
       }
     },
-    banGame() {
-
+    async banGame(game) {
+      let isban = game.isban ? 1 : 0
+      await adminApi.editGame({id: game.id, isban})
+      if(game.isban) {
+        this.messageShow(true, `${game.name}已下架`)
+      } else {
+        this.messageShow(true, `${game.name}已上架`)
+      }
     },
     editGame(id) {
-      this.getEditGameList()
+      this.getEditGame(id)
       this.$refs.myPopRef.popshow()
       // 阻止输入框事件冒泡，防止触发弹出层的移动
       this.$nextTick(() => {
@@ -134,11 +146,24 @@ export default {
         })
       })
     },
-    getEditGameList() {
-      this.editGameList = {}
+    async getEditGame(id) {
+      const {data: res} = await adminApi.getGame({id})
+      if(res.code === 200) {
+        this.editGameList = res.data
+      }
     },
     save() {
-
+      this.$refs.gameForm.validate(async (valid) => {
+        if(valid) {
+          const {id, name, rules} = this.editGameList
+          const {data: res} = await adminApi.editGame({id, name, rules})
+          if(res.code === 200) {
+            this.messageShow(true, `修改成功`)
+            this.$refs.myPopRef.popclose()
+            this.getGameList()
+          }
+        }
+      })
     },
     cancel() {
       this.$refs.myPopRef.popclose()
@@ -151,10 +176,9 @@ export default {
     },
     messageShow(isSuccess, msg) {
       if (isSuccess) {
-        this.$message({ type: 'success', message: `${msg}成功` })
-        this.getVersionList()
+        this.$message({ type: 'success', message: `${msg}` })
       } else {
-        this.$message({ type: 'error', message: `${msg}失败` })
+        this.$message({ type: 'error', message: `${msg}` })
       }
     },
   }

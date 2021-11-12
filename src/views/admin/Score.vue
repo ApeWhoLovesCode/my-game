@@ -4,7 +4,7 @@
       <el-carousel-item class="cartItem" :class="{'noCurCard': carIndex !== index}" v-for="(item,index) in scoreList" :key="index">
         <div class="score-head">
           <img class="score-img" :src="item.img">
-          <div class="score-title">{{item.game}}</div>
+          <div class="score-title">{{item.name}}</div>
         </div>
         <vue-custom-scrollbar class="scroll-card">
           <el-table :data="item.rankList" stripe style="width: 100%">
@@ -12,7 +12,7 @@
             <el-table-column label="用户信息" header-align="center" align="center">
               <template slot-scope="scope">
                 <div class="userInfo">
-                  <img class="avatar" :src="item.img"></img>
+                  <img class="avatar" :src="scope.row.avatar"></img>
                   <div class="name">{{ scope.row.name }}</div>
                 </div>
               </template>
@@ -25,7 +25,7 @@
             <el-table-column label="封禁该成绩" header-align="center" align="center">
               <template slot-scope="scope">
                 <div>
-                  <el-switch v-model="scope.row.isBan" @change="banUser(scope.row)" />
+                  <el-switch v-model="scope.row.isBan" @change="banUser(scope.row, item)" />
                 </div>
               </template>
             </el-table-column>
@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import adminApi from "@/utils/adminApi";
+import api from "@/utils/api";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import 'vue-custom-scrollbar/dist/vueScrollbar.css'
 import adminPop from '@/components/adminPop/adminPop'
@@ -55,7 +57,7 @@ export default {
       scoreList: [],
       scoreListCopy: [],
       addUserList: [],
-      carheight: '500px',
+      carheight: '',
       carIndex: 0,
       windowTime: null
     }
@@ -74,112 +76,35 @@ export default {
     reSet() {
       this.carheight = this.$refs.pageScoreRef.offsetHeight - 20 + 'px'
     },
-    getScoreList() {
-      let data = [
-        {
-          game: '贪吃蛇',
-          img: require('@/assets/img/logo.png'),
-          rankList: [
-            { id: 101, name: '李白1', score: '66', isBan: false },
-            { id: 102, name: '李白2', score: '66', isBan: true },
-            { id: 103, name: '李白3', score: '66', isBan: true },
-            { id: 104, name: '李白4', score: '66', isBan: false },
-            { id: 105, name: '李白5', score: '66', isBan: false },
-            { id: 106, name: '李白6', score: '66', isBan: false },
-            { id: 107, name: '李白7', score: '66', isBan: false },
-            { id: 108, name: '李白8', score: '66', isBan: false },
-            { id: 109, name: '李白9', score: '66', isBan: false },
-            { id: 110, name: '李白10', score: '66', isBan: false },
-            { id: 111, name: '李白11', score: '66', isBan: false },
-            { id: 112, name: '李白12', score: '66', isBan: false },
-          ],
-        },
-        {
-          game: '俄罗斯方块',
-          img: require('@/assets/img/logo.png'),
-          rankList: [
-            { id: 101, name: '李白1', score: '66', isBan: false },
-            { id: 102, name: '李白2', score: '66', isBan: true },
-            { id: 103, name: '李白3', score: '66', isBan: true },
-            { id: 104, name: '李白4', score: '66', isBan: false },
-            { id: 105, name: '李白5', score: '66', isBan: false },
-            { id: 106, name: '李白6', score: '66', isBan: false },
-            { id: 107, name: '李白7', score: '66', isBan: false },
-            { id: 108, name: '李白8', score: '66', isBan: false },
-            { id: 109, name: '李白9', score: '66', isBan: false },
-            { id: 110, name: '李白10', score: '66', isBan: false },
-            { id: 111, name: '李白11', score: '66', isBan: false },
-            { id: 112, name: '李白12', score: '66', isBan: false },
-          ],
-        },
-        {
-          game: '飞机大战',
-          img: require('@/assets/img/logo.png'),
-          rankList: [
-            { id: 101, name: '李白1', score: '66', isBan: false },
-            { id: 102, name: '李白2', score: '66', isBan: true },
-            { id: 103, name: '李白3', score: '66', isBan: true },
-            { id: 104, name: '李白4', score: '66', isBan: false },
-            { id: 105, name: '李白5', score: '66', isBan: false },
-            { id: 106, name: '李白6', score: '66', isBan: false },
-            { id: 107, name: '李白7', score: '66', isBan: false },
-            { id: 108, name: '李白8', score: '66', isBan: false },
-            { id: 109, name: '李白9', score: '66', isBan: false },
-            { id: 110, name: '李白10', score: '66', isBan: false },
-            { id: 111, name: '李白11', score: '66', isBan: false },
-            { id: 112, name: '李白12', score: '66', isBan: false },
-          ],
-        },
-        {
-          game: '飞翔的小鸟',
-          img: require('@/assets/img/logo.png'),
-          rankList: [
-            { id: 101, name: '李白1', score: '66', isBan: false },
-            { id: 102, name: '李白2', score: '66', isBan: true },
-            { id: 103, name: '李白3', score: '66', isBan: true },
-            { id: 104, name: '李白4', score: '66', isBan: false },
-            { id: 105, name: '李白5', score: '66', isBan: false },
-            { id: 106, name: '李白6', score: '66', isBan: false },
-            { id: 107, name: '李白7', score: '66', isBan: false },
-            { id: 108, name: '李白8', score: '66', isBan: false },
-            { id: 109, name: '李白9', score: '66', isBan: false },
-            { id: 110, name: '李白10', score: '66', isBan: false },
-            { id: 111, name: '李白11', score: '66', isBan: false },
-            { id: 112, name: '李白12', score: '66', isBan: false },
-          ],
-        },
-        {
-          game: '2048',
-          img: require('@/assets/img/logo.png'),
-          rankList: [
-            { id: 101, name: '李白1', score: '66', isBan: false },
-            { id: 102, name: '李白2', score: '66', isBan: true },
-            { id: 103, name: '李白3', score: '66', isBan: true },
-            { id: 104, name: '李白4', score: '66', isBan: false },
-            { id: 105, name: '李白5', score: '66', isBan: false },
-            { id: 106, name: '李白6', score: '66', isBan: false },
-            { id: 107, name: '李白7', score: '66', isBan: false },
-            { id: 108, name: '李白8', score: '66', isBan: false },
-            { id: 109, name: '李白9', score: '66', isBan: false },
-            { id: 110, name: '李白10', score: '66', isBan: false },
-            { id: 111, name: '李白11', score: '66', isBan: false },
-            { id: 112, name: '李白12', score: '66', isBan: false },
-          ],
-        },
-      ]
-      data.forEach((item) => {
-        item['pageNum'] = 1
-        item['pageSize'] = 10
-        item['pageTotal'] = item.rankList.length
-      })
-      this.scoreListCopy = JSON.parse(JSON.stringify(data))
-      data.forEach((item) => {
-        item.rankList = item.rankList.slice(0, 10)
-      })
-      this.scoreList = data
+    async getScoreList() {
+      try {
+        const {data: res} = await adminApi.getScoreList()
+        console.log(res.data)
+        let list = res.data
+        list.forEach((item) => {
+          item['pageNum'] = 1
+          item['pageSize'] = 10
+          item['pageTotal'] = item.rankList.length
+        })
+        this.scoreListCopy = JSON.parse(JSON.stringify(list))
+        list.forEach((item) => {
+          item.rankList = item.rankList.slice(0, 10)
+        })
+        this.scoreList = list
+      } catch (error) {
+        console.log('error: ', error);
+      }
     },
     // 封禁该成绩
-    banUser(user) {},
+    async banUser(user, game) {
+      console.log(user, game)
+      await adminApi.banScore({userId: user.id, gameId: game.id, isban: user.isBan})
+      if(user.isBan) {
+        this.messageShow(true, `${user.name}的${game.name}成绩已被封禁`)
+      } else {
+        this.messageShow(true, `${user.name}的${game.name}成绩已经解封`)
+      }
+    },
     // 走马灯切换页面
     carouselChange(i) {
       this.carIndex = i
@@ -218,16 +143,19 @@ export default {
     border-radius: 5px;
     .score-head {
       display: flex;
-      height: 10%;
       align-items: center;
+      justify-content: center;
+      height: 10%;
       color: #000;
       font-size: 24px;
       font-weight: bold;
       background: #fff;
-      padding-left: 20px;
+      border-bottom: 2px solid #ececec;
+      box-sizing: border-box;
       .score-img {
+        width: auto;
         height: 80%;
-        border-radius: 50%;
+        border-radius: 5px;
       }
       .score-title {
         margin-left: 20px;
@@ -240,11 +168,12 @@ export default {
       height: 82%;
       .userInfo {
         display: flex;
-        justify-content: center;
+        align-items: center;
         .avatar {
           width: 30px;
           height: 30px;
           margin-right: 10px;
+          border-radius: 50%;
         }
       }
     }

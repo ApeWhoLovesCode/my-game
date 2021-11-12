@@ -30,7 +30,7 @@ export default {
     ...mapState(['adminUser'])
   },
   created() {
-    if(this.adminUser.token !== 'lhh_token_07') {
+    if(this.adminUser && this.adminUser.token !== 'lhh_token_07') {
       this.$router.push('/admin/login')
     }
   },

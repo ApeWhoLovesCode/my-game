@@ -263,6 +263,11 @@ export default {
   font-size: 30px;
   color: #e6e6e6;
   cursor: pointer;
+  padding: 3px;
+  border-radius: 6px;
+}
+.admin:hover {
+  background: rgba(#84828d, 0.3);
 }
 .content {
   position: absolute;

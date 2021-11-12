@@ -4,7 +4,7 @@ let api = 'api'    // 本地 vue.config.js proxy 代理
 
 export default {
   /* 
-   * 用户
+   * 用户管理
    */
   // 登录
   login(params) {
@@ -31,11 +31,27 @@ export default {
     return http.post(`/${api}/admin/users/editUser`, params)
   },
   /* 
-  * 游戏
+  * 游戏管理
   */
- // 获取游戏数据
- getGameList() {
-   return http.get(`/${api}/admin/games/getGameList`)
- },
+  // 获取游戏数据
+  getGameList() {
+    return http.get(`/${api}/admin/games/getGameList`)
+  },
+  // 获取单个游戏数据
+  getGame(params) {
+    return http.post(`/${api}/admin/games/getGame`, params)
+  },
+  editGame(params) {
+    return http.post(`/${api}/admin/games/editGame`, params)
+  },
+  /* 
+  * 得分管理
+  */
+  getScoreList() {
+    return http.get(`/${api}/admin/score/getScoreList`)
+  },
+  banScore(params) {
+    return http.post(`/${api}/admin/score/banScore`, params)
+  }
  
 }
