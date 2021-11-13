@@ -74,7 +74,8 @@ router.beforeEach((to, from, next) => {
   // 检查上面配置的 每个页面配置的 meta 信息 是否为需要登录
   if (to.meta.requiresAuth) {
     // 如果已登录，则直接通过
-    if (store.state.gameUser) {
+    let user = store.state.gameUser
+    if (user && user.gameToken === `lhh_token_${user.id}`) {
       next()
     } else {
       next({ path: '/login' })  // // 未登录则跳转至login页面

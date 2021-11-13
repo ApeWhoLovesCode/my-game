@@ -1,6 +1,7 @@
 <template>
   <div class="page-admin">
     <div class="content">
+      <div class="admin-logo iconfont icon-permission"></div>
       <el-form :model="adminForm" status-icon :rules="rules" ref="adminForm" label-width="110px" class="register_from">
         <el-form-item label="用户名：" prop="username">
           <el-input v-model="adminForm.username"></el-input>
@@ -63,7 +64,6 @@ export default {
           try {
             const { username, password } = this.adminForm
             const { data: res } = await adminApi.login({ username, password })
-            console.log(res)
             if (res.code === 200) {
               this.$message({ type: 'success', message: '登录成功' })
               this.$store.commit('setAdminUser', res.data)
@@ -72,7 +72,7 @@ export default {
               this.$message({ type: 'error', message: res.data })
             }
           } catch (error) {
-            console.log('error', error)
+            this.$message({ type: 'error', message: res.data })
           }
         } else {}
       })
@@ -89,6 +89,32 @@ export default {
 }
 </script>
 <style lang='scss' scoped>
+/* 小于1600px */
+@media screen and (max-width: 1600px) {
+  .content {
+    width: 500px;
+    height: 300px;
+    .admin-logo {
+      font-size: 90px;
+    }
+    ::v-deep .register_from {
+      padding-top: 30px;
+    }
+  }
+}
+/* 大于等于1600px */
+@media screen and (min-width: 1600px) {
+  .content {
+    width: 600px;
+    height: 360px;
+    .admin-logo {
+      font-size: 110px;
+    }
+    ::v-deep .register_from {
+      padding-top: 50px;
+    }
+  }
+}
 .page-admin {
   position: relative;
   width: 100vw;
@@ -96,59 +122,63 @@ export default {
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   min-width: 1000px;
   min-height: 600px;
-}
-.content {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 500px;
-  height: 300px;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  ::v-deep .register_from {
-    padding-top: 30px;
-    width: 80%;
-    height: 60%;
+  .content {
     position: absolute;
     left: 50%;
-    top: 40%;
-    transform: translate(-50%, -40%);
-    // 用户名和密码样式
-    .el-form-item__label {
-      text-align: right;
-      font-size: 18px;
-      user-select: none;
-      color: #525157;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    .admin-logo {
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
     }
-    .el-form-item__label::before {
-      content: '';
-    }
-    // 错误提示
-    .el-form-item__error {
-      color: #af2d2d;
-    }
-    // 登录和重置按钮
-    .el-form-item__content {
-      display: flex;
-      justify-content: center;
-      margin-left: 50 !important;
-      .el-button {
-        margin-right: 15px;
+    ::v-deep .register_from {
+      width: 80%;
+      height: 60%;
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -40%);
+      // 用户名和密码样式
+      .el-form-item__label {
+        text-align: right;
+        font-size: 18px;
+        user-select: none;
+        color: #525157;
       }
-      .el-button:first-child {
-        background: #4c44a5;
-        border-color: #4c44a5;
+      .el-form-item__label::before {
+        content: '';
       }
-      .el-button:first-child:hover {
-        opacity: 0.8;
+      // 错误提示
+      .el-form-item__error {
+        color: #af2d2d;
       }
-    }
-    .el-form-item:last-child {
-      margin-bottom: 0;
-    }
-    .el-form-item:last-child .el-form-item__content {
-      margin-top: 10px;
+      // 登录和重置按钮
+      .el-form-item__content {
+        display: flex;
+        justify-content: center;
+        margin-left: 50 !important;
+        .el-button {
+          margin-right: 15px;
+        }
+        .el-button:first-child {
+          background: #4c44a5;
+          border-color: #4c44a5;
+        }
+        .el-button:first-child:hover {
+          opacity: 0.8;
+        }
+      }
+      .el-form-item:last-child {
+        margin-bottom: 0;
+      }
+      .el-form-item:last-child .el-form-item__content {
+        margin-top: 10px;
+      }
     }
   }
 }

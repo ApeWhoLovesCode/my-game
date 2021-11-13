@@ -20,7 +20,9 @@
           <el-input ref="password" type="password" v-model="loginForm.password" @keyup.enter.native="login"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="login()">登录</el-button>
+          <el-button type="primary" @click="login()">
+            <div class="login-btn">登录<i class="el-icon--right iconfont icon-denglu1"></i></div>
+          </el-button>
           <el-button @click="registered()">注册</el-button>
         </el-form-item>
       </el-form>
@@ -100,21 +102,32 @@ export default {
           let username = this.loginForm.username;
           let password = this.loginForm.password;
           const { data } = await api.login({ username, password });
-          // 将用户信息保存到 vuex 和本地中
-          this.$store.commit("setUserInfo", data.data);
+          if(data.data.isBan) {
+            this.$message({
+              type: "error",
+              message: "您已被封号，如有疑问请联系客服！",
+              duration: "3000"
+            })
+            return
+          }
           if (data.code == 200) {
-            this.$notify({
-              title: "登录成功",
-              message: `${this.timeHello}，${data.data.name}`,
-              type: "success",
-              duration: 1500,
-              customClass: "loginNotify",
-            });
+            // 将用户信息保存到 vuex 和本地中
+            this.$store.commit("setUserInfo", data.data);
+            setTimeout(() => {
+              this.$notify({
+                title: "登录成功",
+                message: `${this.timeHello}，${data.data.name}`,
+                type: "success",
+                duration: 1500,
+                offset: 60,
+                customClass: "loginNotify",
+              });
+            }, 1000);
             this.$router.push("/home");
           } else {
             this.$message({
               type: "error",
-              message: "用户名或密码错误",
+              message: data.data,
               duration: "2000",
             });
           }
@@ -277,6 +290,10 @@ export default {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   animation: down 1s 0.2s ease both;
+  .login-btn {
+    display: flex;
+    align-items: center;
+  }
   ::v-deep .login_form {
     padding-top: 30px;
     width: 80%;
@@ -303,9 +320,9 @@ export default {
     .el-form-item__content {
       display: flex;
       justify-content: center;
-      margin-left: 0 !important;
+      margin-left: 20px !important;
       .el-button:first-child {
-        margin-right: 50px;
+        margin-right: 30px;
         background: #4c44a5;
         border-color: #4c44a5;
       }

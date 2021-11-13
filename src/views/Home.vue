@@ -45,6 +45,10 @@
             class="community iconfont icon-menu_sqhd2"
           ></span>
         </el-tooltip>
+        <el-tooltip effect="dark" content="全屏 / 退出全屏" placement="bottom">
+          <div v-if="!isFullScreen" class="full-screen iconfont icon-quanping" @click="fullScreen(true)"></div>
+          <div v-else class="full-screen iconfont icon-cancel-full-screen" @click="fullScreen(false)"></div>
+        </el-tooltip>
         <!-- 登录 / 退出 -->
         <el-popover
           placement="top"
@@ -80,7 +84,7 @@
         <vue-custom-scrollbar class="scroll-area">
           <el-tooltip
             placement="right"
-            v-for="(item, i) in gamesList"
+            v-for="(item, i) in tabGamesList"
             :key="item.id"
           >
             <!-- 鼠标移过去显示的游戏规则 -->
@@ -123,109 +127,110 @@
       @closeUserInfo="closeUserInfo"
     />
 
-    <!-- #region -->
-    <!-- 飞机大战 -->
-    <PlaneWar
-      v-if="gamesList[0].begin"
-      :ref="gamesList[0].ref"
-      :class="{
-        small: gamesList[0].small == 1,
-        nosmall: gamesList[0].small == 2,
-      }"
-      :gameItem="gamesList[0]"
-      :isPx="gamesList[0].small == 1 && gamesList[0].delay"
-      :smallBox="gamesList[0].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[0].id)"
-      @updateScore="updateScore(arguments)"
-    />
-    <!-- 俄罗斯方块 -->
-    <Tetris
-      v-if="gamesList[1].begin"
-      :ref="gamesList[1].ref"
-      :class="{
-        small: gamesList[1].small == 1,
-        nosmall: gamesList[1].small == 2,
-      }"
-      :gameItem="gamesList[1]"
-      :isPx="gamesList[1].small == 1 && gamesList[1].delay"
-      :smallBox="gamesList[1].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[1].id)"
-      @updateScore="updateScore(arguments)"
-    />
-    <!-- 贪吃蛇 -->
-    <Snake
-      v-if="gamesList[2].begin"
-      :ref="gamesList[2].ref"
-      :class="{
-        small: gamesList[2].small == 1,
-        nosmall: gamesList[2].small == 2,
-      }"
-      :gameItem="gamesList[2]"
-      :isPx="gamesList[2].small == 1 && gamesList[2].delay"
-      :smallBox="gamesList[2].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[2].id)"
-      @updateScore="updateScore(arguments)"
-    />
-    <!-- 飞翔的小鸟 -->
-    <FlyingBrid
-      v-if="gamesList[3].begin"
-      :ref="gamesList[3].ref"
-      :class="{
-        small: gamesList[3].small == 1,
-        nosmall: gamesList[3].small == 2,
-      }"
-      :gameItem="gamesList[3]"
-      :isPx="gamesList[3].small == 1 && gamesList[3].delay"
-      :smallBox="gamesList[3].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[3].id)"
-      @updateScore="updateScore(arguments)"
-    />
-    <!-- 2048 -->
-    <TwoFour
-      v-if="gamesList[4].begin"
-      :ref="gamesList[4].ref"
-      :class="{
-        small: gamesList[4].small == 1,
-        nosmall: gamesList[4].small == 2,
-      }"
-      :gameItem="gamesList[4]"
-      :isPx="gamesList[4].small == 1 && gamesList[4].delay"
-      :smallBox="gamesList[4].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[4].id)"
-      @updateScore="updateScore(arguments)"
-    />
-    <!-- 五子棋 -->
-    <GoBang
-      v-if="gamesList[5].begin"
-      :ref="gamesList[5].ref"
-      :class="{
-        small: gamesList[5].small == 1,
-        nosmall: gamesList[5].small == 2,
-      }"
-      :gameItem="gamesList[5]"
-      :isPx="gamesList[5].small == 1 && gamesList[5].delay"
-      :smallBox="gamesList[5].small == 1 ? smallBox : {}"
-      @gameoverFn="gameoverFn"
-      @restartFn="restartFn"
-      @small="small"
-      @click.native="popClick(gamesList[5].id)"
-      @updateScore="updateScore(arguments)"
-    />
+    <template v-if="gamesList">
+      <!-- 飞机大战 -->
+      <PlaneWar
+        v-if="gamesList[0] && gamesList[0].begin"
+        :ref="gamesList[0].ref"
+        :class="{
+          small: gamesList[0].small == 1,
+          nosmall: gamesList[0].small == 2,
+        }"
+        :gameItem="gamesList[0]"
+        :isPx="gamesList[0].small == 1 && gamesList[0].delay"
+        :smallBox="gamesList[0].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[0].id)"
+        @updateScore="updateScore(arguments)"
+      />
+      <!-- 俄罗斯方块 -->
+      <Tetris
+        v-if="gamesList[1] && gamesList[1].begin"
+        :ref="gamesList[1].ref"
+        :class="{
+          small: gamesList[1].small == 1,
+          nosmall: gamesList[1].small == 2,
+        }"
+        :gameItem="gamesList[1]"
+        :isPx="gamesList[1].small == 1 && gamesList[1].delay"
+        :smallBox="gamesList[1].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[1].id)"
+        @updateScore="updateScore(arguments)"
+      />
+      <!-- 贪吃蛇 -->
+      <Snake
+        v-if="gamesList[2] && gamesList[2].begin"
+        :ref="gamesList[2].ref"
+        :class="{
+          small: gamesList[2].small == 1,
+          nosmall: gamesList[2].small == 2,
+        }"
+        :gameItem="gamesList[2]"
+        :isPx="gamesList[2].small == 1 && gamesList[2].delay"
+        :smallBox="gamesList[2].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[2].id)"
+        @updateScore="updateScore(arguments)"
+      />
+      <!-- 飞翔的小鸟 -->
+      <FlyingBrid
+        v-if="gamesList[3] && gamesList[3].begin"
+        :ref="gamesList[3].ref"
+        :class="{
+          small: gamesList[3].small == 1,
+          nosmall: gamesList[3].small == 2,
+        }"
+        :gameItem="gamesList[3]"
+        :isPx="gamesList[3].small == 1 && gamesList[3].delay"
+        :smallBox="gamesList[3].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[3].id)"
+        @updateScore="updateScore(arguments)"
+      />
+      <!-- 2048 -->
+      <TwoFour
+        v-if="gamesList[4] && gamesList[4].begin"
+        :ref="gamesList[4].ref"
+        :class="{
+          small: gamesList[4].small == 1,
+          nosmall: gamesList[4].small == 2,
+        }"
+        :gameItem="gamesList[4]"
+        :isPx="gamesList[4].small == 1 && gamesList[4].delay"
+        :smallBox="gamesList[4].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[4].id)"
+        @updateScore="updateScore(arguments)"
+      />
+      <!-- 五子棋 -->
+      <GoBang
+        v-if="gamesList[5] && gamesList[5].begin"
+        :ref="gamesList[5].ref"
+        :class="{
+          small: gamesList[5].small == 1,
+          nosmall: gamesList[5].small == 2,
+        }"
+        :gameItem="gamesList[5]"
+        :isPx="gamesList[5].small == 1 && gamesList[5].delay"
+        :smallBox="gamesList[5].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[5].id)"
+        @updateScore="updateScore(arguments)"
+      />
+    </template>
     <!-- #endregion -->
     <!-- 方向键位 -->
     <template v-if="isKeyShow">
@@ -252,7 +257,7 @@
 </template>
 
 <script>
-import gameData from "@/utils/gameData.js";
+// import gameData from "@/utils/gameData.js";
 import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
 import { mapState } from "vuex";
@@ -296,8 +301,10 @@ export default {
       // 游戏的弹出层
       gamePops: [],
       // 游戏的渲染
+      // 左侧 tabs 的数据
+      tabGamesList: [], 
       // gamesList: gameData,
-      gamesList: gameData,
+      gamesList: [],
       // 游戏标签页的值
       elTabsValue: "",
       // 游戏标签页的数据
@@ -321,6 +328,8 @@ export default {
       hideCommunityTime: null,
       // 进入界面的特效
       isEnterTx: true,
+      // 是否全屏
+      isFullScreen: false
     };
   },
   computed: {
@@ -349,13 +358,19 @@ export default {
     //#region
     // 获取游戏数据
     async getGameList() {
-      const { data: gameData } = await api.getGameData();
-      gameData.data.forEach((item) => {
-        item.begin = false;
-        item.delay = false;
-        item.outside = false;
-      });
-      this.gamesList = gameData.data;
+      try {
+        const { data: gameData } = await api.getGameData();
+        let res = gameData.data
+        res.forEach((item) => {
+          item.begin = false;
+          item.delay = false;
+          item.outside = false;
+        });
+        this.gamesList = res;
+        this.tabGamesList = res.filter(item => item.isban === 0)
+      } catch (error) {
+        this.$message({type:'error',message: '获取游戏数据失败'})
+      }
     },
     // 点击了游戏
     gameItemClick(id) {
@@ -506,14 +521,9 @@ export default {
     // 游戏结束上传得分
     async updateScore(params) {
       let userId = this.gameUser.id;
-      let gameId = "g" + params[0];
+      let gameId = params[0];
       let score = params[1];
-      const { data } = await api.updateScore({ userId, gameId, score });
-      if (data.code == 200) {
-        // console.log("最高分");
-      } else {
-        // console.log("不是最高分");
-      }
+      await api.updateScore({ userId, gameId, score });
     },
     //#endregion
 
@@ -538,7 +548,7 @@ export default {
 
     // 退出登录
     logout() {
-      this.$confirm("确定要退出当前账号吗？", "退出登录", {
+      this.$confirm("您确定要退出当前账号吗？", "退出登录", {
         confirmButtonText: "确定",
         cancelButtonText: "不退了",
         center: true,
@@ -556,7 +566,6 @@ export default {
         })
         .catch(() => {});
     },
-
     // 点击了用户信息
     editUser() {
       this.isEditUserInfo = true;
@@ -565,6 +574,22 @@ export default {
     closeUserInfo() {
       this.isEditUserInfo = false;
     },
+    fullScreen(isFull) {
+      this.isFullScreen = !this.isFullScreen
+      if(isFull) {
+        const docElm = document.documentElement
+        if (docElm.requestFullscreen) docElm.requestFullscreen()
+        else if (docElm.msRequestFullscreen) docElm.msRequestFullscreen()
+        else if (docElm.mozRequestFullScreen) docElm.mozRequestFullScreen()
+        else if (docElm.webkitRequestFullScreen) docElm.webkitRequestFullScreen()
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen()
+        else if (document.msExitFullscreen) document.msExitFullscreen()
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen()
+        else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen()
+      }
+      
+    }
   },
 };
 </script>
@@ -723,6 +748,9 @@ export default {
     }
     .music {
       color: #7052db;
+    }
+    .full-screen {
+      font-size: 23px;
     }
     .avatar {
       display: inline-block;

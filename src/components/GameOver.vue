@@ -18,7 +18,7 @@
             <img :src="item.avatar"></img>
             <div class="rankItemData">
               <div class="rankUser rankItemText">{{item.name}}</div>
-              <div class="rankScore rankItemText">得分：{{item["g" + gameId]}}</div>
+              <div class="rankScore rankItemText">得分：{{item['g' + gameId]}}</div>
             </div>
           </div>
           </div>
@@ -78,7 +78,7 @@ export default {
   methods: {
     // 发起网络请求，获取排行榜数据
     async getRankList() {
-      let gameId = "g" + this.gameId;
+      let gameId = this.gameId;
       const { data } = await api.getRankList({ gameId });
       this.rankList = data.data;
     },
@@ -105,6 +105,7 @@ export default {
     margin-top: 10px;
     font-size: 15px;
     font-weight: bold;
+    user-select: none;
   }
   .content {
     margin: 20px 0;

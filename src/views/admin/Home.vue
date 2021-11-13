@@ -1,53 +1,119 @@
 <template>
-  <div class="page-home">
+  <div class="page-admin-home">
     <div v-for="(item,i) in tabsList" :key="i" class="tabs" :class="`tabitem${i+1}`">
       <router-link :to="item.path">
         <div class="tabTo">{{item.tab}}</div>
       </router-link>
     </div>
+    <div class="top-tab">
+      <el-tooltip effect="dark" content="全屏 / 退出全屏" placement="bottom">
+        <div v-if="!isFullScreen" class="top-tab-item iconfont icon-quanping" @click="fullScreen(true)"></div>
+        <div v-else class="top-tab-item iconfont icon-cancel-full-screen" @click="fullScreen(false)"></div>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="退出登录" placement="bottom">
+        <div class="top-tab-item iconfont icon-tuichudenglu" @click="logout"></div>
+      </el-tooltip>
+    </div>
     <div class="content">
-      <!-- <vue-custom-scrollbar class="scroll-area"> -->
-        <router-view></router-view>
-      <!-- </vue-custom-scrollbar> -->
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
-import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import {mapState} from 'vuex'
 export default {
-  components: {
-    vueCustomScrollbar
-  },
   data() {
     return {
       tabsList: [{tab: '用户管理', path: '/admin/user'},{tab: '游戏管理', path: '/admin/game'},{tab: '评论管理', path: '/admin/comment'},{tab: '得分管理', path: '/admin/score'}],
+      isFullScreen: false
     }
   },
   computed: {
     ...mapState(['adminUser'])
   },
   created() {
-    if(this.adminUser && this.adminUser.token !== 'lhh_token_07') {
+    if(!this.adminUser || this.adminUser.token !== 'lhh_admin_token_07_11') {
       this.$router.push('/admin/login')
     }
   },
   mounted() {},
-  methods: {},
+  methods: {
+    fullScreen(isFull) {
+      this.isFullScreen = !this.isFullScreen
+      if(isFull) {
+        const docElm = document.documentElement
+        if (docElm.requestFullscreen) docElm.requestFullscreen()
+        else if (docElm.msRequestFullscreen) docElm.msRequestFullscreen()
+        else if (docElm.mozRequestFullScreen) docElm.mozRequestFullScreen()
+        else if (docElm.webkitRequestFullScreen) docElm.webkitRequestFullScreen()
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen()
+        else if (document.msExitFullscreen) document.msExitFullscreen()
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen()
+        else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen()
+      }
+    },
+    logout() {
+      this.$confirm("您确定要退出管理员端吗？", "退出登录", {
+        confirmButtonText: "确定",
+        cancelButtonText: "不退了",
+        center: true,
+      })
+        .then(async () => {
+          // 清除用户 后端和前端的 登录状态
+          // await api.logout(); // 后端
+          this.$store.commit("setAdminUser", null); // 前端
+          this.$router.push("/admin/Login");
+          this.$message({
+            type: "info",
+            message: "已退出登录",
+            duration: 1000,
+          });
+        })
+        .catch(() => {});
+    }
+  },
 }
 </script>
 
 <style scoped lang="scss">
-.page-home {
+.page-admin-home {
   position: relative;
   min-width: 1200px;
   min-height: 600px;
   width: 100vw;
   height: 100vh;
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
-  .content {
+  .top-tab {
+    position: absolute;
+    top: 2.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: rgba(216, 216, 216, 0.3);
+    border-radius: 30px;
+    padding: 0 20px;
+    .top-tab-item {
+      font-size: 20px;
+      margin-right: 15px;
+      padding: 6px;
+      border-radius: 5px;
+      color: rgb(216, 216, 216);
+      cursor: pointer;
+    }
+    .top-tab-item:hover {
+      color: #fff;
+      background: rgba(216, 216, 216, 0.5);
+    }
+    .top-tab-item:last-child {
+      margin-right: 0;
+    }
+  }
+  ::v-deep .content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -58,10 +124,13 @@ export default {
     background: rgba(255, 255, 255, .3);
     box-sizing: border-box;
     padding: 30px 100px;
-    .scroll-area {
-      margin: auto;
-      width: 100%;
-      height: 100%;
+    // 修改和删除按钮的样式
+    .el-button--primary {
+      background-color: #8ea0f3;
+      border-color:#8ea0f3; 
+    }
+    .el-button--primary:hover {
+      opacity: .8;
     }
   }
   .tabs {

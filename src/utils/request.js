@@ -93,5 +93,5 @@ service.interceptors.response.use(response => {
   //如果不需要错误处理，以上的处理过程都可省略
   return Promise.resolve(error.response)
 })
-//4.导入文件
+//4.导出文件
 export default service

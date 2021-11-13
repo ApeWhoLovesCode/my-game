@@ -25,7 +25,7 @@
             <el-table-column label="封禁该成绩" header-align="center" align="center">
               <template slot-scope="scope">
                 <div>
-                  <el-switch v-model="scope.row.isBan" @change="banUser(scope.row, item)" />
+                  <el-switch v-model="scope.row.isban" @change="banUser(scope.row, item)" />
                 </div>
               </template>
             </el-table-column>
@@ -42,7 +42,6 @@
 
 <script>
 import adminApi from "@/utils/adminApi";
-import api from "@/utils/api";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import 'vue-custom-scrollbar/dist/vueScrollbar.css'
 import adminPop from '@/components/adminPop/adminPop'
@@ -79,13 +78,16 @@ export default {
     async getScoreList() {
       try {
         const {data: res} = await adminApi.getScoreList()
-        console.log(res.data)
         let list = res.data
         list.forEach((item) => {
           item['pageNum'] = 1
           item['pageSize'] = 10
           item['pageTotal'] = item.rankList.length
+          item.rankList.forEach(item2 => {
+            item2.isban = (item2.isban === 0 ? false : true)
+          })
         })
+
         this.scoreListCopy = JSON.parse(JSON.stringify(list))
         list.forEach((item) => {
           item.rankList = item.rankList.slice(0, 10)
@@ -97,10 +99,10 @@ export default {
     },
     // 封禁该成绩
     async banUser(user, game) {
-      console.log(user, game)
-      await adminApi.banScore({userId: user.id, gameId: game.id, isban: user.isBan})
+      let isban = user.isban ? 1 : 0
+      await adminApi.banScore({userId: user.id, gameId: game.id, isban})
       if(user.isBan) {
-        this.messageShow(true, `${user.name}的${game.name}成绩已被封禁`)
+        this.messageShow(true, `${user.name}的“${game.name}”成绩已被封禁`)
       } else {
         this.messageShow(true, `${user.name}的${game.name}成绩已经解封`)
       }
@@ -110,7 +112,6 @@ export default {
       this.carIndex = i
     },
     curSizeChange(size, i) {
-      console.log('curSizeChange', size, i)
       this.$nextTick(() => {
         const list = this.scoreListCopy[i]
         let num = (size - 1) * list.pageSize
@@ -122,10 +123,10 @@ export default {
     },
     messageShow(isSuccess, msg) {
       if (isSuccess) {
-        this.$message({ type: 'success', message: `${msg}成功` })
-        this.getVersionList()
+        this.$message({ type: 'success', message: `${msg}` })
+        this.getScoreList()
       } else {
-        this.$message({ type: 'error', message: `${msg}失败` })
+        this.$message({ type: 'error', message: `${msg}` })
       }
     },
   },
@@ -182,6 +183,7 @@ export default {
       padding-top: 5px;
       height: 8%;
       text-align: center;
+      border-top: 1px solid #ececec;
     }
   }
 }

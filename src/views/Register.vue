@@ -134,14 +134,14 @@ export default {
 @media screen and (max-width: 1000px) {
   .content {
     width: 500px;
-    height: 500px;
+    height: 400px;
   }
 }
 /* 大于等于1000px */
 @media screen and (min-width: 1000px) {
   .content {
     width: 600px;
-    height: 550px;
+    height: 480px;
   }
 }
 .register {
@@ -160,7 +160,6 @@ export default {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   ::v-deep .register_from {
-    padding-top: 30px;
     width: 80%;
     height: 60%;
     position: absolute;
