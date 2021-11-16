@@ -230,6 +230,23 @@
         @click.native="popClick(gamesList[5].id)"
         @updateScore="updateScore(arguments)"
       />
+      <!-- 扫雷 -->
+      <MineSweeper
+        v-if="gamesList[6] && gamesList[6].begin"
+        :ref="gamesList[6].ref"
+        :class="{
+          small: gamesList[6].small == 1,
+          nosmall: gamesList[6].small == 2,
+        }"
+        :gameItem="gamesList[6]"
+        :isPx="gamesList[6].small == 1 && gamesList[6].delay"
+        :smallBox="gamesList[6].small == 1 ? smallBox : {}"
+        @gameoverFn="gameoverFn"
+        @restartFn="restartFn"
+        @small="small"
+        @click.native="popClick(gamesList[6].id)"
+        @updateScore="updateScore(arguments)"
+      />
     </template>
     <!-- #endregion -->
     <!-- 方向键位 -->
@@ -252,12 +269,12 @@
       ></span>
     </template>
 
-    <EnterTx v-if="isEnterTx" />
+    <!-- <EnterTx v-if="isEnterTx" /> -->
   </el-container>
 </template>
 
 <script>
-// import gameData from "@/utils/gameData.js";
+// import gameData_local from "@/utils/gameData.js";
 import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
 import { mapState } from "vuex";
@@ -273,6 +290,7 @@ import Snake from "@/components/Snake.vue";
 import FlyingBrid from "@/components/FlyingBrid.vue";
 import TwoFour from "@/components/2048.vue";
 import GoBang from "@/components/GoBang.vue";
+import MineSweeper from "@/components/MineSweeper.vue";
 import Community from "@/views/Community.vue";
 import EnterTx from "@/components/EnterTx.vue";
 export default {
@@ -287,6 +305,7 @@ export default {
     FlyingBrid,
     TwoFour,
     GoBang,
+    MineSweeper,
     EditUSerInfo,
     Community,
     EnterTx,

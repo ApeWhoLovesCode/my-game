@@ -67,6 +67,17 @@ export default [
   },
   {
     'id': 107,
+    'name': '扫雷',
+    'ref': 'mineSweeper',
+    'img': require('@/assets/img/phone3.png'),
+    'rules': '扫雷吧兄弟',
+    'begin': false, // 是否开始游戏
+    'small': 0,   // 是否缩小 0:基础状态 1:缩小 2:恢复
+    'delay': false,  // 用于缩小的延迟
+    'outside': false, // 用于显示的优先级
+  },
+  {
+    'id': 108,
     'name': '其他游戏',
     'ref': 'game1',
     'img': require('@/assets/img/otherGame.png'),

@@ -77,8 +77,6 @@ export default {
       level: 1,
       // 游戏结束
       gameOver: false,
-      // 记录当前是是否为暂停状态
-      isPause: false,
       // 游戏结束显示分数的定时器
       gOTimer: null,
       // 游戏结束显示得分
@@ -129,7 +127,6 @@ export default {
     // 监听现在点的是哪个弹出层 就重新监听用户的键盘事件
     gameItem: {
       handler(val) {
-        if (val.outside) this.onKeyDown();
         // 监听到从缩小状态回到弹出层状态，重新获取弹出层信息
         if (val.small == 2) {
           setTimeout(() => {
@@ -164,7 +161,6 @@ export default {
       setTimeout(() => {
         this.canvas = this.$refs.canvas;
         this.ctx = this.canvas.getContext("2d");
-        this.onKeyDown();
         // 画棋盘
         this.drawCheckerboard();
         // 保存棋子的坐标
@@ -362,17 +358,8 @@ export default {
         }, 10);
       }, 100);
     },
-    // 监听用户的键盘事件
-    onKeyDown() {
-      document.onkeydown = (e) => {
-        if (e.code == "Space") {
-          this.isPause = !isPause;
-        }
-      };
-    },
     // 缩小
     small() {
-      this.isPause = true;
       // 暂停游戏
       this.$emit("small", this.gameItem);
       setTimeout(() => {
