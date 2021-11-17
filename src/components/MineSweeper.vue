@@ -11,21 +11,25 @@
     @alreadyClose="exit"
     @popChange="popChange"
   >
-    <canvas ref="canvas" id="mycanvas" :width="canvasWidth" :height="canvasWidth" @click="getMouse"></canvas>
+    <canvas 
+      ref="canvas" 
+      id="mycanvas" 
+      :width="canvasWidth" 
+      :height="canvasWidth" 
+      @click="getMouse(false, $event)" 
+      @contextmenu.prevent.stop="getMouse(true, $event)" 
+    />
     <div class="score">
       <span>得分：{{ score }}</span>
     </div>
     <GameOver
       v-if="gameOver"
       ref="gameover"
-      :width="isPx ? 30 : 65"
-      :height="35"
+      :gameName="gameItem.name"
+      :gameId="gameItem.id"
       @exit="exit"
       @restart="restart"
     >
-      <div class="gameoverItem">
-        关卡奖励: <i>{{ level }}</i>
-      </div>
       <div class="gameoverItem">
         得分: <i>{{ gOScore.score }}</i>
       </div>
@@ -68,8 +72,6 @@ export default {
       popHeight: 80,
       // 当前分数
       score: 0,
-      // 关卡
-      level: 1,
       // 游戏结束
       gameOver: false,
       // 记录当前是是否为暂停状态
@@ -95,6 +97,7 @@ export default {
       allArr: [],
       // 雷的数量
       rayNum: 10,
+      rayArr: [],
       // 已经打开的数组
       openArr: []
     };
@@ -102,7 +105,7 @@ export default {
   computed: {
     // 最终得分
     finalScore() {
-      return this.score * this.level;
+      return this.score;
     },
   },
   watch: {
@@ -178,14 +181,14 @@ export default {
         this.ctx.moveTo(begin, begin + gridWidth * i);
         this.ctx.lineTo(begin + lineLength, begin + gridWidth * i);
         this.ctx.lineWidth = 3;
-        this.ctx.strokeStyle = "#689eeb";
+        this.ctx.strokeStyle = "#c0cce4";
         this.ctx.stroke();
         // 竖线
         this.ctx.beginPath();
         this.ctx.moveTo(begin + gridWidth * i, begin);
         this.ctx.lineTo(begin + gridWidth * i, begin + lineLength);
         this.ctx.lineWidth = 3;
-        this.ctx.strokeStyle = "#689eeb";
+        this.ctx.strokeStyle = "#c0cce4";
         this.ctx.stroke();
       }
     },
@@ -207,30 +210,60 @@ export default {
           };
           // 将所有的位置置为 0
           this.openArr[i][j] = null;
+          this.drawGrid(gridWidth * j + 3, gridWidth * i + 3)
         }
       }
       // 随机生成雷
       for(let i = 0; i < this.rayNum; i++) {
         let {x, y} = this.randomRay()
+        this.rayArr.push([x, y])
         this.allArr[x][y].score = 9
+        this.besidRayGrid(x, y)
       }
+      console.log(this.rayArr)
       console.log(this.allArr)
+    },
+    // 画格子
+    drawGrid(x, y) {
+      let img = new Image()
+      img.src = require('@/assets/img/grid.png')
+      img.onload = () => {
+        this.ctx.drawImage(img, x, y, this.gridWidth, this.gridWidth)
+      }
     },
     // 随机生成雷
     randomRay() {
       let gridNum = this.lineNum - 2
       let x = Math.round(Math.random() * gridNum)
       let y = Math.round(Math.random() * gridNum)
-      console.log(x, y)
       if(this.allArr[x][y].score === 9) {
-        console.log('重复了')
-        this.randomRay()
+        return this.randomRay()
       } else {
         return {x, y}
       }
     },
+    // 雷旁边的格子加1
+    besidRayGrid(x, y) {
+      // 右边极限值 9-1-1 = 7
+      let max = this.lineNum - 1 - 1
+      // 上边
+      if(y > 0) {
+        x > 0 && this.allArr[x - 1][y - 1].score !== 9 && this.allArr[x - 1][y - 1].score++
+        this.allArr[x][y - 1].score !== 9 && this.allArr[x][y - 1].score++
+        x < max && this.allArr[x + 1][y - 1].score !== 9 && this.allArr[x + 1][y - 1].score++
+      }
+      // 下边 
+      if(y < max) {
+        x > 0 && this.allArr[x - 1][y + 1].score !== 9 && this.allArr[x - 1][y + 1].score++
+        this.allArr[x][y + 1].score !== 9 && this.allArr[x][y + 1].score++
+        x < max && this.allArr[x + 1][y + 1].score !== 9 && this.allArr[x + 1][y + 1].score++
+      }
+      // 左右剩余两个
+      x > 0 && this.allArr[x - 1][y].score !== 9 && this.allArr[x - 1][y].score++
+      x < max && this.allArr[x + 1][y].score !== 9 && this.allArr[x + 1][y].score++
+    },
     // 点击获取鼠标位置，下棋
-    getMouse() {
+    getMouse(isRight, e) {
       if (this.gameOver) return;
       // canvas 中棋子的位置
       let chessX = window.event.pageX - this.canvasLeft;
@@ -246,31 +279,74 @@ export default {
               chessY >= y - 15 &&
               chessY <= y + 15
             ) {
-              this.openArr[i][j] = score;
-              this.drawChess(x, y, score);
-              // 判断游戏是否结束
-              // if (this.checkChess(i, j, chess)) {
-              //   this.gameOver = true;
-              //   return;
-              // }
-              // return;
+              if(isRight) {
+                this.drawTagRay(x, y)
+              } else {
+                this.openArr[i][j] = score;
+                if(score === 0) this.openNearGrid(i, j)
+                else this.drawChess(x, y, score);
+              }
+              this.allArr[i][j].isPlay = true
             }
           }
         }
       }
     },
-    // 画棋子
+    // 点击后画每一格
     drawChess(x, y, score) {
+      // 画背面正方形
+      this.ctx.beginPath()
+      this.ctx.fillStyle = '#dbf1fb'
+      this.ctx.fillRect(x - 15 + 3, y - 15 + 3, this.gridWidth, this.gridWidth)
+      this.ctx.closePath()
+      this.ctx.stroke();
+      // 画雷
+      if(score === 9) {
+        let img = new Image()
+        img.src = require('@/assets/img/ray.png')
+        img.onload = () => {
+          this.ctx.drawImage(img, x - 15 + 7, y - 15 + 7, 22, 22)
+        }
+        this.gameOver = true
+        return
+      }
+      let fontColor = ''
+      switch(score) {
+        case 0: return;
+        case 1: fontColor = '#689eeb'; break;
+        case 2: fontColor = '#207210'; break;
+        case 3: fontColor = '#b00e0b'; break;
+        default: fontColor = '#34016e';
+      }
       // 设置字体
-      this.ctx.font = "18px bold 黑体";
-      // 设置颜色
-      this.ctx.fillStyle = "#ff0";
+      this.ctx.font = "20px bold 黑体";
+      this.ctx.fillStyle = fontColor;
       // 设置水平对齐方式
       this.ctx.textAlign = "center";
       // 设置垂直对齐方式
       this.ctx.textBaseline = "middle";
       // 绘制文字（参数：要写的字，x坐标，y坐标）
-      this.ctx.fillText(score, x, y);
+      this.ctx.fillText(score, x + 3, y + 5);
+    },
+    // 画旗子
+    drawTagRay(x, y) {
+      let img = new Image()
+      img.src = require('@/assets/img/flag.png')
+      img.onload = () => {
+        this.ctx.drawImage(img, x - 15 + 7, y - 15 + 7, 22, 22)
+      }
+    },
+    // 点击了附近没有雷的格子 打开旁边所有这样的格子 
+    openNearGrid(i, j) {
+      let max = this.lineNum - 1 - 1
+      this.allArr[i][j].isPlay = true
+      let {x, y, score} = this.allArr[i][j]
+      this.drawChess(x, y, score)
+      j > 0 && !this.allArr[i][j - 1].isPlay && this.allArr[i][j - 1].score === 0 && this.openNearGrid(i, j - 1)
+      i < max && !this.allArr[i + 1][j].isPlay && this.allArr[i + 1][j].score === 0 && this.openNearGrid(i + 1, j)
+      j < max && !this.allArr[i][j + 1].isPlay && this.allArr[i][j + 1].score === 0 && this.openNearGrid(i, j + 1)
+      i > 0 && !this.allArr[i - 1][j].isPlay && this.allArr[i - 1][j].score === 0 && this.openNearGrid(i - 1, j)
+      return
     },
     // 弹出层移动的回调
     popChange() {

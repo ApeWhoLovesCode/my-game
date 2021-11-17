@@ -178,14 +178,13 @@ export default {
   position: absolute;
   /* z-index: 101; */
   background: #fff;
-  border-radius: 2vw;
+  border-radius: 1.5vw;
   box-shadow: 0 0 20px 10px rgba(31, 31, 31, 0.3);
   min-width: 350px;
 }
 .center {
   top: 50%;
   left: 50%;
-  /* margin: -25% 0 0 -25%; */
   transform: translate(-50%, -50%);
   animation: center 0.6s ease-out;
 }
