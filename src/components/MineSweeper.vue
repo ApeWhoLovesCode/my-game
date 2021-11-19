@@ -93,7 +93,8 @@ export default {
       lineNum: 10,
       // 格子宽度
       gridWidth: 30,
-      // 所有的各自里面的数据 0:空 1-8:数字 9:雷
+      // 所有的格子里面的数据 {x, y, score, isPlay, tag}
+      // score(0:空 1-8:数字 9:雷) isPlay(是否已经打开) tag(1:旗子 2:问号)
       allArr: [],
       // 雷的数量
       rayNum: 10,
@@ -130,6 +131,20 @@ export default {
       },
       deep: true,
     },
+    allArr: {
+      handler(val) {
+        let res = val.every(arr => {
+          let res2 = arr.every(item => {
+            if(item.score !== 9) return item.isPlay
+            else return true
+          })
+          return res2
+        })
+        console.log(res)
+        if(res) this.gameOver = true
+      },
+      deep: true
+    }
   },
   mounted() {
     let width = this.canvasWidth + 60
@@ -202,12 +217,14 @@ export default {
         this.openArr.push([]);
         for (let j = 0; j < gridNum; j++) {
           // 保存所有的棋子位置信息
-          this.allArr[i][j] = {
+          this.$set(this.allArr[i], j, {
             x: 15 + gridWidth * j,
             y: 15 + gridWidth * i,
             score: 0,
             isPlay: false
-          };
+          })
+          // tag 不用监听
+          this.allArr[i][j].tag = 0
           // 将所有的位置置为 0
           this.openArr[i][j] = null;
           this.drawGrid(gridWidth * j + 3, gridWidth * i + 3)
@@ -272,7 +289,7 @@ export default {
       for (let i = 0; i < this.lineNum - 1; i++) {
         for (let j = 0; j < this.lineNum - 1; j++) {
           if (!this.allArr[i][j].isPlay) {
-            let {x, y, score} = this.allArr[i][j]
+            let {x, y, score, tag} = this.allArr[i][j]
             if (
               chessX >= x - 15 &&
               chessX <= x + 15 &&
@@ -280,13 +297,17 @@ export default {
               chessY <= y + 15
             ) {
               if(isRight) {
-                this.drawTagRay(x, y)
+                let newTag = tag === 0 ? 1 : ( tag === 1 ? 2 : 0)
+                this.allArr[i][j].tag = newTag
+                console.log(newTag)
+                this.drawTagRay(x, y, newTag)
               } else {
+                if(this.allArr[i][j].tag !== 0) return
                 this.openArr[i][j] = score;
                 if(score === 0) this.openNearGrid(i, j)
                 else this.drawChess(x, y, score);
+                this.allArr[i][j].isPlay = true
               }
-              this.allArr[i][j].isPlay = true
             }
           }
         }
@@ -328,25 +349,41 @@ export default {
       // 绘制文字（参数：要写的字，x坐标，y坐标）
       this.ctx.fillText(score, x + 3, y + 5);
     },
-    // 画旗子
-    drawTagRay(x, y) {
+    // 右键 画旗子或问号
+    drawTagRay(x, y, tag) {
+      this.drawGrid(x-15+3, y-15+3)
+      if(tag === 0) return
+      let imgName = tag === 1 ? 'flag' : 'uncertain'
       let img = new Image()
-      img.src = require('@/assets/img/flag.png')
+      img.src = require(`@/assets/img/${imgName}.png`)
       img.onload = () => {
         this.ctx.drawImage(img, x - 15 + 7, y - 15 + 7, 22, 22)
       }
     },
     // 点击了附近没有雷的格子 打开旁边所有这样的格子 
-    openNearGrid(i, j) {
+    openNearGrid(i, j, isEnd) {
       let max = this.lineNum - 1 - 1
       this.allArr[i][j].isPlay = true
       let {x, y, score} = this.allArr[i][j]
       this.drawChess(x, y, score)
-      j > 0 && !this.allArr[i][j - 1].isPlay && this.allArr[i][j - 1].score === 0 && this.openNearGrid(i, j - 1)
-      i < max && !this.allArr[i + 1][j].isPlay && this.allArr[i + 1][j].score === 0 && this.openNearGrid(i + 1, j)
-      j < max && !this.allArr[i][j + 1].isPlay && this.allArr[i][j + 1].score === 0 && this.openNearGrid(i, j + 1)
-      i > 0 && !this.allArr[i - 1][j].isPlay && this.allArr[i - 1][j].score === 0 && this.openNearGrid(i - 1, j)
-      return
+      // 已经打开数字了结束这个递归
+      if(isEnd) return
+      if(j > 0 && !this.allArr[i][j - 1].isPlay) {  // 上
+        if(this.allArr[i][j - 1].score === 0) this.openNearGrid(i, j - 1)
+        else this.openNearGrid(i, j - 1, true)
+      } 
+      if(i < max && !this.allArr[i + 1][j].isPlay) {  // 右
+        if(this.allArr[i + 1][j].score === 0) this.openNearGrid(i + 1, j)
+        else this.openNearGrid(i + 1, j, true)
+      } 
+      if(j < max && !this.allArr[i][j + 1].isPlay) {  // 下
+        if(this.allArr[i][j + 1].score === 0) this.openNearGrid(i, j + 1)
+        else this.openNearGrid(i, j + 1, true)
+      }
+      if(i > 0 && !this.allArr[i - 1][j].isPlay) {   // 左
+        if(this.allArr[i - 1][j].score === 0) this.openNearGrid(i - 1, j)
+        else this.openNearGrid(i - 1, j, true)
+      }
     },
     // 弹出层移动的回调
     popChange() {
