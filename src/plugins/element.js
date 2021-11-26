@@ -24,7 +24,12 @@ import {
   TableColumn,
   Pagination,
   Carousel,
-  CarouselItem
+  CarouselItem,
+  RadioGroup,
+  RadioButton,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -48,6 +53,11 @@ Vue.use(TableColumn)
 Vue.use(Pagination)
 Vue.use(Carousel)
 Vue.use(CarouselItem)
+Vue.use(RadioGroup)
+Vue.use(RadioButton)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
 
 // 需要全局挂载 挂载到Vue的原型上
 Vue.prototype.$message = Message

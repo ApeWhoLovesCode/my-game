@@ -20,7 +20,22 @@
       @contextmenu.prevent.stop="getMouse(true, $event)" 
     />
     <div class="score">
-      <span>得分：{{ score }}</span>
+      <el-dropdown class="set" trigger="click" :hide-on-click="false" :tabindex="selectLevel" @command="changeLevel">
+        <span class="el-dropdown-link">
+          难度<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu class="set-select" slot="dropdown">
+          <el-dropdown-item 
+            v-for="(item, index) in selectLevelArr" 
+            :key="index" 
+            :class="{active: selectLevel === index}"
+            :command="index"
+          >
+            {{item}}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <div class="time">用时：{{usedTimeFormat}}</div>
     </div>
     <GameOver
       v-if="gameOver"
@@ -100,7 +115,13 @@ export default {
       rayNum: 10,
       rayArr: [],
       // 已经打开的数组
-      openArr: []
+      openArr: [],
+      // 计时
+      usedTime: 0,
+      timer: null,
+      // 设置的等级 0:初级 1:中级 2:高级 3:地狱
+      selectLevelArr: ['初级','中级','高级','地狱'],
+      selectLevel: 0,
     };
   },
   computed: {
@@ -108,6 +129,15 @@ export default {
     finalScore() {
       return this.score;
     },
+    // 用时
+    usedTimeFormat() {
+      let res = ''
+      let min = parseInt(this.usedTime / 60 )
+      if(min < 1) res = this.usedTime
+      else if(min < 60) res = `${min}:${this.usedTime % 60}`
+      else res = `${parseInt(min / 60)}:${min % 60}:${this.usedTime % 3600}`
+      return res
+    }
   },
   watch: {
     // 判断游戏结束
@@ -115,6 +145,9 @@ export default {
       if (val) {
         this.$nextTick(() => {
           this.$refs.gameover.popshow();
+          clearInterval(this.timer)
+          // 发送游戏结束事件，上传最高分到数据库
+          this.$emit("updateScore", this.gameItem.id, this.usedTime);
           this.scoreShow();
         });
       }
@@ -131,17 +164,18 @@ export default {
       },
       deep: true,
     },
+    // 判断游戏是否结束
     allArr: {
       handler(val) {
-        let res = val.every(arr => {
+        const isOver = val.every(arr => {
+          // 所有非雷的区域都下棋，游戏才结束
           let res2 = arr.every(item => {
             if(item.score !== 9) return item.isPlay
-            else return true
+            return true
           })
           return res2
         })
-        console.log(res)
-        if(res) this.gameOver = true
+        if(isOver) this.gameOver = true
       },
       deep: true
     }
@@ -165,6 +199,9 @@ export default {
     });
     this.init()
   },
+  destroyed() {
+    clearInterval(this.timer)
+  },
   methods: {
     init() {
       setTimeout(() => {
@@ -174,6 +211,8 @@ export default {
         this.drawCheckerboard();
         // 保存棋子的坐标
         this.saveLocation();
+        // 开始计时
+        this.openTiming()
       }, 100);
       setTimeout(() => {
         this.getCanvasMargin();
@@ -184,6 +223,12 @@ export default {
       // 获取dom元素对象与浏览器 左边/顶部 的距离 
       this.canvasLeft = this.$refs.canvas.getBoundingClientRect().left;
       this.canvasTop = this.$refs.canvas.getBoundingClientRect().top;
+    },
+    // 开启计时
+    openTiming() {
+      this.timer = setInterval(() => {
+        this.usedTime += 1
+      }, 1000);
     },
     // 画棋盘
     drawCheckerboard() {
@@ -237,7 +282,7 @@ export default {
         this.allArr[x][y].score = 9
         this.besidRayGrid(x, y)
       }
-      console.log(this.rayArr)
+      console.log('作弊专用，雷的位置是：',this.rayArr)
       console.log(this.allArr)
     },
     // 画格子
@@ -385,6 +430,10 @@ export default {
         else this.openNearGrid(i - 1, j, true)
       }
     },
+    // 改变等级
+    changeLevel(i) {
+      this.selectLevel = i
+    },
     // 弹出层移动的回调
     popChange() {
       this.getCanvasMargin();
@@ -462,12 +511,42 @@ export default {
   }
   .score {
     position: absolute;
-    left: 50%;
     top: 12px;
-    transform: translateX(-50%);
-    font-size: 18px;
-    color: #e9e9e9;
+    width: 100%;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -1;
+    .set {
+      position: absolute;
+      left: 20px;
+      margin-right: 20px;
+      .el-dropdown-link {
+        cursor: pointer;
+        padding: 2px 5px;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #fff;
+      }
+      .el-dropdown-link:hover {
+        background: rgba(255, 255, 255, .3);
+      }
+    }
+    .time {
+      text-align: center;
+      color: #052564;
+    }
+  }
+}
+.set-select {
+  background: rgba(255, 255, 255, .3);
+  .el-dropdown-menu__item {
+    color: #0a3283;
+  }
+  .active {
+    background: rgba(255, 255, 255, .7);
+    color: #021842;
   }
 }
 </style>

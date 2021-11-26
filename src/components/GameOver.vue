@@ -18,7 +18,7 @@
             <img :src="item.avatar"></img>
             <div class="rankItemData">
               <div class="rankUser rankItemText">{{item.name}}</div>
-              <div class="rankScore rankItemText">得分：{{item['g' + gameId]}}</div>
+              <div class="rankScore rankItemText">{{scoreText}}：{{item['g' + gameId]}}</div>
             </div>
           </div>
           </div>
@@ -68,7 +68,11 @@ export default {
       },
     };
   },
-  computed: {},
+  computed: {
+    scoreText() {
+      return this.gameId !== 107 ? '得分' : '用时' 
+    }
+  },
   watch: {},
   mounted() {
     setTimeout(() => {
@@ -80,7 +84,21 @@ export default {
     async getRankList() {
       let gameId = this.gameId;
       const { data } = await api.getRankList({ gameId });
+      // 扫雷处理得分
+      if(gameId === 107) {
+        data.data.forEach(item => {
+          item['g107'] = this.timeFormat(item['g107'])
+        })
+      } 
       this.rankList = data.data;
+    },
+    timeFormat(time) {
+      let res = ''
+      let min = parseInt(time / 60 )
+      if(min < 1) res = time
+      else if(min < 60) res = `${min}:${time % 60}`
+      else res = `${parseInt(min / 60)}:${min % 60}:${time % 3600}`
+      return res
     },
     popshow() {
       this.$refs.gameoverPop.popshow();
