@@ -20,7 +20,7 @@
       @contextmenu.prevent.stop="getMouse(true, $event)" 
     />
     <div class="score">
-      <el-dropdown class="set" trigger="click" :hide-on-click="false" :tabindex="selectLevel" @command="changeLevel">
+      <el-dropdown class="set" trigger="click" :tabindex="selectLevel" @command="changeLevel">
         <span class="el-dropdown-link">
           难度<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
@@ -45,11 +45,11 @@
       @exit="exit"
       @restart="restart"
     >
-      <div class="gameoverItem">
-        得分: <i>{{ gOScore.score }}</i>
+      <div v-if="isSuccess" class="gameoverItem">
+        用时: <i>{{ usedTimeFormat }}</i>
       </div>
-      <div class="gameoverItem">
-        总得分: <i>{{ gOScore.final }}</i>
+      <div v-else class="fail gameoverItem">
+        <i class="iconfont icon-shibaibiaoqing"></i>&nbsp;游戏失败
       </div>
     </GameOver>
   </myPop>
@@ -87,16 +87,10 @@ export default {
       popHeight: 80,
       // 当前分数
       score: 0,
+      // 游戏成功，才上传成绩
+      isSuccess: false,
       // 游戏结束
       gameOver: false,
-      // 记录当前是是否为暂停状态
-      isPause: false,
-      // 游戏结束显示分数的定时器
-      gOTimer: null,
-      // 游戏结束显示得分
-      gOScore: { score: 0, final: 0 },
-      // 30 * 9(格子) + 10 * 3(线) = 300
-      canvasWidth: 300,
       // 获取canvas画板距离浏览器左/上的距离
       canvasLeft: 0,
       canvasTop: 0,
@@ -104,31 +98,42 @@ export default {
       canvas: {},
       // 得到 canvas 的 2d 上下文
       ctx: {},
-      // 棋盘的行列 每行每列由10根线分为9个格
-      lineNum: 10,
+      /* 
+       游戏等级数据
+       初级 10雷 9*9=81格
+       中级 40雷 16*16=256格
+       高级 100雷 22*22=484格
+       地狱 200雷 25*25=625格
+      */
+      LevelData: [
+        { type: '初级', lineNum: 10, rayNum: 10 },
+        { type: '中级', lineNum: 17, rayNum: 40 },
+        { type: '高级', lineNum: 23, rayNum: 100 },
+        { type: '地狱', lineNum: 26, rayNum: 200 }
+      ],
       // 格子宽度
       gridWidth: 30,
-      // 所有的格子里面的数据 {x, y, score, isPlay, tag}
-      // score(0:空 1-8:数字 9:雷) isPlay(是否已经打开) tag(1:旗子 2:问号)
-      allArr: [],
+      // 线的粗细
+      lineWidth: 3,
+      // 30(格子宽度) * 9(lineNum-1格子数量) + 3(线粗细) * 10(lineNum) = 300
+      canvasWidth: 300,
+      // 棋盘的行列 每行每列由10根线分为9个格
+      lineNum: 10,
       // 雷的数量
       rayNum: 10,
       rayArr: [],
-      // 已经打开的数组
-      openArr: [],
+      // 所有的格子里面的数据 {x, y, score, isPlay, tag}
+      // score(0:空 1-8:数字 9:雷) isPlay(是否已经打开) tag(1:旗子 2:问号)
+      allArr: [],
       // 计时
       usedTime: 0,
       timer: null,
       // 设置的等级 0:初级 1:中级 2:高级 3:地狱
       selectLevelArr: ['初级','中级','高级','地狱'],
-      selectLevel: 0,
+      selectLevel: 0
     };
   },
   computed: {
-    // 最终得分
-    finalScore() {
-      return this.score;
-    },
     // 用时
     usedTimeFormat() {
       let res = ''
@@ -144,11 +149,12 @@ export default {
     gameOver(val) {
       if (val) {
         this.$nextTick(() => {
-          this.$refs.gameover.popshow();
           clearInterval(this.timer)
-          // 发送游戏结束事件，上传最高分到数据库
-          this.$emit("updateScore", this.gameItem.id, this.usedTime);
-          this.scoreShow();
+            this.$refs.gameover.popshow();
+          if(this.isSuccess) {
+            // 发送游戏结束事件，上传最高分到数据库
+            this.$emit("updateScore", this.gameItem.id, this.usedTime);
+          }
         });
       }
     },
@@ -175,35 +181,42 @@ export default {
           })
           return res2
         })
-        if(isOver) this.gameOver = true
+        if(isOver) {
+          this.isSuccess = true
+          this.gameOver = true
+        }
       },
       deep: true
     }
   },
   mounted() {
-    let width = this.canvasWidth + 60
-    // 刚开始获取浏览器的宽高
-    this.popWidth = parseInt(
-      (width * 100) / document.documentElement.clientWidth
-    );
-    this.popHeight = parseInt(
-      (width * 100) / document.documentElement.clientHeight
-    );
-    // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function (e) {
-      this.windowTime = setTimeout(() => {
-        that.popWidth = parseInt((width * 100) / e.currentTarget.innerWidth);
-        that.popHeight = parseInt((width * 100) / e.currentTarget.innerHeight);
-      }, 50);
-    });
     this.init()
+    setTimeout(() => {
+      this.getCanvasMargin();
+    }, 1050);
   },
   destroyed() {
     clearInterval(this.timer)
   },
   methods: {
     init() {
+      this.setLevelData()
+      let width = this.canvasWidth + 60
+      // 刚开始获取浏览器的宽高
+      this.popWidth = parseInt(
+        (width * 100) / document.documentElement.clientWidth
+      );
+      this.popHeight = parseInt(
+        (width * 100) / document.documentElement.clientHeight
+      );
+      // 监听浏览器窗口大小变化
+      let that = this;
+      window.addEventListener("resize", function (e) {
+        this.windowTime = setTimeout(() => {
+          that.popWidth = parseInt((width * 100) / e.currentTarget.innerWidth);
+          that.popHeight = parseInt((width * 100) / e.currentTarget.innerHeight);
+        }, 50);
+      });
       setTimeout(() => {
         this.canvas = this.$refs.canvas
         this.ctx = this.canvas.getContext("2d")
@@ -214,9 +227,20 @@ export default {
         // 开始计时
         this.openTiming()
       }, 100);
-      setTimeout(() => {
-        this.getCanvasMargin();
-      }, 1050);
+    },
+    // 设置对应等级棋盘和雷的数量
+    setLevelData() {
+      this.usedTime = 0
+      clearInterval(this.timer)
+      const {lineNum, rayNum} = this.LevelData[this.selectLevel]
+      // 30(格子宽度) * 9(格子数量) + 3(线粗细) * 10(线的数量) = 300
+      this.canvasWidth = this.gridWidth * (lineNum - 1) + this.lineWidth * lineNum
+      this.lineNum = lineNum
+      this.rayNum = rayNum
+      // this.rayNum = 1  // 快速结束游戏
+      // 清空格子和雷数组
+      this.allArr.length = 0
+      this.rayArr.length = 0
     },
     // 获取canvas与浏览器 左边 / 顶部 的距离
     getCanvasMargin() {
@@ -259,7 +283,6 @@ export default {
       let gridNum = this.lineNum - 1
       for (let i = 0; i < gridNum; i++) {
         this.allArr.push([]);
-        this.openArr.push([]);
         for (let j = 0; j < gridNum; j++) {
           // 保存所有的棋子位置信息
           this.$set(this.allArr[i], j, {
@@ -270,8 +293,6 @@ export default {
           })
           // tag 不用监听
           this.allArr[i][j].tag = 0
-          // 将所有的位置置为 0
-          this.openArr[i][j] = null;
           this.drawGrid(gridWidth * j + 3, gridWidth * i + 3)
         }
       }
@@ -282,8 +303,8 @@ export default {
         this.allArr[x][y].score = 9
         this.besidRayGrid(x, y)
       }
-      console.log('作弊专用，雷的位置是：',this.rayArr)
-      console.log(this.allArr)
+      const rayArrRes = JSON.parse(JSON.stringify(this.rayArr))
+      console.log('作弊专用，雷的位置是：', rayArrRes.sort((a,b)=> a[0] - b[0]))
     },
     // 画格子
     drawGrid(x, y) {
@@ -344,11 +365,9 @@ export default {
               if(isRight) {
                 let newTag = tag === 0 ? 1 : ( tag === 1 ? 2 : 0)
                 this.allArr[i][j].tag = newTag
-                console.log(newTag)
                 this.drawTagRay(x, y, newTag)
               } else {
                 if(this.allArr[i][j].tag !== 0) return
-                this.openArr[i][j] = score;
                 if(score === 0) this.openNearGrid(i, j)
                 else this.drawChess(x, y, score);
                 this.allArr[i][j].isPlay = true
@@ -433,50 +452,14 @@ export default {
     // 改变等级
     changeLevel(i) {
       this.selectLevel = i
+      this.init()
     },
     // 弹出层移动的回调
     popChange() {
       this.getCanvasMargin();
     },
-    // 得分分段式显示
-    scoreShow() {
-      setTimeout(() => {
-        // 增加的值 控制在 1 秒
-        let addScore = this.score >= 100 ? parseInt(this.score / 100) : 1;
-        let addFinal =
-          this.finalScore >= 100 ? parseInt(this.finalScore / 100) : 1;
-        this.gOTimer = setInterval(() => {
-          if (this.gOScore.score < this.score) {
-            this.gOScore.score += addScore;
-          } else {
-            if (this.gOScore.final < this.finalScore) {
-              this.gOScore.final += addFinal;
-            } else {
-              clearInterval(this.gOTimer);
-            }
-          }
-        }, 10);
-      }, 100);
-    },
-    // 监听用户的键盘事件
-    onKeyDown() {
-      document.onkeydown = (e) => {
-        switch (e.code) {
-          case "ArrowLeft":
-            break;
-          case "ArrowUp":
-            break;
-          case "ArrowRight":
-            break;
-          case "ArrowDown":
-            break;
-        }
-      };
-    },
     // 缩小
     small() {
-      this.isPause = true;
-      // 暂停游戏
       this.$emit("small", this.gameItem);
       setTimeout(() => {
         this.getCanvasMargin();
@@ -536,6 +519,17 @@ export default {
     .time {
       text-align: center;
       color: #052564;
+    }
+  }
+  .fail {
+    user-select: none;
+    color: #052564;
+    font-weight: bold;
+    font-size: 18px !important;
+    white-space: nowrap;
+    .iconfont {
+      font-size: 18px;
+      color: #052564 !important;
     }
   }
 }

@@ -63,5 +63,5 @@ Vue.use(DropdownItem)
 Vue.prototype.$message = Message
 // 用于游戏结束 弹出对话框
 Vue.prototype.$confirm = MessageBox.confirm
-Vue.prototype.$loading = Loading
 Vue.prototype.$notify = Notification
+Vue.prototype.$loading = Loading.service;

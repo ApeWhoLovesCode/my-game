@@ -17,9 +17,9 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="得分" header-align="center" align="center">
+            <el-table-column :label="item.id !== 107 ? '得分' : '用时'" header-align="center" align="center">
               <template slot-scope="scope">
-                <div class="score-num">{{ scope.row.score }}</div>
+                <div class="score-num">{{ item.id !== 107 ? scope.row.score : usedTime(scope.row.score) }}</div>
               </template>
             </el-table-column>
             <el-table-column label="封禁该成绩" header-align="center" align="center">
@@ -59,6 +59,19 @@ export default {
       carheight: '',
       carIndex: 0,
       windowTime: null
+    }
+  },
+  computed: {
+    usedTime() {
+      return (time) => {
+        if(time === 0) return '无成绩'
+        let res = ''
+        let min = parseInt(time / 60 )
+        if(min < 1) res = time
+        else if(min < 60) res = `${min}:${time % 60}`
+        else res = `${parseInt(min / 60)}:${min % 60}:${time % 3600}`
+        return res
+      }
     }
   },
   created() {},

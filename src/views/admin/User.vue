@@ -124,6 +124,7 @@ export default {
       }
     };
     return {
+      loading: null,
       userList: [],
       userListCopy: [],
       pageNum: 1,
@@ -153,6 +154,7 @@ export default {
   },
   methods: {
     async getUserList() {
+      // const loading = this.$loading()
       try {
         const {data: res} = await adminApi.getAllUser()
         const list = res.data
@@ -166,6 +168,7 @@ export default {
       } catch (error) {
         console.log('error', error)
       }
+      // setTimeout(() => {loading.close()}, 300)
     },
     // 编辑用户
     editUser(isEdit, id) {
