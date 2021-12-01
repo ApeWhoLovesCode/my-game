@@ -230,6 +230,7 @@ export default {
     },
     // 设置对应等级棋盘和雷的数量
     setLevelData() {
+      this.gameOver = false
       this.usedTime = 0
       clearInterval(this.timer)
       const {lineNum, rayNum} = this.LevelData[this.selectLevel]

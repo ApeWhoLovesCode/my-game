@@ -1,7 +1,7 @@
 <template>
   <div class="gameItem">
     <!-- <img :src="gameItem.img" alt="" /> -->
-    <el-image :src="gameItem.img" fit="scale-down" />
+    <el-image :src="gameItem.img" fit="contain" />
     <div class="title">{{ gameItem.name }}</div>
   </div>
 </template>
@@ -58,7 +58,7 @@ $width: 100%; /* 声明宽度变量 */
     background: linear-gradient(
       to top,
       rgba(0, 0, 0, 0.9),
-      rgba(0, 0, 0, 0.01)
+      rgba(0, 0, 0, 0)
     );
     text-align: center;
     text-overflow: ellipsis;

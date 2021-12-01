@@ -29,7 +29,8 @@ import {
   RadioButton,
   Dropdown,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Autocomplete
 } from 'element-ui'
 
 Vue.use(Button)
@@ -58,6 +59,8 @@ Vue.use(RadioButton)
 Vue.use(Dropdown)
 Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
+Vue.use(Autocomplete)
+
 
 // 需要全局挂载 挂载到Vue的原型上
 Vue.prototype.$message = Message

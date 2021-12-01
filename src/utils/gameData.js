@@ -70,7 +70,7 @@ export default [
     'name': '扫雷',
     'ref': 'mineSweeper',
     'img': require('@/assets/img/phone3.png'),
-    'rules': '扫雷吧兄弟',
+    'rules': '一共有4个等级：9 * 9 雷:10（初级）、16 * 16 雷:40（中级）、22 * 22 雷:100（高级）、25 * 25 雷:200（地狱）。鼠标左键打开格子，右键标记地雷。',
     'begin': false, // 是否开始游戏
     'small': 0,   // 是否缩小 0:基础状态 1:缩小 2:恢复
     'delay': false,  // 用于缩小的延迟

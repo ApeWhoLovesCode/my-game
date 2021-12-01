@@ -6,7 +6,23 @@
         <span class="userName">{{ timeHello }}，{{ gameUser.name }}</span>
       </div>
       <div class="headerCenter">
-        <input class="searchInp" type="text" placeholder="Search..." />
+        <!-- <input class="searchInp" type="text" placeholder="Search..." /> -->
+        <el-autocomplete
+          class="searchInp"
+          v-model="searchString"
+          :fetch-suggestions="querySearch"
+          placeholder="请输入游戏名"
+          :trigger-on-focus="false"
+          @select="handleSelect"
+          @keyup.enter.native="searchConfirm"
+          clearable
+        >
+          <template slot-scope="{ item }">
+            <div class="hot_search">
+              
+            </div>
+          </template>
+        </el-autocomplete>
         <el-button
           class="searchBtn"
           type="primary"
@@ -348,7 +364,8 @@ export default {
       // 进入界面的特效
       isEnterTx: true,
       // 是否全屏
-      isFullScreen: false
+      isFullScreen: false,
+      searchString: ''
     };
   },
   computed: {
@@ -607,7 +624,18 @@ export default {
         else if (document.mozCancelFullScreen) document.mozCancelFullScreen()
         else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen()
       }
-      
+    },
+    // 输入框获取焦点时调用的方法
+    querySearch(queryString, cb) {
+      let results = this.gamesList.slice(2,5);
+      // 调用 callback 返回建议列表的数据
+      cb(results);
+    },
+    handleSelect() {
+
+    },
+    searchConfirm() {
+
     }
   },
 };
@@ -714,17 +742,19 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    .searchInp {
+    ::v-deep .searchInp {
       width: 60%;
-      min-width: 300px;
-      color: #fff;
-      padding: 0 15px;
-      height: 100%;
-      border: none;
-      outline: none;
-      border-radius: 9px 0 0 9px;
-      background: #292929;
-      box-shadow: 1px -1px 1px 0px #555 inset;
+      // outline: none;
+      .el-input__inner {
+        width: 100%;
+        height: 35px;
+        min-width: 300px;
+        border-radius: 9px 0 0 9px;
+        color: #fff;
+        background: #292929;
+        box-shadow: 1px -1px 1px 0px #555 inset;
+        border: none;
+      }
     }
     .searchBtn {
       background: #4840a3;
