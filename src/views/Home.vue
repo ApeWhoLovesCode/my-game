@@ -9,9 +9,9 @@
         <!-- <input class="searchInp" type="text" placeholder="Search..." /> -->
         <el-autocomplete
           class="searchInp"
+          placeholder="请输入游戏名"
           v-model="searchString"
           :fetch-suggestions="querySearch"
-          placeholder="请输入游戏名"
           :trigger-on-focus="false"
           @select="handleSelect"
           @keyup.enter.native="searchConfirm"
@@ -19,7 +19,11 @@
         >
           <template slot-scope="{ item }">
             <div class="hot_search">
-              
+              <el-image class="search_img" fit="cover" :src="item.img"></el-image>
+              <div class="search_right">
+                <div class="search_game">{{item.name}}</div>
+                <div class="search_rules">{{item.rules}}</div>
+              </div>
             </div>
           </template>
         </el-autocomplete>
@@ -473,14 +477,12 @@ export default {
       if (this.gameTabsList.indexOf(gameItem) == -1) {
         this.gameTabsList.push(gameItem);
       }
-
       // 将对应的游戏隐藏
       for (let item of this.gamesList) {
         if (item.id == gameItem.id) {
           item.small = 1;
         }
       }
-
       // 恢复点击盒子的事件
       setTimeout(() => (this.isSmall = false), 50);
       setTimeout(() => {
@@ -626,16 +628,22 @@ export default {
       }
     },
     // 输入框获取焦点时调用的方法
-    querySearch(queryString, cb) {
-      let results = this.gamesList.slice(2,5);
+    async querySearch(name, cb) {
+      const {data: res} = await api.search({name})
+      let results = res.data
+      if(results.length === 0) {
+        this.$message({ type:'info', message:`没有找到有关“${name}”的游戏，以下向您推荐了其他的几个游戏！`,duration: 1500 })
+        const num = parseInt(Math.random() * (this.gamesList.length - 5))
+        results = this.gamesList.slice(num, num + 5);
+      }
       // 调用 callback 返回建议列表的数据
       cb(results);
     },
-    handleSelect() {
-
+    handleSelect(item) {
+      this.gameItemClick(item.id)
     },
     searchConfirm() {
-
+      this.gamesList.slice()
     }
   },
 };
@@ -817,6 +825,33 @@ export default {
       width: 100%;
       height: 100%;
       border-radius: 50%;
+    }
+  }
+}
+
+// 搜索弹出内容的样式
+.hot_search {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  height: 100px;
+  .search_img {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+  }
+  .search_right {
+    flex: 1;
+    padding-left: 15px;
+    .search_game {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .search_rules {
+      font-size: 14px;
+      line-height: 20px;
+      color: #acacac;
+      white-space: pre-wrap;
     }
   }
 }

@@ -34,5 +34,9 @@ export default {
   // 获取排行榜数据
   getRankList(gameId) {
     return http.get(`/${api}/games/rankList`, gameId)
+  },
+  // 搜索
+  search(name) {
+    return http.get(`/${api}/games/search`, name)
   }
 }
