@@ -38,5 +38,13 @@ export default {
   // 搜索
   search(name) {
     return http.get(`/${api}/games/search`, name)
+  },
+  // 获取评论数据
+  getComments() {
+    return http.get(`/${api}/comments/commentsData`)
+  },
+  // 发送评论
+  sendMsg(params) {
+    return http.post(`/${api}/comments/sendMsg`, params)
   }
 }

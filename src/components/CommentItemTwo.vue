@@ -4,32 +4,32 @@
       <img :src="replys.avatar" />
     </div>
     <div class="right">
-      <!-- 一级评论 -->
       <div class="content">
-        <span class="name">{{ replys.nickname }}</span>
+        <span class="name">{{ replys.name }}</span>
+        <span v-if="replys.to_user" class="reply">回复<i class="reply-user">@{{replys.to_user}}：</i></span>
         {{ replys.content }}
       </div>
       <div class="bottom">
+        <span class="time">{{ replys.creat_time }}</span>
         <div class="bottomItem">
           <span class="iconfont icon-dianzan_kuai"></span>
-          <span>102</span>
+          <span>{{replys.like}}</span>
         </div>
         <div class="bottomItem">
           <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>5</span>
+          <span>{{replys.no_like}}</span>
         </div>
         <div class="bottomItem" @click="isReplyShow">
           <span class="iconfont icon-pinglun"></span>
           <span>回复</span>
         </div>
-        <span class="time">{{ createTime }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import moment from "moment";
+// import moment from "moment";
 export default {
   name: "commentItemTwo",
   props: {
@@ -44,17 +44,17 @@ export default {
   data() {
     return {};
   },
-  computed: {
-    createTime() {
-      let str = moment(this.replys.createTime).format("yyyy-MM-DD hh:mm:ss");
-      return str;
-    },
-  },
+  // computed: {
+  //   createTime() {
+  //     let str = moment(this.replys.createTime).format("yyyy-MM-DD hh:mm:ss");
+  //     return str;
+  //   },
+  // },
   watch: {},
   mounted() {},
   methods: {
     isReplyShow() {
-      this.$emit("isReplyShow", this.replys.nickname);
+      this.$emit("isReplyShow", this.replys);
     },
   },
 };
@@ -79,11 +79,19 @@ export default {
     .content {
       font-size: 13px;
       padding: 5px 10px 5px 0;
+      // 字间距
+      letter-spacing: 2px;
+      line-height: 22px;
       .name {
         font-size: 14px;
-        font-weight: bold;
-        color: #c4c3d8;
-        margin-right: 15px;
+        color: #eeeeee;
+        margin-right: 10px;
+      }
+      .reply {
+        .reply-user {
+          margin-left: 5px;
+          color: #b9abf6;
+        }
       }
     }
     .bottom {
@@ -91,7 +99,7 @@ export default {
       align-items: center;
       .bottomItem {
         color: #d1d1d1;
-        margin-right: 25px;
+        margin-left: 25px;
         cursor: pointer;
         span {
           font-size: 13px;

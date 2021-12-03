@@ -1,6 +1,5 @@
 /* 退出登录的样式 */
 .el-popover {
-  width: 100px !important;
   min-width: 100px;
   opacity: 0.9;
   padding: 10px 0;

@@ -71,8 +71,8 @@
         </el-tooltip>
         <!-- 登录 / 退出 -->
         <el-popover
-          placement="top"
-          width="160"
+          placement="bottom"
+          width="100"
           v-model="islogout"
           trigger="hover"
         >

@@ -5,7 +5,7 @@
     </div>
     <div class="right">
       <div class="header">
-        <span class="name">{{ comments.nickname }}</span>
+        <span class="name">{{ comments.name }}</span>
         <span class="gameName">#贪吃蛇</span>
       </div>
       <!-- 一级评论 -->
@@ -13,19 +13,19 @@
         {{ comments.content }}
       </div>
       <div class="bottom">
+        <span class="time">{{ comments.creat_time }}</span>
         <div class="bottomItem">
           <span class="iconfont icon-dianzan_kuai"></span>
-          <span>102</span>
+          <span>{{comments.like}}</span>
         </div>
         <div class="bottomItem">
           <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>5</span>
+          <span>{{comments.no_like}}</span>
         </div>
         <div class="bottomItem" @click="replyClick">
           <span class="iconfont icon-pinglun"></span>
           <span>回复</span>
         </div>
-        <span class="time">{{ createTime }}</span>
       </div>
       <!-- 二级评论 -->
       <div class="twoComment">
@@ -37,7 +37,7 @@
           @isReplyShow="isReplyShow"
         />
         <div class="seeReply" v-if="!isShowMoreReply">
-          共有{{ comments.replyComments.length }}条回复,
+          共有{{ comments.childList.length }}条回复,
           <span @click="isShowMoreReply = true">点击查看</span>
         </div>
         <template v-if="isShowMoreReply">
@@ -56,9 +56,12 @@
           type="textarea"
           :autosize="{ minRows: 3, maxRows: 5 }"
           :placeholder="replyPlaceholder"
+          :maxlength="1000"
+          show-word-limit
           v-model="replyContent"
+          @keyup.enter.native="sendMsg"
         />
-        <el-button type="small">发表评论</el-button>
+        <el-button type="small" @click="sendMsg">发表评论</el-button>
       </div>
     </div>
   </div>
@@ -66,7 +69,6 @@
 
 <script>
 import CommentItemTwo from "@/components/CommentItemTwo.vue";
-import moment from "moment";
 
 export default {
   name: "commentItem",
@@ -84,8 +86,8 @@ export default {
       isReply: false,
       // 回复的内容
       replyContent: "",
-      // 回复的人名
-      replyName: this.comments.nickname,
+      // 回复的人名 iid 只用于显示隐藏评论框
+      replyUser: { iid: this.comments.uid,uid: null, name: this.comments.name},
       // 超过 3 个的二级评论
       moreReplyComments: [],
       // 显示更多回复
@@ -93,18 +95,13 @@ export default {
     };
   },
   computed: {
-    // 处理后端的时间字符串
-    createTime() {
-      let str = moment(this.comments.createTime).format("yyyy-MM-DD hh:mm:ss");
-      return str;
-    },
     // 回复的人
     replyPlaceholder() {
-      return "回复 @" + this.replyName + "：";
+      return "回复 @" + this.replyUser.name + "：";
     },
     // 截取前三个评论，多余的存到另一个数组中
     replyComments22() {
-      let replyList = this.comments.replyComments;
+      let replyList = this.comments.childList;
       if (replyList.length <= 3) {
         return replyList;
       } else {
@@ -118,21 +115,38 @@ export default {
   methods: {
     // 点击了回复
     replyClick() {
-      if (this.comments.nickname == this.replyName) {
+      if (this.comments.uid == this.replyUser.iid) {
         this.isReply = !this.isReply;
       } else {
-        this.replyName = this.comments.nickname;
+        this.replyContent = ''
+        this.replyUser.iid = this.comments.uid;
+        this.replyUser.uid = null;
+        this.replyUser.name = this.comments.name;
         this.isReply = true;
       }
     },
-    isReplyShow(name) {
-      if (name == this.replyName) {
+    isReplyShow(user) {
+      if (user.uid == this.replyUser.iid) {
         this.isReply = !this.isReply;
       } else {
-        this.replyName = name;
+        this.replyContent = ''
+        this.replyUser.iid = user.uid;
+        this.replyUser.uid = user.uid;
+        this.replyUser.name = user.name;
         this.isReply = true;
       }
     },
+    sendMsg() {
+      if(!this.replyContent) {
+        this.$message({type: 'info', message: '你还没有评论哦', duration: 1000})
+        return
+      } 
+      const msg = {fid: this.comments.id, to_uid: this.replyUser.uid, content: this.replyContent}
+      this.$emit('replayMsg', msg)
+      this.replyContent = ''
+      this.isReply = false
+      this.replyUser = { iid: 0, uid: 0, name: ''}
+    }
   },
 };
 </script>
@@ -155,19 +169,23 @@ export default {
   }
   .right {
     flex: 1;
+    max-width: 1000px;
     .name {
       font-size: 14px;
       font-weight: bold;
-      color: #474294;
+      color: #cedaff;
       margin-right: 15px;
     }
     .gameName {
       font-size: 14px;
-      color: #413a9e;
+      color: #cedaff;
     }
     .content {
       font-size: 14px;
       padding: 5px 20px 5px 0;
+      // 字间距
+      letter-spacing: 2px;
+      line-height: 22px;
     }
     .bottom {
       display: flex;
@@ -175,7 +193,7 @@ export default {
       margin-bottom: 10px;
       .bottomItem {
         color: #d1d1d1;
-        margin-right: 25px;
+        margin-left: 25px;
         cursor: pointer;
         span {
           font-size: 14px;
@@ -204,13 +222,14 @@ export default {
         color: #e0e3e6;
         span {
           display: inline-block;
-          color: #40399c;
+          color: #948eec;
           cursor: pointer;
-          padding: 1px 3px;
+          padding: 1px 5px;
           border-radius: 3px;
         }
         span:hover {
-          background: #b0afdb;
+          color: #fff;
+          background: #9f9ed3;
         }
       }
     }
@@ -226,7 +245,7 @@ export default {
         max-width: 500px;
       }
       .el-button {
-        margin-left: 20px;
+        margin-left: 15px;
         width: 80px;
         font-size: 14px;
         line-height: 18px;
@@ -234,12 +253,12 @@ export default {
         letter-spacing: 4px;
         white-space: unset;
         height: 100%;
-        background: #a798eb;
+        background: #a793f8;
         border: none;
         color: #e9e9e9;
       }
       .el-button:hover {
-        opacity: 0.8;
+        opacity: 0.85;
         color: #fff;
       }
     }
