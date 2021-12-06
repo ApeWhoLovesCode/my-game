@@ -3,7 +3,7 @@ import http from "./http.js"
 let api = 'api'    // 本地 vue.config.js proxy 代理
 
 export default {
-  /* 
+  /**
    * 用户管理
    */
   // 登录
@@ -30,9 +30,9 @@ export default {
   editUser(params) {
     return http.post(`/${api}/admin/users/editUser`, params)
   },
-  /* 
-  * 游戏管理
-  */
+  /**
+   * 游戏管理
+   */
   // 获取游戏数据
   getGameList() {
     return http.get(`/${api}/admin/games/getGameList`)
@@ -44,14 +44,19 @@ export default {
   editGame(params) {
     return http.post(`/${api}/admin/games/editGame`, params)
   },
-  /* 
-  * 得分管理
-  */
+  /**
+   * 得分管理
+   */
   getScoreList() {
     return http.get(`/${api}/admin/score/getScoreList`)
   },
   banScore(params) {
     return http.post(`/${api}/admin/score/banScore`, params)
+  },
+  /**
+   * 评论管理
+   */
+  getCommentList() {
+    return http.get(`/${api}/admin/comments/getCommentList`)
   }
- 
 }

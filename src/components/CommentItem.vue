@@ -26,15 +26,34 @@
           <span class="iconfont icon-pinglun"></span>
           <span>回复</span>
         </div>
+        <el-popover
+          v-if="comments.isMe"
+          placement="top"
+          width="200"
+          v-model="visible"
+        >
+          <div class="delete-pop">
+            <div class="delete-text">删除评论后，评论下所有回复都会被删除是否继续？</div>
+            <div class="delete-bottom">
+              <span class="cancel" @click="visible=false">取消</span>
+              <span class="determine" @click="$emit('deleteMsg', {id:comments.id, isOne:true});visible=false">确定</span>
+            </div>
+          </div>
+          <div slot="reference" class="bottomItem">
+            <span class="iconfont icon-changyonggoupiaorenshanchu"></span>
+            <span>删除</span>
+          </div>
+        </el-popover>
       </div>
       <!-- 二级评论 -->
       <div class="twoComment">
         <CommentItemTwo
-          v-for="item in replyComments22"
+          v-for="item in replyComments"
           :key="item.id"
           :replys="item"
           :isReply="isReply"
           @isReplyShow="isReplyShow"
+          @deleteMsg="$emit('deleteMsg', $event)"
         />
         <div class="seeReply" v-if="!isShowMoreReply">
           共有{{ comments.childList.length }}条回复,
@@ -47,6 +66,7 @@
             :replys="item"
             :isReply="isReply"
             @isReplyShow="isReplyShow"
+            @deleteMsg="$emit('deleteMsg', $event)"
           />
         </template>
       </div>
@@ -59,7 +79,7 @@
           :maxlength="1000"
           show-word-limit
           v-model="replyContent"
-          @keyup.enter.native="sendMsg"
+          @keyup.native="sendMsg"
         />
         <el-button type="small" @click="sendMsg">发表评论</el-button>
       </div>
@@ -92,6 +112,8 @@ export default {
       moreReplyComments: [],
       // 显示更多回复
       isShowMoreReply: true,
+      // 删除弹出层的显示与隐藏
+      visible: false
     };
   },
   computed: {
@@ -100,7 +122,7 @@ export default {
       return "回复 @" + this.replyUser.name + "：";
     },
     // 截取前三个评论，多余的存到另一个数组中
-    replyComments22() {
+    replyComments() {
       let replyList = this.comments.childList;
       if (replyList.length <= 3) {
         return replyList;
@@ -136,7 +158,8 @@ export default {
         this.isReply = true;
       }
     },
-    sendMsg() {
+    sendMsg(e) {
+      if(e.shiftKey || e.key !== 'Enter') return
       if(!this.replyContent) {
         this.$message({type: 'info', message: '你还没有评论哦', duration: 1000})
         return
@@ -146,7 +169,7 @@ export default {
       this.replyContent = ''
       this.isReply = false
       this.replyUser = { iid: 0, uid: 0, name: ''}
-    }
+    },
   },
 };
 </script>
@@ -261,6 +284,39 @@ export default {
         opacity: 0.85;
         color: #fff;
       }
+    }
+  }
+}
+/* 删除二次确认 */
+.delete-pop {
+  padding: 5px 15px;
+  .delete-text {
+    color: #67686f;
+    font-size: 14px;
+  }
+  .delete-bottom {
+    display: flex;
+    justify-content: center;
+    font-size: 12px;
+    margin-top: 10px;
+    span {
+      padding: 3px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-right: 12px;
+    }
+    span:last-child {
+      margin-right: 0;
+    }
+    .cancel {
+      background: #e9e9e9;
+    }
+    .determine {
+      background: #a895ec;
+      color: #fff;
+    }
+    span:hover {
+      opacity: 0.8;
     }
   }
 }

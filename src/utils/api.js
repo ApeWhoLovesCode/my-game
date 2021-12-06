@@ -40,11 +40,15 @@ export default {
     return http.get(`/${api}/games/search`, name)
   },
   // 获取评论数据
-  getComments() {
-    return http.get(`/${api}/comments/commentsData`)
+  getComments(id) {
+    return http.get(`/${api}/comments/commentsData`, id)
   },
   // 发送评论
   sendMsg(params) {
     return http.post(`/${api}/comments/sendMsg`, params)
+  },
+  // 删除对应的用户评论
+  deleteMsg(params) {
+    return http.delete(`/${api}/comments/deleteMsg`, params)
   }
 }

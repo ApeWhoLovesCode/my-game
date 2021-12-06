@@ -12,7 +12,7 @@
         <el-table-column label="用户信息" header-align="center" align="center">
           <template slot-scope="scope">
             <div class="userInfo">
-              <!-- <img class="user-img" :src="scope.row.avatar" /> -->
+              <img class="user-img" :src="scope.row.avatar" />
               <div class="name">{{ scope.row.name }}</div>
             </div>
           </template>
@@ -295,13 +295,14 @@ export default {
     .userInfo {
       display: flex;
       align-items: center;
-      justify-content: center;
       .user-img {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
         margin-right: 10px;
       }
       .name {
+        flex: 1;
         font-weight: bold;
       }
     }

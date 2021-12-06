@@ -23,6 +23,24 @@
           <span class="iconfont icon-pinglun"></span>
           <span>回复</span>
         </div>
+        <el-popover
+          v-if="replys.isMe"
+          placement="top"
+          width="190"
+          v-model="visible"
+        >
+          <div class="delete-pop">
+            <div class="delete-text">您确定要删除该评论吗？</div>
+            <div class="delete-bottom">
+              <span class="cancel" @click="visible=false">取消</span>
+              <span class="determine" @click="deleteMsg">确定</span>
+            </div>
+          </div>
+          <div slot="reference" class="bottomItem">
+            <span class="iconfont icon-changyonggoupiaorenshanchu"></span>
+            <span>删除</span>
+          </div>
+        </el-popover>
       </div>
     </div>
   </div>
@@ -42,7 +60,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      visible: false
+    };
   },
   // computed: {
   //   createTime() {
@@ -56,6 +76,10 @@ export default {
     isReplyShow() {
       this.$emit("isReplyShow", this.replys);
     },
+    deleteMsg() {
+      this.$emit('deleteMsg', {id:this.replys.id, isOne:false});
+      this.visible = false
+    }
   },
 };
 </script>
@@ -120,6 +144,39 @@ export default {
         color: #c2c2c2;
         font-size: 12px;
       }
+    }
+  }
+}
+/* 删除二次确认 */
+.delete-pop {
+  padding: 5px 15px;
+  .delete-text {
+    color: #67686f;
+    font-size: 14px;
+  }
+  .delete-bottom {
+    display: flex;
+    justify-content: center;
+    font-size: 12px;
+    margin-top: 10px;
+    span {
+      padding: 3px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-right: 12px;
+    }
+    span:last-child {
+      margin-right: 0;
+    }
+    .cancel {
+      background: #e9e9e9;
+    }
+    .determine {
+      background: #a895ec;
+      color: #fff;
+    }
+    span:hover {
+      opacity: 0.8;
     }
   }
 }

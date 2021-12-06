@@ -18,7 +18,7 @@
           :maxlength="1000"
           placeholder="发一条友善的评论吧(*^_^*)"
           v-model="replyContent"
-          @keyup.enter.native="sendMsg()"
+          @keyup.native="sendMsg"
         />
         <el-button class="send" type="small" @click="sendMsg()">发送</el-button>
       </div>
@@ -26,10 +26,11 @@
     </el-popover>
     <vue-custom-scrollbar class="scrollComment">
       <CommentItem
-        v-for="item in commentList"
+        v-for="(item,index) in commentList"
         :key="item.id"
         :comments="item"
-        @replayMsg="sendMsg($event)"
+        @replayMsg="sendMsg"
+        @deleteMsg="deleteMsg($event, index)"
       />
     </vue-custom-scrollbar>
   </div>
@@ -68,24 +69,37 @@ export default {
     this.getCommentList();
   },
   methods: {
+    keyup(e) {
+      console.log(e);
+    },
     async getCommentList() {
-      const { data: res } = await api.getComments();
+      const { data: res } = await api.getComments({userId: this.gameUser.id});
+      // console.log(res.data);
       this.commentList = res.data;
     },
     // 发送评论
     async sendMsg(msg) {
-      if(!this.replyContent && !msg) {
+      // 按着了shift键时无法发送评论
+      if(!msg.fid && (msg.shiftKey || msg.key !== 'Enter')) return
+      if(!this.replyContent && !msg.fid) {
         this.$message({type: 'info', message: '你还没有评论哦', duration: 1000})
         return
+      }
+      // 排除评论中点击确认键的 '\n'
+      let content = ''
+      if(msg && msg.content) {
+        content = this.handleContent(msg.content)
+      } else {
+        content = this.handleContent(this.replyContent)
       }
       const {data: res} = await api.sendMsg({
         uid: this.gameUser.id, 
         fid: msg && msg.fid,
         to_uid: msg && msg.to_uid,
-        content: msg && msg.content || this.replyContent
+        content
       })
-      // 发一级评论
-      if(!msg) {
+      // 前端添加评论 - 发一级评论
+      if(!msg.fid) {
         this.commentList.unshift(res.data)
       } else {
         // 发二级评论
@@ -96,7 +110,25 @@ export default {
       else this.$message({type:'warning',message:'发送失败', duration: 1000})
       this.replyContent = ''
       this.isReply = false
-      
+    },
+    // 处理评论点击确认键 \n 的函数
+    handleContent(content) {
+      const index = content.lastIndexOf("\n")
+      if(index === -1) return content
+      return content.substring(0, index)
+    },
+    // 删除评论
+    async deleteMsg(msg, index) {
+      const { data: res } = await api.deleteMsg({ id: msg.id })
+      if(res.code === 200) this.$message({type:'success',message:'删除成功', duration: 1000})
+      else this.$message({type:'warning',message:'删除失败', duration: 1000})
+      // 前端删除评论
+      if(msg.isOne) {
+        this.commentList.splice(index, 1)
+      } else {
+        const i = this.commentList[index].childList.findIndex(item => item.id === msg.id)
+        this.commentList[index].childList.splice(i, 1)
+      }
     }
   },
 };
@@ -117,10 +149,12 @@ export default {
   // 不提升层级scroll监听不到
   z-index: 95;
   .title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #fff;
-    padding-bottom: 15px;
+    padding: 8px 0;
+    margin-right: 100px;
+    box-shadow: 0 4px 3px -3px #ccc;
   }
   .comments-btn {
     position: absolute;
