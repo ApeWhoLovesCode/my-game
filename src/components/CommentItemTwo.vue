@@ -106,6 +106,8 @@ export default {
       // 字间距
       letter-spacing: 2px;
       line-height: 22px;
+      /* 加了这个属性 \n 才有换行效果 */
+      white-space: pre-wrap;
       .name {
         font-size: 14px;
         color: #eeeeee;

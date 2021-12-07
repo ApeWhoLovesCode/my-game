@@ -58,5 +58,9 @@ export default {
    */
   getCommentList() {
     return http.get(`/${api}/admin/comments/getCommentList`)
-  }
+  },
+  // 删除对应的用户评论
+  deleteComment(params) {
+    return http.delete(`/${api}/admin/comments/deleteComment`, params)
+  },
 }

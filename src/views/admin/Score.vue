@@ -7,7 +7,7 @@
           <div class="score-title">{{item.name}}</div>
         </div>
         <vue-custom-scrollbar class="scroll-card">
-          <el-table :data="item.rankList" stripe style="width: 100%">
+          <el-table border :data="item.rankList" stripe style="width: 100%">
             <el-table-column type="index" header-align="center" align="center" width="70" label="序号" />
             <el-table-column label="用户信息" header-align="center" align="center">
               <template slot-scope="scope">
@@ -181,6 +181,7 @@ export default {
       width: 100%;
       height: 82%;
       .userInfo {
+        padding-left: 20px;
         display: flex;
         align-items: center;
         .avatar {

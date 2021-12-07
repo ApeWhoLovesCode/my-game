@@ -1,12 +1,12 @@
 <template>
   <div class="page-comment">
     <vue-custom-scrollbar class="scroll-area">
-      <el-table :data="commentList" stripe style="width: 100%">
-        <el-table-column type="index" header-align="center" align="center" width="70" label="序号" />
-        <el-table-column label="评论用户信息" header-align="center" align="center">
+      <el-table border :data="commentList" stripe style="width: 100%" row-key="id" :tree-props="{children: 'childList', hasChildren: ''}">
+        <!-- <el-table-column type="expand" header-align="center" align="center" width="70" label="序号" /> -->
+        <el-table-column label="评论用户信息" header-align="center" align="center" width="180">
           <template slot-scope="scope">
-            <div class="userInfo">
-              <img class="user-img" :src="scope.row.avatar" />
+            <div class="comment-userInfo">
+              <!-- <img class="user-img" :src="scope.row.avatar" /> -->
               <div class="name">{{ scope.row.name }}</div>
             </div>
           </template>
@@ -16,12 +16,12 @@
             <div class="comment-content">{{ scope.row.content }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="评论时间" header-align="center" align="center">
+        <el-table-column label="评论时间" header-align="center" align="center" width="180">
           <template slot-scope="scope">
-            <div class="comment-content">{{ scope.row.creat_time }}</div>
+            <div class="comment-time">{{ scope.row.creat_time }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" header-align="center" align="center">
+        <el-table-column label="操作" header-align="center" align="center" width="150">
           <template slot-scope="scope">
             <div class="delete">
               <el-button type="danger" icon="el-icon-delete" @click="deleteComment(scope.row)" circle></el-button>
@@ -58,7 +58,7 @@ export default {
   data() {
     return {
       pageNum: 1,
-      pageSize: 5,
+      pageSize: 10,
       commentList: [],
       commentListCopy: [],
     };
@@ -83,14 +83,24 @@ export default {
       this.commentList = list.slice(num, this.pageSize + num)
       this.commentListCopy = JSON.parse(JSON.stringify(list))
     },
-    deleteComment() {
-
+    async deleteComment(comment) {
+      const {data: res} = await adminApi.deleteComment({id: comment.id})
+      if(res.code === 200) {
+        this.$message({type: 'success', message: `用户：${comment.name} 的评论删除成功`})
+        this.getCommentList()
+      } else {
+        this.$message({type: 'warning', message: `删除失败`})
+      }
     },
-    sizeChange() {
-
+    sizeChange(size) {
+      this.pageNum = 1
+      this.commentList = this.commentListCopy.slice(0, size)
     },
-    curSizeChange() {
-
+    curSizeChange(size) {
+      this.$nextTick(() => {
+        let num = (size - 1) * this.pageSize
+        this.commentList = this.commentListCopy.slice(num, num + this.pageSize)
+      })
     }
   }
 };
@@ -104,9 +114,20 @@ export default {
   .scroll-area {
     flex: 1;
     width: 100%;
-    .userInfo {
+    /* 开头的名字外面盒子的样式 */
+    ::v-deep .el-table__body-wrapper {
+      .el-table__row td:first-child {
+        .cell {
+          display: flex;
+          align-items: center;
+          padding-left: 20px;
+        }
+      }
+    }
+    .comment-userInfo {
       display: flex;
       align-items: center;
+      margin-bottom: 0;
       .user-img {
         width: 30px;
         height: 30px;
@@ -116,13 +137,19 @@ export default {
       .name {
         flex: 1;
         font-weight: bold;
+        padding-left: 10px;
       }
     }
     .comment-content {
       font-size: 14px;
+      /* 加了这个属性 \n 才有换行效果 */
+      white-space: pre-wrap;
+      // border-right: 1px solid #d8d8d8;
+      // border-left: 1px solid #d8d8d8;
     }
   }
   .pagination {
+    margin-top: 15px;
     text-align: center;
   }
 }

@@ -88,7 +88,7 @@ export default {
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   .top-tab {
     position: absolute;
-    top: 2.5%;
+    top: 2%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -119,7 +119,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
-    height: 80%;
+    height: 85%;
     // background: #c4c2e0;
     background: rgba(255, 255, 255, .3);
     box-sizing: border-box;

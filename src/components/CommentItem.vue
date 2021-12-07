@@ -81,7 +81,7 @@
           v-model="replyContent"
           @keyup.native="sendMsg"
         />
-        <el-button type="small" @click="sendMsg">发表评论</el-button>
+        <el-button type="small" @click="sendMsg({key: 'Enter'})">发表评论</el-button>
       </div>
     </div>
   </div>
@@ -209,6 +209,8 @@ export default {
       // 字间距
       letter-spacing: 2px;
       line-height: 22px;
+      /* 加了这个属性 \n 才有换行效果 */
+      white-space: pre-wrap;
     }
     .bottom {
       display: flex;

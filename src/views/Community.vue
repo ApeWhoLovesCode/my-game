@@ -20,7 +20,7 @@
           v-model="replyContent"
           @keyup.native="sendMsg"
         />
-        <el-button class="send" type="small" @click="sendMsg()">发送</el-button>
+        <el-button class="send" type="small" @click="sendMsg({key: 'Enter'})">发送</el-button>
       </div>
       <el-button slot="reference" class="comments-btn" type="small">发表评论</el-button>
     </el-popover>
@@ -114,7 +114,7 @@ export default {
     // 处理评论点击确认键 \n 的函数
     handleContent(content) {
       const index = content.lastIndexOf("\n")
-      if(index === -1) return content
+      if(index === -1 || index !== content.length - 1) return content
       return content.substring(0, index)
     },
     // 删除评论

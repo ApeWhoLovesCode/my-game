@@ -30,7 +30,8 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  Autocomplete
+  Autocomplete,
+  Tree,
 } from 'element-ui'
 
 Vue.use(Button)
@@ -60,6 +61,7 @@ Vue.use(Dropdown)
 Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
 Vue.use(Autocomplete)
+Vue.use(Tree)
 
 
 // 需要全局挂载 挂载到Vue的原型上

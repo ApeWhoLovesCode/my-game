@@ -2,7 +2,7 @@
   <div class="page-user">
     <el-button @click="editUser(false)" plain >新增用户<i class="el-icon-user-solid el-icon--right"></i></el-button>
     <vue-custom-scrollbar class="scroll-area">
-      <el-table :data="userList" stripe style="width: 100%">
+      <el-table border :data="userList" stripe style="width: 100%">
         <el-table-column type="index" header-align="center" align="center" width="70" label="序号" />
         <el-table-column label="用户id" header-align="center" align="center" width="100">
           <template slot-scope="scope">

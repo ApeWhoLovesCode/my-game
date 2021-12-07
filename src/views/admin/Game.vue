@@ -1,7 +1,7 @@
 <template>
   <div class="page-game">
     <vue-custom-scrollbar class="scroll-area">
-      <el-table :data="gameList" stripe style="width: 100%">
+      <el-table border :data="gameList" stripe style="width: 100%">
         <el-table-column type="index" header-align="center" align="center" width="70" label="序号" />
         <el-table-column label="游戏图片" header-align="center" align="center" width="100">
           <template slot-scope="scope">
