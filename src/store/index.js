@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getStorage, setStorage } from '@/utils/storage'
+import adminApi from "@/utils/adminApi";
 
 Vue.use(Vuex)
 
@@ -13,6 +14,8 @@ export default new Vuex.Store({
     // 键盘事件
     currentKey: '',
     timeHello: '你好',
+    // 管理端搜索到的结果
+    searchRes: []
   },
   mutations: {
     setUserInfo(state, data) {
@@ -27,6 +30,9 @@ export default new Vuex.Store({
     // 用于键盘事件特效
     setCurrentKey(state, key) {
       state.currentKey = key
+    },
+    setSearchRes(state, data) {
+      state.searchRes = data
     },
     // 获取当前的时间 小时 判断是早上中午下午晚上
     getTime(state) {
@@ -45,6 +51,11 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    async adminSearch(context, params) {
+      const {data: res} = await adminApi.search(params)
+      context.state.searchRes = res.data
+      console.log(context.state.searchRes);
+    }
   },
   modules: {
   }

@@ -3,6 +3,10 @@ import http from "./http.js"
 let api = 'api'    // 本地 vue.config.js proxy 代理
 
 export default {
+  // 所有表的搜索方法
+  search(params) {
+    return http.get(`/${api}/admin/users/search`, params)
+  },
   /**
    * 用户管理
    */
@@ -15,16 +19,16 @@ export default {
     return http.get(`/${api}/admin/users/logout`)
   },
   // 获取所有用户信息
-  getAllUser() {
-    return http.get(`/${api}/admin/users/getAllUser`)
+  getAllUser(params) {
+    return http.get(`/${api}/admin/users/getAllUser`, params)
   },
   // 获取单个用户信息
   getUser(params) {
-    return http.post(`/${api}/admin/users/getUser`,params)
+    return http.post(`/${api}/admin/users/getUser`, params)
   },
   // 删除用户
   deleteUser(params) {
-    return http.delete(`/${api}/admin/users/deleteUser`,params)
+    return http.delete(`/${api}/admin/users/deleteUser`, params)
   },
   // 修改用户信息
   editUser(params) {

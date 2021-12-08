@@ -102,8 +102,22 @@ export default {
       }
     };
   },
-  created() {
-
+  watch: {
+    "$store.state.searchRes"(list) {
+      if(list.length === 0) {
+        let res = JSON.parse(JSON.stringify(this.gameListCopy))
+        this.gameList = res.slice(0, this.pageSize)
+        return
+      }
+      list.forEach(item => {
+        if(item.isban) item.isban = true
+        else item.isban = false
+      })
+      this.pageNum = 1
+      this.pageSize = 10
+      this.total = list.length
+      this.gameList = list
+    }
   },
   mounted() {
     this.getGameList()

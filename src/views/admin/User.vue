@@ -42,7 +42,7 @@
         background
         :page-sizes="[2, 5, 10, 20, 50]"
         layout="total, sizes, prev, pager, next, jumper"
-        :page-count="pageCount"
+        :total="total"
         :current-page.sync="pageNum"
         :page-size.sync="pageSize"
         @size-change="sizeChange"
@@ -89,6 +89,7 @@ import api from "@/utils/api";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
+import {mapState} from 'vuex'
 export default {
   components: {
     vueCustomScrollbar,
@@ -126,9 +127,9 @@ export default {
     return {
       loading: null,
       userList: [],
-      userListCopy: [],
       pageNum: 1,
       pageSize: 10,
+      total: 0,
       addUserList: {},
       addUserRule: {
         name: [
@@ -144,11 +145,26 @@ export default {
     }
   },
   computed: {
-    pageCount() {
-      return Math.ceil(this.userListCopy.length / this.pageSize) || 1
+    ...mapState(['searchRes'])
+  },
+  watch: {
+    // "$store.state.searchRes"(list) {
+    searchRes(list) {
+      if(list.length === 0) {
+        this.pageSize = 10
+        this.getUserList()
+        return
+      }
+      list.forEach(item => {
+        if(item.isBan) item.isBan = true
+        else item.isBan = false
+      })
+      this.pageNum = 1
+      this.pageSize = 50
+      this.total = list.length
+      this.userList = list
     }
   },
-  created() {},
   mounted() {
     this.getUserList()
   },
@@ -156,15 +172,14 @@ export default {
     async getUserList() {
       // const loading = this.$loading()
       try {
-        const {data: res} = await adminApi.getAllUser()
+        const {data: res} = await adminApi.getAllUser({pageNum: this.pageNum, pageSize: this.pageSize})
         const list = res.data
         list.forEach(item => {
           if(item.isBan) item.isBan = true
           else item.isBan = false
         })
-        let num = (this.pageNum - 1) * this.pageSize
-        this.userList = list.slice(num, this.pageSize + num)
-        this.userListCopy = JSON.parse(JSON.stringify(list))
+        this.total = res.data[0].total
+        this.userList = res.data
       } catch (error) {
         console.log('error', error)
       }
@@ -206,8 +221,6 @@ export default {
               const {data:res} = await api.register({ username, password, phone })
               if(res.code === 200) {
                 this.messageShow(true, `用户新增成功`)
-                this.pageNum = 1
-                this.pageSize = 10
                 this.getUserList()
               }
             } catch (error) {
@@ -244,8 +257,6 @@ export default {
           const {data: res} = await adminApi.deleteUser({id: user.id})
           if(res.code === 200) {
             this.messageShow(true, `${user.name}已被删除`)
-            this.pageNum = 1
-            this.pageSize = 10
             this.getUserList()
           }
         }).catch(() => {});
@@ -262,15 +273,11 @@ export default {
     },
     // 页码改变
     sizeChange(size) {
-      this.pageNum = 1
-      this.userList = this.userListCopy.slice(0, size)
+      this.getUserList()
     },
     // 当前页码发生改变
     curSizeChange(size) {
-      this.$nextTick(() => {
-        let num = (size - 1) * this.pageSize
-        this.userList = this.userListCopy.slice(num, num + this.pageSize)
-      })
+      this.getUserList()
     },
     messageShow(isSuccess, msg) {
       if (isSuccess) {
@@ -311,6 +318,9 @@ export default {
     text-align: center;
     margin-top: 20px;
     height: 30px;
+    ::v-deep .el-pagination__total {
+      color: #f4f4f5;
+    }
   }
   .userpop-wrap {
     margin-top: 30px;

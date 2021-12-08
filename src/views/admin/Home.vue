@@ -2,8 +2,12 @@
   <div class="page-admin-home">
     <div v-for="(item,i) in tabsList" :key="i" class="tabs" :class="`tabitem${i+1}`">
       <router-link :to="item.path">
-        <div class="tabTo">{{item.tab}}</div>
+        <div class="tabTo" @click="routerChange(item.table)">{{item.tab}}</div>
       </router-link>
+    </div>
+    <div class="search">
+      <el-input v-model="searchVal" placeholder="请输入名称" class="search-inp" clearable @keyup.native.enter="search()" />
+      <el-button type="primary" size="mini" class="search-btn" @click="search()">搜索</el-button>
     </div>
     <div class="top-tab">
       <el-tooltip effect="dark" content="全屏 / 退出全屏" placement="bottom">
@@ -26,8 +30,16 @@ import {mapState} from 'vuex'
 export default {
   data() {
     return {
-      tabsList: [{tab: '用户管理', path: '/admin/user'},{tab: '游戏管理', path: '/admin/game'},{tab: '评论管理', path: '/admin/comment'},{tab: '得分管理', path: '/admin/score'}],
-      isFullScreen: false
+      tabsList: [
+        {tab: '用户管理', path: '/admin/user', table: 'user'},
+        {tab: '游戏管理', path: '/admin/game', table: 'gamedata'},
+        {tab: '评论管理', path: '/admin/comment', table: 'comments'},
+        {tab: '得分管理', path: '/admin/score', table: 'gamescore'}
+      ],
+      isFullScreen: false,
+      searchVal: '',
+      // 代表现在要搜索的是哪个表
+      tableType: 'user'
     }
   },
   computed: {
@@ -38,8 +50,23 @@ export default {
       this.$router.push('/admin/login')
     }
   },
-  mounted() {},
+  mounted() {
+    this.tableType = this.tabsList.filter(item => item.path === this.$route.fullPath)[0].table
+    console.log(this.tableType);
+  },
   methods: {
+    routerChange(type) {
+      this.tableType = type
+    },
+    async search() {
+      console.log(this.tableType);
+      if(this.tableType === 'gamescore' || this.tableType === 'comments') {
+        this.$message('此页面的搜索功能还未开发！敬请期待')
+        return
+      }
+      this.$store.dispatch('adminSearch', { searchVal: this.searchVal, tableType: this.tableType })
+    },
+    // 全屏
     fullScreen(isFull) {
       this.isFullScreen = !this.isFullScreen
       if(isFull) {
@@ -61,18 +88,18 @@ export default {
         cancelButtonText: "不退了",
         center: true,
       })
-        .then(async () => {
-          // 清除用户 后端和前端的 登录状态
-          // await api.logout(); // 后端
-          this.$store.commit("setAdminUser", null); // 前端
-          this.$router.push("/admin/Login");
-          this.$message({
-            type: "info",
-            message: "已退出登录",
-            duration: 1000,
-          });
-        })
-        .catch(() => {});
+      .then(async () => {
+        // 清除用户 后端和前端的 登录状态
+        // await api.logout(); // 后端
+        this.$store.commit("setAdminUser", null); // 前端
+        this.$router.push("/admin/Login");
+        this.$message({
+          type: "info",
+          message: "已退出登录",
+          duration: 1000,
+        });
+      })
+      .catch(() => {});
     }
   },
 }
@@ -86,6 +113,32 @@ export default {
   width: 100vw;
   height: 100vh;
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
+  .search {
+    box-sizing: border-box;
+    position: absolute;
+    top: 1%;
+    left: 280px;
+    width: 300px;
+    height: 50px;
+    display: flex;
+    background: rgba(216, 216, 216, 0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    .search-inp {
+      height: 100%;
+      ::v-deep .el-input__inner {
+        height: 100%;
+      }
+    }
+    .search-btn {
+      margin-left: 10px;
+      background: #6a73da;
+      border: none;
+    }
+    .search-btn:hover {
+      opacity: .9;
+    }
+  }
   .top-tab {
     position: absolute;
     top: 2%;
