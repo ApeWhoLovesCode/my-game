@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2724499 */
-  src: url('//at.alicdn.com/t/font_2724499_3xasu1v1605.woff2?t=1638770883211') format('woff2'),
-       url('//at.alicdn.com/t/font_2724499_3xasu1v1605.woff?t=1638770883211') format('woff'),
-       url('//at.alicdn.com/t/font_2724499_3xasu1v1605.ttf?t=1638770883211') format('truetype');
+  src: url('//at.alicdn.com/t/font_2724499_f9zs2a6sj0s.woff2?t=1639040598014') format('woff2'),
+       url('//at.alicdn.com/t/font_2724499_f9zs2a6sj0s.woff?t=1639040598014') format('woff'),
+       url('//at.alicdn.com/t/font_2724499_f9zs2a6sj0s.ttf?t=1639040598014') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bianji:before {
+  content: "\e603";
+}
+
+.icon-pinglun1:before {
+  content: "\e60f";
+}
+
+.icon-rotate:before {
+  content: "\e615";
+}
+
+.icon-xuanzhuan:before {
+  content: "\e655";
 }
 
 .icon-changyonggoupiaorenshanchu:before {

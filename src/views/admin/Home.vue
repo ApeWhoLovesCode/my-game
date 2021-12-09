@@ -108,15 +108,15 @@ export default {
 <style scoped lang="scss">
 .page-admin-home {
   position: relative;
-  min-width: 1200px;
-  min-height: 600px;
+  min-width: 1300px;
+  min-height: 800px;
   width: 100vw;
   height: 100vh;
   background: linear-gradient(to right, #24243e, #332d77, #24243e);
   .search {
     box-sizing: border-box;
     position: absolute;
-    top: 1%;
+    // top: 1%;
     left: 280px;
     width: 300px;
     height: 50px;
@@ -124,6 +124,7 @@ export default {
     background: rgba(216, 216, 216, 0.3);
     padding: 8px 12px;
     border-radius: 8px;
+    animation: search .8s ease forwards;
     .search-inp {
       height: 100%;
       ::v-deep .el-input__inner {
@@ -139,9 +140,19 @@ export default {
       opacity: .9;
     }
   }
+  @keyframes search {
+    0% {
+      opacity: 0;
+      top: -50px;
+    }
+    100% {
+      opacity: 1;
+      top: 1%;
+    }
+  }
   .top-tab {
     position: absolute;
-    top: 2%;
+    top: 1.8%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -176,7 +187,7 @@ export default {
     // background: #c4c2e0;
     background: rgba(255, 255, 255, .3);
     box-sizing: border-box;
-    padding: 30px 100px;
+    padding: 1% 100px;
     // 修改和删除按钮的样式
     .el-button--primary {
       background-color: #8ea0f3;
@@ -190,16 +201,29 @@ export default {
     position: absolute;
     box-sizing: border-box;
     z-index: 1;
-    width: 200px;
-    height: 200px;
-    font-size: 24px;
+    // width: 200px;
+    // height: 200px;
+    // font-size: 24px;
     cursor: pointer;
     overflow: hidden;
     box-shadow: 0 0 20px 5px rgba(113, 92, 185, 0.5);
     user-select: none;
+    animation: tab 1s ease forwards;
     .tabTo {
       width: 100%;
       height: 100%;
+    }
+    @keyframes tab {
+      0% {
+        font-size: 12px;
+        width: 0px;
+        height: 0px;
+      }
+      100% {
+        font-size: 24px;
+        width: 200px;
+        height: 200px;
+      }
     }
   }
   .tabs:hover {
@@ -239,5 +263,6 @@ export default {
     line-height: 250px;
     background-image: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
   }
+  
 }
 </style>

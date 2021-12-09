@@ -3,7 +3,10 @@
     class="community"
     :class="isCommunityShow ? 'communityShow' : 'communityHide'"
   >
-    <div class="title">评论区</div>
+    <div class="title">
+      <div class="title-text">评论区</div><i class="iconfont icon-bianji"></i>
+      <div class="bottom_line"></div>
+    </div>
     <el-popover
       placement="left"
       width="500"
@@ -69,9 +72,6 @@ export default {
     this.getCommentList();
   },
   methods: {
-    keyup(e) {
-      console.log(e);
-    },
     async getCommentList() {
       const { data: res } = await api.getComments({userId: this.gameUser.id});
       // console.log(res.data);
@@ -149,13 +149,58 @@ export default {
   // 不提升层级scroll监听不到
   z-index: 95;
   .title {
+    position: relative;
+    display: flex;
+    align-items: center;
     font-size: 18px;
     font-weight: bold;
     color: #fff;
-    padding: 8px 0;
+    padding-left: 10px;
     margin-right: 100px;
-    box-shadow: 0 4px 3px -3px #ccc;
+    padding-bottom: 10px;
+    .title-text {
+      display: inline-block;
+      width: 60px;
+    }
+    .iconfont {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      margin-left: 10px;
+      font-size: 16px;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      animation: round 2s linear infinite alternate;
+    }
+    .bottom_line {
+      position: absolute;
+      left: 0;
+      bottom: 10px;
+      // width: 110px;
+      height: 2px;
+      background: #f3f3f3;
+      animation: line 2s linear infinite alternate;
+    }
   }
+  @keyframes round {
+    50% {
+      transform: translateX(0) rotate(0deg);
+    }
+    100% {
+      transform: translateX(100px) rotate(360deg);
+    }
+  }
+  @keyframes line {
+    0% {
+      width: 0px;
+    }
+    100% {
+      width: 200px;
+    }
+  }
+
   .comments-btn {
     position: absolute;
     top: 20px;
@@ -169,6 +214,7 @@ export default {
     margin: auto;
     width: 100%;
     height: calc(100% - 40px);
+    position: relative;
   }
 }
 .community .commentItem:last-child {
