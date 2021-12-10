@@ -67,7 +67,12 @@ export default {
   computed: {
     ...mapState(['gameUser'])
   },
-  watch: {},
+  watch: {
+    // 监听到分享，前端插入评论
+    "$store.state.shareData"(val) {
+      this.commentList.unshift(val)
+    }
+  },
   mounted() {
     this.getCommentList();
   },

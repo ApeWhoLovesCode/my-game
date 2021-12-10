@@ -27,8 +27,29 @@
     </div>
     <div class="bottom">
       <el-button class="cancel" @click="exit">退出游戏</el-button>
-      <el-button class="confirm" @click="restart">重新开始</el-button>
+      <el-button class="share btn" @click="share">分享得分</el-button>
+      <el-button class="confirm btn" @click="restart">重新开始</el-button>
     </div>
+    <fixedPop ref="sharePopRef" class="share-pop" :width="250">
+      <div class="share-title">
+        <i>分享到社区</i><i class="gameName">#{{gameName}}</i>
+      </div>
+      <div class="shareVal">{{shareVal}}</div>
+      <el-input
+        class="share-inp"
+        type="textarea"
+        :rows="3"
+        show-word-limit
+        :maxlength="500"
+        placeholder="分享一下你此时的心情吧"
+        v-model="inpVal"
+        @keyup.native="shareDetermine"
+      />
+      <div class="share-bottom">
+        <div class="cancel btn" @click="cancelShare">取消</div>
+        <div class="send btn" @click="shareDetermine({key: 'Enter'})">分享</div>
+      </div>
+    </fixedPop>
   </fixedPop>
 </template>
 
@@ -36,6 +57,7 @@
 import fixedPop from "@/components/fixedPop/fixedPop.vue";
 import vueCustomScrollbar from "vue-custom-scrollbar";
 import "vue-custom-scrollbar/dist/vueScrollbar.css";
+import {mapState} from 'vuex';
 import api from "../utils/api.js";
 export default {
   name: "gameover",
@@ -56,6 +78,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    score: {
+      type: Number || String,
+      require: false
+    }
   },
   data() {
     return {
@@ -66,9 +92,14 @@ export default {
         suppressScrollX: true,
         wheelPropagation: false,
       },
+      isShare: false,
+      // 分享的内容
+      shareVal: '',
+      inpVal: ''
     };
   },
   computed: {
+    ...mapState(['gameUser']),
     scoreText() {
       return this.gameId !== 107 ? '得分' : '用时' 
     }
@@ -89,7 +120,7 @@ export default {
         data.data.forEach(item => {
           item['g107'] = this.timeFormat(item['g107'])
         })
-      } 
+      }
       this.rankList = data.data;
     },
     timeFormat(time) {
@@ -105,6 +136,36 @@ export default {
     },
     popclose() {
       this.$refs.gameoverPop.popclose();
+    },
+    share() {
+      if(this.isShare) {
+        this.$message({type:'info',message:'请不要多次分享哦', duration: 1000})
+        return
+      }
+      if(this.gameId === 107) {
+        this.shareVal = `我在${this.gameName}中通关仅用时：${this.score}s~~`
+      } else {
+        this.shareVal = `我在${this.gameName}中得到了${this.score}分~~`
+      } 
+      this.$refs.sharePopRef.popshow()
+    },
+    cancelShare() {
+      this.$refs.sharePopRef.popclose()
+    },
+    // 确定分享
+    async shareDetermine(e) {
+      if(e.shiftKey || e.key !== 'Enter') return
+      let content = this.shareVal + this.inpVal
+      const {data: res} = await api.shareScore({
+        uid: this.gameUser.id, content, share_game: this.gameName
+      })
+      this.$store.commit('setShareData', res.data)
+      if(res.code === 200) {
+        this.$message({type:'success',message:'分享成功', duration: 1000})
+        this.isShare = true
+      }
+      else this.$message({type:'warning',message:'分享失败', duration: 1000})
+      this.$refs.sharePopRef.popclose()
     },
     exit() {
       this.$emit("exit");
@@ -137,7 +198,7 @@ export default {
         margin-bottom: 10px;
         animation: score 0.4s linear 0.3s forwards;
         i {
-          color: #e9e932;
+          color: #e9d732;
         }
       }
       .gameoverItem:last-child {
@@ -202,6 +263,13 @@ export default {
   .bottom {
     margin: 10px 30px;
     text-align: right;
+    .share {
+      padding: 10px;
+      font-size: 13px;
+      margin-right: 10px;
+      color: #fff;
+      background: #917ee6;
+    }
     .cancel {
       padding: 10px;
       font-size: 13px;
@@ -213,8 +281,50 @@ export default {
       background: #6557f7;
       color: #fff;
     }
-    .confirm:hover {
-      opacity: 0.8;
+    .btn:hover {
+      opacity: 0.85;
+    }
+  }
+  .share-pop {
+    padding: 20px 20px;
+    .share-title {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      user-select: none;
+      margin-bottom: 8px;
+      .gameName {
+        color: #7052db;
+      }
+    }
+    .shareVal {
+      font-size: 14px;
+      color: #FFAA00;
+      margin-bottom: 10px;
+    }
+    .share-bottom {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-template-rows: 40px;
+      grid-gap: 10px;
+      .cancel {
+        color: #333;
+      }
+      .send {
+        color: #7052db;
+      }
+      .btn {
+        line-height: 40px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #f1f1f1;
+      }
     }
   }
 }

@@ -1,5 +1,9 @@
 <template>
-  <div v-if="isShow" ref="fixedPop" class="popContent center">
+  <div v-if="isShow" 
+    ref="fixedPop" 
+    class="popContent center" 
+    :style="`width: ${width}px`"
+  >
     <slot></slot>
   </div>
 </template>
@@ -10,7 +14,7 @@ export default {
   props: {
     width: {
       type: Number,
-      default: 50,
+      default: 350,
     },
     height: {
       type: Number,
@@ -80,8 +84,8 @@ export default {
   background: #fff;
   border-radius: 2vw;
   box-shadow: 0 0 20px 10px rgba(31, 31, 31, 0.3);
-  min-width: 350px;
-  opacity: 0.9;
+  /* min-width: 350px; */
+  /* opacity: 0.9; */
   z-index: 101;
 }
 .center {

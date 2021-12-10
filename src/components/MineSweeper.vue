@@ -42,6 +42,7 @@
       ref="gameover"
       :gameName="gameItem.name"
       :gameId="gameItem.id"
+      :score="usedTimeFormat"
       @exit="exit"
       @restart="restart"
     >

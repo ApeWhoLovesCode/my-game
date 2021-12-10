@@ -35,6 +35,10 @@ export default {
   getRankList(gameId) {
     return http.get(`/${api}/games/rankList`, gameId)
   },
+  // 分享得分
+  shareScore(params) {
+    return http.post(`/${api}/comments/shareScore`, params)
+  },
   // 搜索
   search(name) {
     return http.get(`/${api}/games/search`, name)

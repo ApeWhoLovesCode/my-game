@@ -6,11 +6,11 @@
     <div class="right">
       <div class="header">
         <span class="name">{{ comments.name }}</span>
-        <span class="gameName">#贪吃蛇</span>
+        <span v-if="comments.share_game" class="gameName">#{{ comments.share_game }}</span>
       </div>
       <!-- 一级评论 -->
       <div class="content">
-        {{ comments.content }}
+        <span v-if="comments.share_game">游戏分享：</span>{{ comments.content }}
       </div>
       <div class="bottom">
         <span class="time">{{ comments.creat_time }}</span>
@@ -194,10 +194,10 @@ export default {
     flex: 1;
     max-width: 1000px;
     .name {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: bold;
       color: #cedaff;
-      margin-right: 15px;
+      margin-right: 20px;
     }
     .gameName {
       font-size: 14px;
@@ -211,6 +211,10 @@ export default {
       line-height: 22px;
       /* 加了这个属性 \n 才有换行效果 */
       white-space: pre-wrap;
+      span {
+        font-weight: bold;
+        color: #cedaff;
+      }
     }
     .bottom {
       display: flex;

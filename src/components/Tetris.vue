@@ -33,6 +33,7 @@
       ref="gameover"
       :gameName="gameItem.name"
       :gameId="gameItem.id"
+      :score="gOScore.final"
       @exit="exit"
       @restart="restart"
     >

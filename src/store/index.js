@@ -15,7 +15,9 @@ export default new Vuex.Store({
     currentKey: '',
     timeHello: '你好',
     // 管理端搜索到的结果
-    searchRes: []
+    searchRes: [],
+    // 分享的信息
+    shareData: {}
   },
   mutations: {
     setUserInfo(state, data) {
@@ -33,6 +35,10 @@ export default new Vuex.Store({
     },
     setSearchRes(state, data) {
       state.searchRes = data
+    },
+    // 分享的信息
+    setShareData(state, data) {
+      state.shareData = data
     },
     // 获取当前的时间 小时 判断是早上中午下午晚上
     getTime(state) {
