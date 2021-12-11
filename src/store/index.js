@@ -60,7 +60,6 @@ export default new Vuex.Store({
     async adminSearch(context, params) {
       const {data: res} = await adminApi.search(params)
       context.state.searchRes = res.data
-      console.log(context.state.searchRes);
     }
   },
   modules: {

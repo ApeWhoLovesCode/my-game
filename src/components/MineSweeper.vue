@@ -42,12 +42,13 @@
       ref="gameover"
       :gameName="gameItem.name"
       :gameId="gameItem.id"
-      :score="usedTimeFormat"
+      :score="{ time: usedTimeFormat, level: selectLevelArr[selectLevel] }"
+      :isSuccess="isSuccess"
       @exit="exit"
       @restart="restart"
     >
       <div v-if="isSuccess" class="gameoverItem">
-        用时: <i>{{ usedTimeFormat }}</i>
+        用时: <i>{{ usedTimeFormat }}s</i>
       </div>
       <div v-else class="fail gameoverItem">
         <i class="iconfont icon-shibaibiaoqing"></i>&nbsp;游戏失败

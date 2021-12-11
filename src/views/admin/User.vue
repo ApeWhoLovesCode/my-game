@@ -222,6 +222,9 @@ export default {
               if(res.code === 200) {
                 this.messageShow(true, `用户新增成功`)
                 this.getUserList()
+                this.$refs.myPopRef.popclose()
+              } else {
+                this.messageShow(false, res.data.message)
               }
             } catch (error) {
               this.messageShow(false, `用户新增失败`)
@@ -230,17 +233,17 @@ export default {
             try {
               const {id, name: username, phone} = this.addUserList
               const {data: res} = await adminApi.editUser({id, username, phone})
-              console.log(res)
               if(res.code === 200) {
-                this.messageShow(true, `修改成功`)
+                this.messageShow(true, `用户信息修改成功`)
                 this.getUserList()
+                this.$refs.myPopRef.popclose()
+              } else {
+                this.messageShow(false, res.data.message)
               }
             } catch (error) {
               this.messageShow(false, `修改失败`)
             }
           }
-          console.log('save')
-          this.$refs.myPopRef.popclose()
         }
       })
     },

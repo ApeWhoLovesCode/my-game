@@ -3,7 +3,7 @@
     <el-header>
       <div class="headerLeft">
         <span class="gameName">MY-GAME</span>
-        <span class="userName">{{ timeHello }}，{{ gameUser.name }}</span>
+        <span v-if="gameUser" class="userName">{{ timeHello }}，{{ gameUser.name }}</span>
       </div>
       <div class="headerCenter">
         <!-- <input class="searchInp" type="text" placeholder="Search..." /> -->
@@ -86,7 +86,7 @@
           </div>
           <!-- <i slot="reference" class="iconfont icon-denglu"></i> -->
           <div slot="reference" class="avatar">
-            <img v-if="gameUser.avatar" :src="gameUser.avatar" />
+            <img v-if="gameUser && gameUser.avatar" :src="gameUser.avatar" />
             <img v-else src="@/assets/img/user.png" alt="">
           </div>
         </el-popover>
@@ -143,6 +143,7 @@
     </el-container>
 
     <EditUSerInfo
+      v-if="isEditUserInfo"
       :isEditUserInfo.sync="isEditUserInfo"
       @closeUserInfo="closeUserInfo"
     />

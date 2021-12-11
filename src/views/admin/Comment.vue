@@ -13,7 +13,10 @@
         </el-table-column>
         <el-table-column label="评论内容" header-align="center" align="center">
           <template slot-scope="scope">
-            <div class="comment-content">{{ scope.row.content }}</div>
+            <div class="comment-content">
+              <i v-if="scope.row.share_game">游戏分享：</i>
+              {{ scope.row.content }}
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="评论时间" header-align="center" align="center" width="180">
@@ -71,13 +74,9 @@ export default {
   created() {
     this.getCommentList()
   },
-  mounted() {
-
-  },
   methods: {
     async getCommentList() {
       const {data: res} = await adminApi.getCommentList()
-      console.log(res.data);
       const list = res.data
       let num = (this.pageNum - 1) * this.pageSize
       this.commentList = list.slice(num, this.pageSize + num)
@@ -144,8 +143,9 @@ export default {
       font-size: 14px;
       /* 加了这个属性 \n 才有换行效果 */
       white-space: pre-wrap;
-      // border-right: 1px solid #d8d8d8;
-      // border-left: 1px solid #d8d8d8;
+      i {
+        color: #677ae5;
+      }
     }
   }
   .pagination {

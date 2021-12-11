@@ -41,6 +41,7 @@
 </template>
 
 <script>
+let listener  // 用于移除reset事件
 import adminApi from "@/utils/adminApi";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import 'vue-custom-scrollbar/dist/vueScrollbar.css'
@@ -77,12 +78,12 @@ export default {
   created() {},
   mounted() {
     this.getScoreList()
-    this.carheight = this.$refs.pageScoreRef.offsetHeight - 20 + 'px'
-    this.reSet = throttle(this.reSet, 30, true)
-    const that = this
-    window.addEventListener("resize", function (e) {
-      that.reSet()
-    });
+    // this.reSet = throttle(this.reSet, 30, true)
+    listener = () => { this.reSet() }
+    window.addEventListener("resize", listener);
+  },
+  destroyed() {
+    window.removeEventListener("resize", listener)
   },
   methods: {
     reSet() {
@@ -91,6 +92,7 @@ export default {
     async getScoreList() {
       try {
         const {data: res} = await adminApi.getScoreList()
+        this.carheight = this.$refs.pageScoreRef.offsetHeight - 20 + 'px'
         let list = res.data
         list.forEach((item) => {
           item['pageNum'] = 1

@@ -5,7 +5,7 @@ import store from '@/store/'
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: '/home' },
   {
     path: '/login',
     component: () => import('../views/Login.vue'),

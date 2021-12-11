@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import adminApi from "@/utils/adminApi";
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import {mapState} from 'vuex'
 export default {
@@ -48,18 +49,15 @@ export default {
   created() {
     if(!this.adminUser || this.adminUser.token !== 'lhh_admin_token_07_11') {
       this.$router.push('/admin/login')
-    }
-  },
-  mounted() {
+      return
+    } 
     this.tableType = this.tabsList.filter(item => item.path === this.$route.fullPath)[0].table
-    console.log(this.tableType);
   },
   methods: {
     routerChange(type) {
       this.tableType = type
     },
     async search() {
-      console.log(this.tableType);
       if(this.tableType === 'gamescore' || this.tableType === 'comments') {
         this.$message('此页面的搜索功能还未开发！敬请期待')
         return
@@ -90,7 +88,7 @@ export default {
       })
       .then(async () => {
         // 清除用户 后端和前端的 登录状态
-        // await api.logout(); // 后端
+        await adminApi.logout(); // 后端
         this.$store.commit("setAdminUser", null); // 前端
         this.$router.push("/admin/Login");
         this.$message({

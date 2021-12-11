@@ -136,13 +136,13 @@ export default {
     },
     // 调用修改用户信息的接口
     async editUser(params) {
-      const { data } = await api.editUser(params);
-      this.$store.commit("setUserInfo", data.data);
-      this.$message({
-        type: "success",
-        message: "修改成功",
-        duration: 1000,
-      });
+      const { data:res } = await api.editUser(params);
+      if(res.code === 200) {
+        this.$store.commit("setUserInfo", res.data);
+        this.$message({type: "success",message: "修改成功",duration: 1000,});
+      } else {
+        this.$message({type: "warning",message: res.data, duration: 1000,});
+      }
     },
     // 修改姓名
     reviseName() {

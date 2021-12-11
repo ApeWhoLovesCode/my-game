@@ -27,10 +27,10 @@
     </div>
     <div class="bottom">
       <el-button class="cancel" @click="exit">退出游戏</el-button>
-      <el-button class="share btn" @click="share">分享得分</el-button>
+      <el-button v-if="isRankList" class="share btn" @click="share">分享得分</el-button>
       <el-button class="confirm btn" @click="restart">重新开始</el-button>
     </div>
-    <fixedPop ref="sharePopRef" class="share-pop" :width="250">
+    <fixedPop v-if="isRankList" ref="sharePopRef" class="share-pop" :width="250">
       <div class="share-title">
         <i>分享到社区</i><i class="gameName">#{{gameName}}</i>
       </div>
@@ -78,9 +78,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    // Object 是扫雷传的，包括时间和等级(用时分享信息)
     score: {
-      type: Number || String,
+      type: Number | Object,
       require: false
+    },
+    isSuccess: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -138,14 +143,18 @@ export default {
       this.$refs.gameoverPop.popclose();
     },
     share() {
+      if(!this.isSuccess) {
+        this.$message({type:'info',message:'游戏失败了，无法分享噢', duration: 1000})
+        return
+      }
       if(this.isShare) {
         this.$message({type:'info',message:'请不要多次分享哦', duration: 1000})
         return
       }
       if(this.gameId === 107) {
-        this.shareVal = `我在${this.gameName}中通关仅用时：${this.score}s~~`
+        this.shareVal = `我在${this.gameName}${this.score.level}难度中通关仅用时：${this.score.time}s ~~ `
       } else {
-        this.shareVal = `我在${this.gameName}中得到了${this.score}分~~`
+        this.shareVal = `我在${this.gameName}中得到了${this.score}分 ~~ `
       } 
       this.$refs.sharePopRef.popshow()
     },
