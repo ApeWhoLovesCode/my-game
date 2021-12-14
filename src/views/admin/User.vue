@@ -253,16 +253,16 @@ export default {
     // 删除用户
     deleteUser(user) {
       this.$confirm('您确定要删除该用户吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async() => {
-          const {data: res} = await adminApi.deleteUser({id: user.id})
-          if(res.code === 200) {
-            this.messageShow(true, `${user.name}已被删除`)
-            this.getUserList()
-          }
-        }).catch(() => {});
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const {data: res} = await adminApi.deleteUser({id: user.id})
+        if(res.code === 200) {
+          this.messageShow(true, `${user.name}已被删除`)
+          this.getUserList()
+        }
+      }).catch(() => {});
     },
     // 封禁用户
     async banUser(user) {

@@ -83,13 +83,19 @@ export default {
       this.commentListCopy = JSON.parse(JSON.stringify(list))
     },
     async deleteComment(comment) {
-      const {data: res} = await adminApi.deleteComment({id: comment.id})
-      if(res.code === 200) {
-        this.$message({type: 'success', message: `用户：${comment.name} 的评论删除成功`})
-        this.getCommentList()
-      } else {
-        this.$message({type: 'warning', message: `删除失败`})
-      }
+      this.$confirm('该评论及其所有回复都会被删除，是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const {data: res} = await adminApi.deleteComment({id: comment.id})
+        if(res.code === 200) {
+          this.$message({type: 'success', message: `用户：${comment.name} 的评论删除成功`})
+          this.getCommentList()
+        } else {
+          this.$message({type: 'warning', message: `删除失败`})
+        }
+      }).catch(() => {});
     },
     sizeChange(size) {
       this.pageNum = 1

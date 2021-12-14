@@ -48,7 +48,7 @@
       @restart="restart"
     >
       <div v-if="isSuccess" class="gameoverItem">
-        用时: <i>{{ usedTimeFormat }}s</i>
+        用时: <i>{{ usedTimeFormat }}</i>
       </div>
       <div v-else class="fail gameoverItem">
         <i class="iconfont icon-shibaibiaoqing"></i>&nbsp;游戏失败

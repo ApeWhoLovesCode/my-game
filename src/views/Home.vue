@@ -15,7 +15,6 @@
           :trigger-on-focus="false"
           @select="handleSelect"
           @keyup.enter.native="searchConfirm"
-          clearable
         >
           <template slot-scope="{ item }">
             <div class="hot_search">
@@ -290,7 +289,7 @@
       ></span>
     </template>
 
-    <!-- <EnterTx v-if="isEnterTx" /> -->
+    <EnterTx v-if="isEnterTx" />
   </el-container>
 </template>
 
