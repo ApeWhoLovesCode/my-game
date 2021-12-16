@@ -30,7 +30,7 @@ section {
   position: relative;
   width: 20vw;
   height: 10vw;
-  margin: 13vh auto;
+  margin: 10vh auto;
   transform-style: preserve-3d;
   /* 添加动画 */
   animation: rotate 12s linear infinite;

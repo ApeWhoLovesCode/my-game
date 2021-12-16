@@ -32,7 +32,7 @@ const routes = [
     path: '/admin/Home',
     name: 'Home',
     component: () => import('../views/admin/Home.vue'),
-    redirect: '/admin/user',
+    redirect: '/admin/welcome',
     children: [
       {
         path: '/admin/welcome',
