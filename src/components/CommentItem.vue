@@ -14,7 +14,7 @@
       </div>
       <div class="bottom">
         <span class="time">{{ comments.creat_time }}</span>
-        <div class="bottomItem">
+        <div class="bottomItem" :class="{'likeActive': comments.isLike}" @click="$emit('likeClick', comments.id)">
           <span class="iconfont icon-dianzan_kuai"></span>
           <span>{{comments.like}}</span>
         </div>
@@ -135,6 +135,10 @@ export default {
   },
   watch: {},
   methods: {
+    // 点赞
+    likeClick() {
+
+    },
     // 点击了回复
     replyClick() {
       if (this.comments.uid == this.replyUser.iid) {
@@ -237,7 +241,10 @@ export default {
         }
       }
       .bottomItem:hover {
-        color: #889de2 !important;
+        color: #adbce9;
+      }
+      .likeActive {
+        color: #889de2;
       }
       .time {
         color: #c2c2c2;

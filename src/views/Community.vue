@@ -34,6 +34,7 @@
         :comments="item"
         @replayMsg="sendMsg"
         @deleteMsg="deleteMsg($event, index)"
+        @likeClick="likeClick($event, index)"
       />
     </vue-custom-scrollbar>
   </div>
@@ -77,6 +78,13 @@ export default {
     this.getCommentList();
   },
   methods: {
+    // 点赞
+    async likeClick(id, index) {
+      const {data:res} = await api.like({id, uid: this.gameUser.id})
+      console.log('res: ', res);
+      this.commentList[index].like += this.commentList[index].isLike ? -1 : 1
+      this.commentList[index].isLike = !this.commentList[index].isLike
+    },
     async getCommentList() {
       const { data: res } = await api.getComments({userId: this.gameUser.id});
       // console.log(res.data);

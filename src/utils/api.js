@@ -54,5 +54,9 @@ export default {
   // 删除对应的用户评论
   deleteMsg(params) {
     return http.delete(`/${api}/comments/deleteMsg`, params)
-  }
+  },
+  // 点赞
+  like(params) {
+    return http.post(`/${api}/comments/like`, params)
+  },
 }
