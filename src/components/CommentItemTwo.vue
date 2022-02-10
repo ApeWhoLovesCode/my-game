@@ -6,18 +6,18 @@
     <div class="right">
       <div class="content">
         <span class="name">{{ replys.name }}</span>
-        <span v-if="replys.to_user" class="reply">回复<i class="reply-user">@{{replys.to_user}}：</i></span>
-        {{ replys.content }}
+        <span v-if="replys.to_user" class="reply">回复<i class="reply-user">@{{replys.to_user}}</i></span>
+        ：{{ replys.content }}
       </div>
       <div class="bottom">
         <span class="time">{{ replys.creat_time }}</span>
-        <div class="bottomItem">
+        <div class="bottomItem" :class="{'likeActive': replys.isLike}" @click="$emit('likeClick')">
           <span class="iconfont icon-dianzan_kuai"></span>
           <span>{{replys.like}}</span>
         </div>
-        <div class="bottomItem">
+        <div class="bottomItem" :class="{'noLikeActive': replys.isNoLike}" @click="$emit('noLikeClick')">
           <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>{{replys.no_like}}</span>
+          <span>{{replys.noLike}}</span>
         </div>
         <div class="bottomItem" @click="isReplyShow">
           <span class="iconfont icon-pinglun"></span>
@@ -111,9 +111,9 @@ export default {
       .name {
         font-size: 14px;
         color: #eeeeee;
-        margin-right: 10px;
       }
       .reply {
+        margin-left: 10px;
         .reply-user {
           margin-left: 5px;
           color: #b9abf6;
@@ -140,7 +140,13 @@ export default {
         }
       }
       .bottomItem:hover {
-        color: #889de2 !important;
+        color: #adbce9;
+      }
+      .likeActive {
+        color: #889de2;
+      }
+      .noLikeActive {
+        color: #9687db;
       }
       .time {
         color: #c2c2c2;

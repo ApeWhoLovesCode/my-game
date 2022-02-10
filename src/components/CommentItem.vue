@@ -14,13 +14,13 @@
       </div>
       <div class="bottom">
         <span class="time">{{ comments.creat_time }}</span>
-        <div class="bottomItem" :class="{'likeActive': comments.isLike}" @click="$emit('likeClick', comments.id)">
+        <div class="bottomItem" :class="{'likeActive': comments.isLike}" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: true })">
           <span class="iconfont icon-dianzan_kuai"></span>
           <span>{{comments.like}}</span>
         </div>
-        <div class="bottomItem">
+        <div class="bottomItem" :class="{'noLikeActive': comments.isNoLike}" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: false })">
           <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>{{comments.no_like}}</span>
+          <span>{{comments.noLike}}</span>
         </div>
         <div class="bottomItem" @click="replyClick">
           <span class="iconfont icon-pinglun"></span>
@@ -48,12 +48,14 @@
       <!-- 二级评论 -->
       <div class="twoComment">
         <CommentItemTwo
-          v-for="item in replyComments"
+          v-for="(item,index2) in replyComments"
           :key="item.id"
           :replys="item"
           :isReply="isReply"
           @isReplyShow="isReplyShow"
           @deleteMsg="$emit('deleteMsg', $event)"
+          @likeClick="$emit('likeClick', { id: item.id, index2: index2, like: true })"
+          @noLikeClick="$emit('likeClick', { id: item.id, index2: index2, like: false })"
         />
         <div class="seeReply" v-if="!isShowMoreReply">
           共有{{ comments.childList.length }}条回复,
@@ -67,6 +69,8 @@
             :isReply="isReply"
             @isReplyShow="isReplyShow"
             @deleteMsg="$emit('deleteMsg', $event)"
+            @likeClick="$emit('likeClick', { id: item.id, index2: index2, like: true })"
+            @noLikeClick="$emit('likeClick', { id: item.id, index2: index2, like: false })"
           />
         </template>
       </div>
@@ -245,6 +249,9 @@ export default {
       }
       .likeActive {
         color: #889de2;
+      }
+      .noLikeActive {
+        color: #9687db;
       }
       .time {
         color: #c2c2c2;

@@ -79,11 +79,17 @@ export default {
   },
   methods: {
     // 点赞
-    async likeClick(id, index) {
-      const {data:res} = await api.like({id, uid: this.gameUser.id})
-      console.log('res: ', res);
-      this.commentList[index].like += this.commentList[index].isLike ? -1 : 1
-      this.commentList[index].isLike = !this.commentList[index].isLike
+    async likeClick(target, index) {
+      const request = target.like ? 'like' : 'noLike'
+      const isLike = target.like ? 'isLike' : 'isNoLike'
+      await api[request]({id: target.id, uid: this.gameUser.id})
+      if(isNaN(target.index2)) {
+        this.commentList[index][request] += this.commentList[index][isLike] ? -1 : 1
+        this.commentList[index][isLike] = !this.commentList[index][isLike]
+      } else {
+        this.commentList[index].childList[target.index2][request] += this.commentList[index].childList[target.index2][isLike] ? -1 : 1
+        this.commentList[index].childList[target.index2][isLike] = !this.commentList[index].childList[target.index2][isLike]
+      }
     },
     async getCommentList() {
       const { data: res } = await api.getComments({userId: this.gameUser.id});

@@ -59,4 +59,8 @@ export default {
   like(params) {
     return http.post(`/${api}/comments/like`, params)
   },
+  // 点踩
+  noLike(params) {
+    return http.post(`/${api}/comments/noLike`, params)
+  },
 }
