@@ -7,6 +7,7 @@
       <div class="header">
         <span class="name">{{ comments.name }}</span>
         <span v-if="comments.share_game" class="gameName">#{{ comments.share_game }}</span>
+        <span v-if="comments.isTop" class="overHead">置顶</span>
       </div>
       <!-- 一级评论 -->
       <div class="content">
@@ -205,11 +206,19 @@ export default {
       font-size: 16px;
       font-weight: bold;
       color: #cedaff;
-      margin-right: 20px;
+      margin-right: 16px;
     }
     .gameName {
       font-size: 14px;
       color: #cedaff;
+    }
+    .overHead {
+      margin-left: 8px;
+      font-size: 14px;
+      color: #FFAA00;
+      background: rgba(248, 210, 133, 0.2);
+      padding: 1px 5px;
+      border-radius: 4px;
     }
     .content {
       font-size: 14px;

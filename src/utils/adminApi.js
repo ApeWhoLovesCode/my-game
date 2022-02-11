@@ -67,4 +67,8 @@ export default {
   deleteComment(params) {
     return http.delete(`/${api}/admin/comments/deleteComment`, params)
   },
+  // 置顶评论
+  overHead(params) {
+    return http.post(`/${api}/admin/comments/overHead`, params)
+  }
 }

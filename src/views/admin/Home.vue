@@ -40,7 +40,7 @@ export default {
       isFullScreen: false,
       searchVal: '',
       // 代表现在要搜索的是哪个表
-      tableType: 'user'
+      tableType: 'welcome'
     }
   },
   computed: {
@@ -51,14 +51,14 @@ export default {
       this.$router.push('/admin/login')
       return
     } 
-    this.tableType = this.tabsList.filter(item => item.path === this.$route.fullPath)[0].table
+    // this.tableType = this.tabsList.filter(item => item.path === this.$route.fullPath)[0].table
   },
   methods: {
     routerChange(type) {
       this.tableType = type
     },
     async search() {
-      if(this.tableType === 'gamescore' || this.tableType === 'comments') {
+      if(this.tableType === 'welcome' || this.tableType === 'gamescore' || this.tableType ===  'comments') {
         this.$message('此页面的搜索功能还未开发！敬请期待')
         return
       }

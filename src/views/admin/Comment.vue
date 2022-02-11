@@ -11,7 +11,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="评论内容" header-align="center" align="center">
+        <el-table-column label="评论内容" header-align="center" align="left">
           <template slot-scope="scope">
             <div class="comment-content">
               <i v-if="scope.row.share_game">游戏分享：</i>
@@ -19,15 +19,40 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="评论时间" header-align="center" align="center" width="180">
+        <el-table-column label="点赞/点踩" header-align="center" align="center" width="140">
+          <template slot-scope="scope">
+            <div class="like-wrap">
+              <div class="likeItem" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: true })">
+                <span class="iconfont icon-dianzan_kuai"></span>
+                <span>{{scope.row.like}}</span>
+              </div>
+              <div class="likeItem noLike" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: false })">
+                <span class="iconfont icon-dianzan_kuai cai"></span>
+                <span>{{scope.row.noLike}}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="评论时间" header-align="center" align="center" width="170">
           <template slot-scope="scope">
             <div class="comment-time">{{ scope.row.creat_time }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" header-align="center" align="center" width="150">
+        <el-table-column label="是否置顶" header-align="center" align="center" width="100">
           <template slot-scope="scope">
-            <div class="delete">
-              <el-button type="danger" icon="el-icon-delete" @click="deleteComment(scope.row)" circle></el-button>
+            <el-switch 
+              v-model="scope.row.isTop" 
+              active-color="#8ea0f3" 
+              inactive-color="#bbb" 
+              :disabled="!!scope.row.fid"
+              @change="overHead(scope.row)" 
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" header-align="center" align="center" width="100">
+          <template slot-scope="scope">
+            <div class="operation">
+              <el-button type="danger" icon="el-icon-delete" circle @click="deleteComment(scope.row)"></el-button>
             </div>
           </template>
         </el-table-column>
@@ -75,6 +100,16 @@ export default {
     this.getCommentList()
   },
   methods: {
+    // 置顶
+    async overHead(comment) {
+      let isTop = comment.isTop ? 1 : 0
+      await adminApi.overHead({id: comment.id, isTop})
+      if(comment.isTop) {
+        this.$message({type:'success', message: `用户${comment.name}的评论已被置顶`})
+      } else {
+        this.$message({type:'info', message: `用户${comment.name}的评论已取消置顶`})
+      }
+    },
     async getCommentList() {
       const {data: res} = await adminApi.getCommentList()
       const list = res.data
@@ -152,6 +187,31 @@ export default {
       i {
         color: #677ae5;
       }
+    }
+    .like-wrap {
+      display: flex;
+      justify-content: center;
+      .likeItem {
+        color: #889de2;
+        span {
+          font-size: 13px;
+        }
+        .iconfont {
+          font-size: 14px;
+          margin-right: 4px;
+        }
+        .cai {
+          display: inline-block;
+          transform: rotateX(180deg);
+        }
+      }
+      .noLike {
+        margin-left: 8px;
+        color: #aa88e2;
+      }
+    }
+    .comment-time {
+      font-size: 13px;
     }
   }
   .pagination {
