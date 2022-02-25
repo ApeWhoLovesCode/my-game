@@ -11,13 +11,23 @@
       </div>
       <div class="bottom">
         <span class="time">{{ replys.creat_time }}</span>
-        <div class="bottomItem" :class="{'likeActive': replys.isLike}" @click="$emit('likeClick')">
-          <span class="iconfont icon-dianzan_kuai"></span>
-          <span>{{replys.like}}</span>
+        <div class="bottomItem" :class="{'likeActive': replys.isLike}" @click="likeClick(true)">
+          <div style="position: relative;"> 
+            <span class="iconfont icon-dianzan_kuai"></span>
+            <span>{{replys.like}}</span>
+            <div class="isLike" :class="isLikeAnimation ? (replys.isLike ? 'like-animation' : 'no-like-animation') : ''">
+              <span class="iconfont icon-dianzan_kuai">{{replys.isLike ? ' +1' : ' -1'}}</span>
+            </div>
+          </div>
         </div>
-        <div class="bottomItem" :class="{'noLikeActive': replys.isNoLike}" @click="$emit('noLikeClick')">
-          <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>{{replys.noLike}}</span>
+        <div class="bottomItem" :class="{'noLikeActive': replys.isNoLike}" @click="likeClick(false)">
+          <div style="position: relative;">
+            <span class="iconfont icon-dianzan_kuai cai"></span>
+            <span>{{replys.noLike}}</span>
+            <div class="isLike" :class="isNoLikeAnimation ? (replys.noLike ? 'like-animation' : 'no-like-animation') : ''">
+              <span class="iconfont icon-dianzan_kuai cai">{{replys.noLike ? ' +1' : ' -1'}}</span>
+            </div>
+          </div>
         </div>
         <div class="bottomItem" @click="isReplyShow">
           <span class="iconfont icon-pinglun"></span>
@@ -61,7 +71,9 @@ export default {
   },
   data() {
     return {
-      visible: false
+      visible: false,
+      isLikeAnimation: false,
+      isNoLikeAnimation: false
     };
   },
   // computed: {
@@ -73,6 +85,16 @@ export default {
   watch: {},
   mounted() {},
   methods: {
+    // 点赞
+    likeClick(like) {
+      if(like) {
+        if(!this.isLikeAnimation) this.isLikeAnimation = true
+        this.$emit('likeClick')
+      } else {
+        if(!this.isNoLikeAnimation) this.isNoLikeAnimation = true
+        this.$emit('noLikeClick')
+      }
+    },
     isReplyShow() {
       this.$emit("isReplyShow", this.replys);
     },
@@ -131,6 +153,7 @@ export default {
           font-size: 13px;
         }
         .iconfont {
+          white-space: nowrap;
           font-size: 14px;
           margin-right: 6px;
         }
@@ -154,6 +177,43 @@ export default {
       }
     }
   }
+  .isLike {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    font-size: 20px;
+    opacity: 0;
+    z-index: -1;
+  }
+  /* 点赞动画 */
+  .like-animation {
+    animation: like ease-out 1s;
+  }
+  .no-like-animation {
+    animation: noLike ease-out 1s;
+  }
+  @keyframes like {
+    0% {
+      opacity: 1;
+      top: -12px;
+    }
+    100% {
+      opacity: 0;
+      display: none;
+      top: -24px;
+    }
+  }
+  @keyframes noLike {
+    0% {
+      opacity: 1;
+      top: -10px;
+    }
+    100% {
+      opacity: 0;
+      display: none;
+      top: -24px;
+    }
+  }  
 }
 /* 删除二次确认 */
 .delete-pop {

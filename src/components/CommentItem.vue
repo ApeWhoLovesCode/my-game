@@ -15,13 +15,23 @@
       </div>
       <div class="bottom">
         <span class="time">{{ comments.creat_time }}</span>
-        <div class="bottomItem" :class="{'likeActive': comments.isLike}" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: true })">
-          <span class="iconfont icon-dianzan_kuai"></span>
-          <span>{{comments.like}}</span>
+        <div class="bottomItem" :class="{'likeActive': comments.isLike}" @click="likeClick({ id: comments.id, index2: undefined, like: true })">
+          <div style="position: relative;">
+            <span class="iconfont icon-dianzan_kuai"></span>
+            <span>{{comments.like}}</span>
+            <div class="isLike" :class="isLikeAnimation ? (comments.isLike ? 'like-animation' : 'no-like-animation') : ''">
+              <span class="iconfont icon-dianzan_kuai">{{comments.isLike ? ' +1' : ' -1'}}</span>
+            </div>
+          </div>
         </div>
-        <div class="bottomItem" :class="{'noLikeActive': comments.isNoLike}" @click="$emit('likeClick', { id: comments.id, index2: undefined, like: false })">
-          <span class="iconfont icon-dianzan_kuai cai"></span>
-          <span>{{comments.noLike}}</span>
+        <div class="bottomItem" :class="{'noLikeActive': comments.isNoLike}" @click="likeClick({ id: comments.id, index2: undefined, like: false })">
+          <div style="position: relative;">
+            <span class="iconfont icon-dianzan_kuai cai"></span>
+            <span>{{comments.noLike}}</span>
+            <div class="isLike" :class="isNoLikeAnimation ? (comments.noLike ? 'like-animation' : 'no-like-animation') : ''">
+              <span class="iconfont icon-dianzan_kuai cai">{{comments.noLike ? ' +1' : ' -1'}}</span>
+            </div>
+          </div>
         </div>
         <div class="bottomItem" @click="replyClick">
           <span class="iconfont icon-pinglun"></span>
@@ -104,7 +114,7 @@ export default {
     comments: {
       type: Object,
       require: true,
-    },
+    }
   },
   data() {
     return {
@@ -118,7 +128,9 @@ export default {
       // 显示更多回复
       isShowMoreReply: true,
       // 删除弹出层的显示与隐藏
-      visible: false
+      visible: false,
+      isLikeAnimation: false,
+      isNoLikeAnimation: false
     };
   },
   computed: {
@@ -138,11 +150,12 @@ export default {
       }
     },
   },
-  watch: {},
   methods: {
     // 点赞
-    likeClick() {
-
+    likeClick(obj) {
+      if(!this.isLikeAnimation && obj.like) this.isLikeAnimation = true
+      if(!this.isNoLikeAnimation && !obj.like) this.isNoLikeAnimation = true
+      this.$emit('likeClick', obj)
     },
     // 点击了回复
     replyClick() {
@@ -245,6 +258,7 @@ export default {
           font-size: 14px;
         }
         .iconfont {
+          white-space: nowrap;
           font-size: 14px;
           margin-right: 6px;
         }
@@ -313,6 +327,43 @@ export default {
         opacity: 0.85;
         color: #fff;
       }
+    }
+  }
+  .isLike {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    font-size: 20px;
+    opacity: 0;
+    z-index: -1;
+  }
+  /* 点赞动画 */
+  .like-animation {
+    animation: like ease-out 1s;
+  }
+  .no-like-animation {
+    animation: noLike ease-out 1s;
+  }
+  @keyframes like {
+    0% {
+      opacity: 1;
+      top: -12px;
+    }
+    100% {
+      opacity: 0;
+      display: none;
+      top: -24px;
+    }
+  }
+  @keyframes noLike {
+    0% {
+      opacity: 1;
+      top: -10px;
+    }
+    100% {
+      opacity: 0;
+      display: none;
+      top: -24px;
     }
   }
 }

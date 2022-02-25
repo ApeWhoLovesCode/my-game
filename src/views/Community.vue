@@ -62,7 +62,7 @@ export default {
     return {
       commentList: [],
       replyContent: '',
-      isReply: false
+      isReply: false,
     };
   },
   computed: {
@@ -219,7 +219,6 @@ export default {
       width: 200px;
     }
   }
-
   .comments-btn {
     position: absolute;
     top: 20px;
