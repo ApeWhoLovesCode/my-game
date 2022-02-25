@@ -119,7 +119,11 @@ export default {
       })
       // 前端添加评论 - 发一级评论
       if(!msg.fid) {
-        this.commentList.unshift(res.data)
+        let index = 0
+        for (const item of this.commentList) {
+          if(item.isTop) index++
+        }
+        this.commentList.splice(index, 0, res.data)
       } else {
         // 发二级评论
         const msgI = this.commentList.findIndex(item => item.id === msg.fid)
