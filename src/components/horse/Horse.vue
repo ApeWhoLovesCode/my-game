@@ -1,12 +1,11 @@
 <template>
   <div class="main">
     <section>
-      <div class="horse"></div>
-      <div class="horse"></div>
-      <div class="horse"></div>
-      <div class="horse"></div>
-      <div class="horse"></div>
-      <div class="horse"></div>
+      <div class="horse">A</div>
+      <div class="horse">D</div>
+      <div class="horse">M</div>
+      <div class="horse">I</div>
+      <div class="horse">N</div>
     </section>
     <div class="welcome">
       <h1>welcome</h1>
@@ -28,13 +27,13 @@ export default {};
 }
 section {
   position: relative;
-  width: 20vw;
-  height: 10vw;
+  width: 12vw;
+  height: 12vw;
   margin: 10vh auto;
   transform-style: preserve-3d;
   /* 添加动画 */
-  animation: rotate 12s linear infinite;
-  background: url(./horse_img/logo2.png) no-repeat;
+  animation: rotate 18s linear infinite;
+  background: url('../../assets/img/logo.png') no-repeat;
   background-size: 100% 100%;
 }
 
@@ -54,8 +53,10 @@ section .horse {
   top: 30%;
   width: 6vw;
   height: 6vw;
-  background: url(./horse_img/logo.png) no-repeat;
-  background-size: 100% 100%;
+  font-size: 6vw;
+  color: #41b883;
+  /* background: url(./horse_img/logo.png) no-repeat;
+  background-size: 100% 100%; */
 }
 
 /* 先旋转好再移动距离 */
@@ -63,19 +64,16 @@ section .horse {
   transform: rotateY(0) translateZ(20vw);
 }
 .horse:nth-child(2) {
-  transform: rotateY(60deg) translateZ(20vw);
+  transform: rotateY(72deg) translateZ(20vw);
 }
 .horse:nth-child(3) {
-  transform: rotateY(120deg) translateZ(20vw);
+  transform: rotateY(144deg) translateZ(20vw);
 }
 .horse:nth-child(4) {
-  transform: rotateY(180deg) translateZ(20vw);
+  transform: rotateY(216deg) translateZ(20vw);
 }
 .horse:nth-child(5) {
-  transform: rotateY(240deg) translateZ(20vw);
-}
-.horse:nth-child(6) {
-  transform: rotateY(300deg) translateZ(20vw);
+  transform: rotateY(288deg) translateZ(20vw);
 }
 
 .welcome {
