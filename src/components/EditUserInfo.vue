@@ -82,6 +82,14 @@
           @click="newPassOK"
         ></el-button>
       </div>
+      <div class="upload-wrap">
+        <!-- <span>头像更改：</span> -->
+        <!-- <el-upload>
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload> -->
+        <UploadImg v-model="userInfo.img" :limit="1" />
+      </div>
     </div>
   </el-drawer>
 </template>
@@ -89,8 +97,12 @@
 <script>
 import { mapState } from "vuex";
 import api from "@/utils/api";
+import UploadImg from "@/components/uploadImg/index"
 export default {
   name: "EditUserInfo",
+  components: {
+    UploadImg
+  },
   props: {
     isEditUserInfo: {
       type: Boolean,
@@ -100,6 +112,7 @@ export default {
   data() {
     return {
       userInfo: {
+        img: "",
         name: "",
         phone: "",
         pass: "",
@@ -271,6 +284,10 @@ export default {
       background: #409eff;
       color: #fff;
     }
+  }
+  .upload-wrap {
+    width: 200px;
+    height: 200px;
   }
 }
 @keyframes tips {
