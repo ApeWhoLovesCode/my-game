@@ -101,15 +101,20 @@ export default {
     },
     // 添加图片，选取到图片后的回调函数
     async handleAddImg(file) {
+      console.log('file: ', file);
+      const formData = new FormData()
+      formData.append('avatar', file)
+      console.log('formData: ', formData);
+      const { data:res } = await api.uploadAvatar({id: 1, file: formData});
+      console.log('res: ', res);
+
       const fr = new FileReader()
       let url = ''
       const self = this
       fr.onload = async function() {
         url = fr.result
-        console.log('url: ', url);
+        console.log('fr: ', fr);
         self.fileList.push({ url: url })
-        const { data:res } = await api.uploadAvatar({id: 1, file: url});
-        console.log('res: ', res);
       }
       fr.readAsDataURL(file)
     },

@@ -65,6 +65,7 @@ export default {
   },
   // 上传头像
   uploadAvatar(params) {
+    // return http.post(`/${api}/upload`, params, "multipart/form-data")
     return http.post(`/${api}/upload`, params)
   }
 }
