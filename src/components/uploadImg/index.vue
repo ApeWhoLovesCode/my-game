@@ -32,6 +32,8 @@
 
 <script>
 import api from "@/utils/api";
+import axios from 'axios'
+import {mapState} from 'vuex'
 
 export default {
   props: {
@@ -70,6 +72,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["gameUser"]),
     limitNum() {
       if (typeof (this.value) === 'string') return 1
       else return this.limit
@@ -101,12 +104,17 @@ export default {
     },
     // 添加图片，选取到图片后的回调函数
     async handleAddImg(file) {
-      console.log('file: ', file);
       const formData = new FormData()
-      formData.append('avatar', file)
-      console.log('formData: ', formData);
-      const { data:res } = await api.uploadAvatar({id: 1, file: formData});
+      formData.append('img', file)
+      const res = await axios({ 
+        method: 'post', 
+        url: '/uploadapi/upload?pass=lhh_970519495_8756609',
+        data: formData, 
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
       console.log('res: ', res);
+      // const { data:res } = await api.uploadAvatar({id: 1, file: formData});
+      // console.log('res: ', res);
 
       const fr = new FileReader()
       let url = ''
