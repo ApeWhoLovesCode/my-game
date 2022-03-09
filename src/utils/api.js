@@ -63,8 +63,4 @@ export default {
   noLike(params) {
     return http.post(`/${api}/comments/noLike`, params)
   },
-  // 上传头像
-  uploadAvatar(params) {
-    return http.post(`/${api}/upload`, params)
-  }
 }

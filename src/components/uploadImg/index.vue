@@ -41,10 +41,10 @@ export default {
       type: [Array, String],
       required: true
     },
-    limit: { // 限制的数目
+    limit: { // 限制的数目  只能上传一张图片
       type: Number,
       required: false,
-      default: 3
+      default: 1
     },
     editable: { // 是否可编辑,默认可编辑
       type: Boolean,
@@ -91,12 +91,31 @@ export default {
   mounted() {
     if (this.value) {
       this.fileList = []
-      this.fileList.push({ url: value })
+      this.fileList.push({ url: this.value })
     } else {
       this.fileList = [] // 清空 fileList 数组，并且触发试图响应
     }
   },
   methods: {
+    /** 上传图片 */
+    async uploadImg(file) {
+      try {
+        const formData = new FormData()
+        formData.append('img', file)
+        formData.append('id', this.gameUser.id)
+        formData.append('pass', 'lhh_970519495_30624700')
+        const {data:res} = await axios({ 
+          method: 'post', 
+          url: '/uploadapi/upload',
+          data: formData, 
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        const { data:res2 } = await api.editUser({id: this.gameUser.id, avatar: res.data});
+        this.$store.commit("setUserInfo", res2.data);
+      } catch (error) {
+        console.log('error: ', error);
+      }
+    },
     // 添加图片
     addImg() {
       this.handleChange = 'handleAddImg'
@@ -104,31 +123,18 @@ export default {
     },
     // 添加图片，选取到图片后的回调函数
     async handleAddImg(file) {
-      const formData = new FormData()
-      formData.append('img', file)
-      const res = await axios({ 
-        method: 'post', 
-        url: '/uploadapi/upload?pass=lhh_970519495_8756609',
-        data: formData, 
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      console.log('res: ', res);
-      // const { data:res } = await api.uploadAvatar({id: 1, file: formData});
-      // console.log('res: ', res);
-
+      this.uploadImg(file)
       const fr = new FileReader()
       let url = ''
       const self = this
       fr.onload = async function() {
         url = fr.result
-        console.log('fr: ', fr);
         self.fileList.push({ url: url })
       }
       fr.readAsDataURL(file)
     },
     // 更新图片
     updateImg(index) {
-      console.log('updateImg')
       this.handleChange = 'handleUpdateImg'
       this.handleChangeParams = index
       document.getElementById('uploadImg' + this.Id).click()
@@ -136,6 +142,7 @@ export default {
 
     //  更新图片，选取到图片后的回调函数
     async handleUpdateImg(file, index) {
+      this.uploadImg(file)
       const fr = new FileReader()
       let url = ''
       const self = this

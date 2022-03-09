@@ -88,7 +88,7 @@
           <el-button size="small" type="primary">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload> -->
-        <UploadImg v-model="userInfo.img" :limit="1" />
+        <UploadImg v-model="userInfo.avatar" :limit="1" />
       </div>
     </div>
   </el-drawer>
@@ -112,7 +112,7 @@ export default {
   data() {
     return {
       userInfo: {
-        img: "",
+        avatar: "",
         name: "",
         phone: "",
         pass: "",
@@ -129,12 +129,13 @@ export default {
   computed: {
     ...mapState(["gameUser"]),
   },
-  watch: {},
   mounted() {
-    this.userInfo.name = this.gameUser.name;
-    this.userInfo.phone = this.gameUser.phone;
+    this.getUserInfo()
   },
   methods: {
+    getUserInfo() {
+      this.userInfo = this.gameUser
+    },
     // 点击修改用户信息弹出层外部
     editUserInfoComplete() {
       this.$confirm("您已经完成个人信息的修改了吗？", "关闭用户编辑界面", {
