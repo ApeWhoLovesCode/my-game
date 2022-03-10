@@ -282,11 +282,8 @@ export default {
       this.windowWidth = this.$refs.planeWarPop.$el.offsetWidth - 30;
       this.windowHeight = this.$refs.planeWarPop.$el.offsetHeight - 30;
       // 由于 弹出层使用了 translate 50% 所有要获取回之前的 left 和 top
-      this.windowLeft =
-        this.$refs.planeWarPop.$el.offsetLeft * (1 - this.popWidth / 100);
-      this.windowTop =
-        this.$refs.planeWarPop.$el.offsetTop * (1 - this.popHeight / 100);
-      // console.log("this.windowLeft:", this.windowLeft);
+      this.windowLeft = this.$refs.planeWarPop.$el.offsetLeft * (1 - this.popWidth / 100);
+      this.windowTop = this.$refs.planeWarPop.$el.offsetTop * (1 - this.popHeight / 100);
     },
     // 点击判断是否是游戏状态
     getMouse() {

@@ -68,6 +68,7 @@
             type="password"
             v-model="userInfo.newPass"
             placeholder="请输入新密码:"
+            :disabled="!userInfo.pass"
             @blur="newPassRules"
           ></el-input>
           <p v-show="!userRules.newPass">密码应在3到15位之间</p>
@@ -83,11 +84,6 @@
         ></el-button>
       </div>
       <div class="upload-wrap">
-        <!-- <span>头像更改：</span> -->
-        <!-- <el-upload>
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload> -->
         <UploadImg v-model="userInfo.avatar" :limit="1" />
       </div>
     </div>

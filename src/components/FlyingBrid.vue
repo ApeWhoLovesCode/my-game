@@ -128,10 +128,7 @@ export default {
     bird: {
       handler(b) {
         // 撞到地或天空了
-        if (
-          b.y <= b.h / 3 ||
-          b.y >= this.canvas.height - this.land.y - b.h / 2
-        ) {
+        if (b.y <= b.h / 3 || b.y >= this.canvas.height - this.land.y - b.h / 2) {
           this.gameOver = true;
         }
         // 撞到管道了
@@ -185,12 +182,8 @@ export default {
   },
   mounted() {
     // 刚开始获取浏览器的宽高
-    this.popWidth = parseInt(
-      (800 * 100) / document.documentElement.clientWidth
-    );
-    this.popHeight = parseInt(
-      (600 * 100) / document.documentElement.clientHeight
-    );
+    this.popWidth = parseInt((800 * 100) / document.documentElement.clientWidth);
+    this.popHeight = parseInt((600 * 100) / document.documentElement.clientHeight);
     // 监听浏览器窗口大小变化
     let that = this;
     window.addEventListener("resize", function (e) {

@@ -486,8 +486,7 @@ export default {
         for (let i = 0; i < this.currentModel[this.currentIndex].length; i++) {
           let blockModel = this.currentModel[this.currentIndex][i];
           // 固定的16宫格内的当前块索引
-          let currentI =
-            fixedClass.length - this.currentModel[this.currentIndex].length + i;
+          let currentI = fixedClass.length - this.currentModel[this.currentIndex].length + i;
           this.fixedBlocks[
             this.moveY + blockModel.row + "_" + (this.moveX + blockModel.col)
           ] = fixedClass[currentI];

@@ -206,11 +206,8 @@ export default {
       for (let item of arr) {
         this.ctx.beginPath();
         this.ctx.arc(
-          begin + gridWidth * item.x,
-          begin + gridWidth * item.y,
-          5,
-          0,
-          2 * Math.PI
+          begin + gridWidth * item.x, begin + gridWidth * item.y, 
+          5, 0, 2 * Math.PI
         );
         this.ctx.fillStyle = "#763a0d";
         this.ctx.fill();
@@ -295,7 +292,6 @@ export default {
         x.isR && j - a >= 0 && this.chessArr[i][j - a] == chess
           ? x.sum++
           : (x.isR = false);
-
         // 处理列
         y.isL && i + a < 15 && this.chessArr[i + a][j] == chess
           ? y.sum++
@@ -304,29 +300,17 @@ export default {
           ? y.sum++
           : (y.isR = false);
         // 处理斜边1 '\'
-        z.isL &&
-        i + a < 15 &&
-        j + a < 15 &&
-        this.chessArr[i + a][j + a] == chess
+        z.isL && i + a < 15 && j + a < 15 && this.chessArr[i + a][j + a] == chess
           ? z.sum++
           : (z.isL = false);
-        z.isR &&
-        i - a >= 0 &&
-        j - a >= 0 &&
-        this.chessArr[i - a][j - a] == chess
+        z.isR && i - a >= 0 && j - a >= 0 && this.chessArr[i - a][j - a] == chess
           ? z.sum++
           : (z.isR = false);
         // 处理斜边2 '/'
-        z2.isL &&
-        i + a < 15 &&
-        j - a >= 0 &&
-        this.chessArr[i + a][j - a] == chess
+        z2.isL && i + a < 15 && j - a >= 0 && this.chessArr[i + a][j - a] == chess
           ? z2.sum++
           : (z2.isL = false);
-        z2.isR &&
-        i - a >= 0 &&
-        j + a < 15 &&
-        this.chessArr[i - a][j + a] == chess
+        z2.isR && i - a >= 0 && j + a < 15 && this.chessArr[i - a][j + a] == chess
           ? z2.sum++
           : (z2.isR = false);
       }

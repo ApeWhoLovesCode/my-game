@@ -1,7 +1,6 @@
 <template>
   <div
     v-if="isShow"
-    v-show="!isHide"
     ref="mypop"
     :style="{
       width: popWidth,
@@ -74,8 +73,6 @@ export default {
     return {
       // 是否显示(v-if)
       isShow: false,
-      // 是否隐藏(用于缩小)
-      isHide: false,
     };
   },
   computed: {

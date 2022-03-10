@@ -1,32 +1,32 @@
 <template>
   <div class="ttx-imgs-wrap">
     <template v-if="editable">
-      <div v-for="(item,index) in fileList" :key="index" class="item">
+      <div v-if="value" class="item">
         <div class="img-wrap">
-          <img :src="item.url">
+          <img :src="value">
           <div class="operate-wrap">
-            <span class="operate-update" @click="updateImg(index)">更新</span>
-            <span v-if="delAble" class="operate-delete" @click="deleteImg(index)">删除</span>
+            <span class="operate-update" @click="updateImg()">更新</span>
+            <span class="operate-delete" @click="deleteImg()">删除</span>
           </div>
-          <label v-if="item.url" class="success-upload">
+          <label v-if="value" class="success-upload">
             <i />
           </label>
         </div>
       </div>
-      <div v-if="fileList.length < limitNum" class="item">
+      <div v-if="!value" class="item">
         <div class="upload-icon-wrap" @click="addImg()">
           <i class="el-icon-plus" />
         </div>
       </div>
     </template>
     <template v-else>
-      <div v-for="(item,index) in fileList" :key="index" class="item">
+      <div v-if="value"  class="item">
         <div class="img-wrap">
-          <img :src="item.url">
+          <img :src="value">
         </div>
       </div>
     </template>
-    <input :id="'uploadImg'+Id" type="file" accept="image/*" style="display:none;" @change="imgChange($event)">
+    <input id="uploadImg" type="file" accept="image/*" style="display:none;" @change="imgChange($event)">
   </div>
 </template>
 
@@ -41,60 +41,21 @@ export default {
       type: [Array, String],
       required: true
     },
-    limit: { // 限制的数目  只能上传一张图片
-      type: Number,
-      required: false,
-      default: 1
-    },
     editable: { // 是否可编辑,默认可编辑
       type: Boolean,
       required: false,
       default: true
     },
-    autoUpload: { // 是否自动上传，默认自动上传
-      type: Boolean,
-      required: false,
-      default: true
-    },
-    delAble: { // 是否自动上传，默认自动上传
-      type: Boolean,
-      required: false,
-      default: true
-    }
   },
   data() {
     const Id = Date.now() + Math.round(Math.random() * 10000) + '' + Math.round(Math.random() * 1000)
     return {
       Id: Id,
-      fileList: [], // {url:'',key:'',raw:''}
       handleChange: '',
-      handleChangeParams: null
     }
   },
   computed: {
-    ...mapState(["gameUser"]),
-    limitNum() {
-      if (typeof (this.value) === 'string') return 1
-      else return this.limit
-    }
-  },
-  watch: {
-    value: function(val) {
-      if (val) {
-        this.fileList = []
-        this.fileList.push({ url: val })
-      } else {
-        this.fileList = [] // 清空 fileList 数组，并且触发试图响应
-      }
-    }
-  },
-  mounted() {
-    if (this.value) {
-      this.fileList = []
-      this.fileList.push({ url: this.value })
-    } else {
-      this.fileList = [] // 清空 fileList 数组，并且触发试图响应
-    }
+    ...mapState(["gameUser"])
   },
   methods: {
     /** 上传图片 */
@@ -102,7 +63,8 @@ export default {
       try {
         const formData = new FormData()
         formData.append('img', file)
-        formData.append('id', this.gameUser.id)
+        const id = this.gameUser?.id ?? ''
+        formData.append('id', id)
         formData.append('pass', 'lhh_970519495_30624700')
         const {data:res} = await axios({ 
           method: 'post', 
@@ -110,8 +72,12 @@ export default {
           data: formData, 
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        const { data:res2 } = await api.editUser({id: this.gameUser.id, avatar: res.data});
-        this.$store.commit("setUserInfo", res2.data);
+        this.$emit('input', res.data)
+        if(id) {
+          const { data:res2 } = await api.editUser({id, avatar: res.data});
+          this.$store.commit("setUserInfo", res2.data);
+        }
+        return res.data
       } catch (error) {
         console.log('error: ', error);
       }
@@ -119,48 +85,30 @@ export default {
     // 添加图片
     addImg() {
       this.handleChange = 'handleAddImg'
-      document.getElementById('uploadImg' + this.Id).click()
+      document.getElementById('uploadImg').click()
     },
     // 添加图片，选取到图片后的回调函数
     async handleAddImg(file) {
-      this.uploadImg(file)
-      const fr = new FileReader()
-      let url = ''
-      const self = this
-      fr.onload = async function() {
-        url = fr.result
-        self.fileList.push({ url: url })
-      }
-      fr.readAsDataURL(file)
+      await this.uploadImg(file)
     },
     // 更新图片
-    updateImg(index) {
+    updateImg() {
       this.handleChange = 'handleUpdateImg'
-      this.handleChangeParams = index
-      document.getElementById('uploadImg' + this.Id).click()
+      document.getElementById('uploadImg').click()
     },
-
     //  更新图片，选取到图片后的回调函数
-    async handleUpdateImg(file, index) {
-      this.uploadImg(file)
-      const fr = new FileReader()
-      let url = ''
-      const self = this
-      fr.onload = function() {
-        url = fr.result
-        self.fileList.splice(index, 1, { url: url })
-      }
-      fr.readAsDataURL(file)
+    async handleUpdateImg(file) {
+      await this.uploadImg(file)
     },
     // 删除图片
-    deleteImg(index) {
-      this.fileList.splice(index, 1)
+    deleteImg() {
+      this.$emit('input', '')
     },
     // 选取图片
     imgChange($event) {
       const file = $event.target.files[0]
-      this[this.handleChange](file, this.handleChangeParams)
-      document.getElementById('uploadImg' + this.Id).value = ''
+      this[this.handleChange](file)
+      document.getElementById('uploadImg').value = ''
     },
   }
 }

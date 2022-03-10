@@ -55,10 +55,12 @@
           ref="UserForm"
           :model="addUserList"
           :rules="addUserRule"
-          label-width="90px"
-          hide-required-asterisk
+          label-width="100px"
           class="addUserListForm"
         >
+          <el-form-item label="头像：" prop="avatar">
+            <UploadImg v-model="addUserList.avatar" />
+          </el-form-item>
           <el-form-item label="姓名：" prop="name">
             <el-input v-model="addUserList.name" class="popInput" maxlength="10" show-word-limit placeholder="请输入用户姓名" />
           </el-form-item>
@@ -90,10 +92,12 @@ import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
 import {mapState} from 'vuex'
+import UploadImg from "@/components/uploadImg/index"
 export default {
   components: {
     vueCustomScrollbar,
-    adminPop
+    adminPop,
+    UploadImg,
   },
   data() {
     var phoneValidator = (rule, value, callback) => {
@@ -130,15 +134,22 @@ export default {
       pageNum: 1,
       pageSize: 10,
       total: 0,
-      addUserList: {},
+      addUserList: {
+        avatar: '',
+        name: '',
+        phone: '',
+        password: '',
+        checkPass: ''
+      },
       addUserRule: {
+        avatar: [{ required: false }],
         name: [
             { required: true, message: '请输入名字', trigger: 'blur' },
             { min: 3, max: 10, message: '名字长度应在3 - 10位之间', trigger: 'blur' }
           ],
-        phone: [{ validator: phoneValidator, trigger: 'blur' }],
-        password: [{ validator: validatePass, trigger: "blur" }],
-        checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        phone: [{ required: true, validator: phoneValidator, trigger: 'blur' }],
+        password: [{ required: true, validator: validatePass, trigger: "blur" }],
+        checkPass: [{ required: true, validator: validatePass2, trigger: "blur" }],
       },
       // 用于判断是 "编辑状态" 还是 "新增状态" 使用弹出层
       isEdit: false
@@ -170,7 +181,6 @@ export default {
   },
   methods: {
     async getUserList() {
-      // const loading = this.$loading()
       try {
         const {data: res} = await adminApi.getAllUser({pageNum: this.pageNum, pageSize: this.pageSize})
         const list = res.data
@@ -183,13 +193,12 @@ export default {
       } catch (error) {
         console.log('error', error)
       }
-      // setTimeout(() => {loading.close()}, 300)
     },
     // 编辑用户
     editUser(isEdit, id) {
       this.isEdit = isEdit
       if(isEdit) this.getEditUset(id)
-      else this.addUserList = {}
+      else this.addUserList = { avatar: '',name: '',phone: '',password: '',checkPass: ''}
       this.$refs.myPopRef.popshow()
       // 阻止输入框事件冒泡，防止触发弹出层的移动
       this.$nextTick(() => {
@@ -217,8 +226,8 @@ export default {
         if(valid) {
           if(!this.isEdit) {
             try {
-              const {name: username, password, phone} = this.addUserList;
-              const {data:res} = await api.register({ username, password, phone })
+              const {name: username, password, phone, avatar} = this.addUserList;
+              const {data:res} = await api.register({ username, password, phone, avatar })
               if(res.code === 200) {
                 this.messageShow(true, `用户新增成功`)
                 this.getUserList()
@@ -231,8 +240,8 @@ export default {
             }
           } else {
             try {
-              const {id, name: username, phone} = this.addUserList
-              const {data: res} = await adminApi.editUser({id, username, phone})
+              const {id, name: username, phone, avatar} = this.addUserList
+              const {data: res} = await adminApi.editUser({ id, username, phone, avatar })
               if(res.code === 200) {
                 this.messageShow(true, `用户信息修改成功`)
                 this.getUserList()
