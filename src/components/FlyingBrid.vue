@@ -21,6 +21,7 @@
       <span>得分：{{ score }}</span>
       <span>等级：{{ level }}</span>
     </div>
+    <div v-if="isPause" class="pause">暂停中，按空格继续~</div>
     <GameOver
       v-if="gameOver"
       ref="gameover"
@@ -80,7 +81,7 @@ export default {
       // 游戏结束
       gameOver: false,
       // 记录当前是是否为暂停状态
-      isPause: false,
+      isPause: true,
       // 游戏结束显示分数的定时器
       gOTimer: null,
       // 游戏结束显示得分
@@ -98,6 +99,8 @@ export default {
         pipe_b: require("../assets/img/birdimg/pipe_b.png"),
         sky: require("../assets/img/birdimg/sky750.png"),
       },
+      // 加载完成的图片
+      imgOnloadObj: null,
       // 点击小鸟上升的值
       clickUpNum: -2,
       bird: {
@@ -125,6 +128,11 @@ export default {
     },
   },
   watch: {
+    isPause(val) {
+      if (!val) {
+        this.startAnimation();
+      }
+    },
     bird: {
       handler(b) {
         // 撞到地或天空了
@@ -160,7 +168,7 @@ export default {
       },
       deep: true,
     },
-    // 监听得分变化，提升蛇的速度
+    // 监听得分变化，提升速度
     score(val, oldval) {
       if (parseInt(val / 20) != parseInt(oldval / 20)) {
         this.level++;
@@ -213,20 +221,29 @@ export default {
             r: parseInt(Math.random() * 140 + 54),
           });
         }
-        let that = this;
+        this.onKeyDown()
         // 加载图片
+        let that = this;
         this.loadImage(this.imglist, function (imgObj) {
-          (function go() {
-            that.run(imgObj);
-            if (!that.gameOver) {
-              // 时间间隔为 1000/60 每秒 60 帧
-              requestAnimationFrame(go);
-            }
-          })();
+          that.imgOnloadObj = imgObj
+          that.startAnimation()
         });
       }, 300);
     },
-    run(imgObj) {
+    // 开启动画绘画
+    startAnimation() {
+      let that = this;
+      (function go() {
+        that.run();
+        if (that.isPause || that.gameOver) {
+          return
+        }
+        // 时间间隔为 1000/60 每秒 60 帧
+        requestAnimationFrame(go);
+      })();
+    },
+    run() {
+      const imgObj = this.imgOnloadObj
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // 天
       this.updateSky();
@@ -301,9 +318,9 @@ export default {
       this.sky.x <= -750 ? (this.sky.x = 750) : "";
       this.sky.x2 <= -750 ? (this.sky.x2 = 750) : "";
     },
-
     // 点击画板 小鸟上升
     birdUp() {
+      if(this.isPause) return
       this.bird.speed = this.clickUpNum;
     },
     // 加载图片
@@ -347,6 +364,14 @@ export default {
         }, 10);
       }, 100);
     },
+    // 监听用户的键盘事件
+    onKeyDown() {
+      document.onkeydown = (e) => {
+        switch (e.code) {
+          case "Space": this.isPause = !this.isPause; break;
+        }
+      };
+    },
     // 缩小
     small() {
       this.isPause = true;
@@ -378,6 +403,17 @@ export default {
   #mycanvas {
     border-radius: 8px;
     color: #aa9cc5;
+  }
+  .pause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba($color: #000000, $alpha: .5);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    user-select: none;
   }
   .score {
     position: absolute;

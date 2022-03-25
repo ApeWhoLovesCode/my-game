@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#protect-horse {
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#protect-horse .game-wrap {
+  position: relative;
+  display: inline-block;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+#protect-horse .game-wrap .title {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  right: 0;
+  font-size: 24px;
+  font-weight: bold;
+  height: 30px;
+  line-height: 30px;
+  color: #ccc;
+  text-align: center;
+}
+#protect-horse .game-wrap .canvas-wrap {
+  position: relative;
+  width: 1150px;
+  height: 700px;
+  background-image: radial-gradient(circle 500px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%);
+  border-radius: 4px;
+}
+#protect-horse .game-wrap .canvas-wrap #mycanvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}/*# sourceMappingURL=ProtectTheHorse.css.map */

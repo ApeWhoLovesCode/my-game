@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>test</title>
+  <link rel="stylesheet" href="./ProtectTheHorse.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+  <div id="protect-horse">
+    <div class="game-wrap">
+      <div class="title">{{title}}</div>
+      <!-- 外层 宽800高450 -->
+      <div class="canvas-wrap">
+        <canvas ref="canvasRef" id="mycanvas" width="1050" height="600"></canvas>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="module">
+  var game = new Vue({
+    el: '#protect-horse',
+    data: {
+      title: 'game',
+      // canvas 对象
+      canvas: {},
+      // 得到 canvas 的 2d 上下文
+      ctx: {},
+      // 设置游戏的暂停
+      isPause: true,
+      // 敌人数组
+      enemy: [{x: 50, y: 50, w: 50, h: 50, type: ''}],
+      // 敌人定时器
+      enemyTimer: null,
+      // 最小刻度
+      minScale: 2,
+      // 所有静态图片资源
+      imgObj: {
+        // vue项目中 webpack 打包要用require('')
+        bug: "./assets/img/bug.png",
+        floorTile: "./assets/img/floor-tile.png"
+      },
+      // 加载完成的图片
+      imgOnloadObj: null,
+      // 地板：大小 数量
+      floorTile: {size: 50, num: 84},
+      // 移动轨迹
+      movePath: [],
+    },
+    watch: {
+      // 暂停的判断
+      isPause: {
+        // immediate: true,
+        handler(val) {
+          if (!val) {
+            this.startAnimation();
+          }
+        }
+      }
+    },
+    mounted() {
+      this.init();
+    },
+    methods: {
+      init() {
+        this.canvas = this.$refs.canvasRef;
+        this.ctx = this.canvas.getContext("2d");
+        this.initMovePath()
+        this.onKeyDown()
+        // 加载图片
+        let that = this;
+        this.loadImage(this.imgObj, function (imgObj) {
+          that.imgOnloadObj = imgObj
+          that.startAnimation()
+        });
+      },
+      // 初始化行动轨迹
+      initMovePath() {
+        const size = this.floorTile.size
+        const movePathItem = {x: 20, y: 50}
+        const movePath = []
+        // 控制x y轴的方向 正数表示往该方向移动，0代表该方向不动
+        let isY = 0, isX = 1
+        for(let i = 0; i < this.floorTile.num; i++) {
+        // for(let i = 0; i < 10; i++) {
+          switch (i) {
+            // 相对于编程来说
+            // 正 Y 
+            case 3: case 15: case 21: case 39: case 58: case 68: {
+              isY = 1; isX = 0; break;
+            }
+            // 正 X
+            case 5: case 10: case 23: case 34: case 77: {
+              isY = 0; isX = 1; break;
+            } 
+            // 负 Y
+            case 8: case 29: case 51: case 62: case 74: case 79: {
+              isY = -1; isX = 0; break;
+            } 
+            // 负 X
+            case 18: case 48: case 53: case 60: case 64: case 70: case 81: {
+              isY = 0; isX = -1; break;
+            } 
+          }
+          if(isX) movePathItem.x += isX > 0 ? size : -size
+          if(isY) movePathItem.y += isY > 0 ? size : -size
+          movePath.push(JSON.parse(JSON.stringify(movePathItem)))
+        }
+        console.log('movePath: ', movePath);
+        this.movePath = movePath
+      },
+      // 开启动画绘画
+      startAnimation() {
+        let that = this;
+        (function go() {
+          that.startDraw();
+          if (!that.isPause) {
+            // 时间间隔为 1000/60 每秒 60 帧
+            requestAnimationFrame(go);
+          }
+        })();
+      },
+      // 开始绘画
+      startDraw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.enemy[0].x += this.minScale
+        this.drawFloorTile()
+        this.drawEnemy()
+      },
+      // 画敌人
+      drawEnemy() {
+        const {x,y,w,h} = this.enemy[0]
+        this.ctx.drawImage(this.imgOnloadObj.bug, x, y, w, h);
+      },
+      // 画地板
+      drawFloorTile() {
+        const size = this.floorTile.size
+        for(let f of this.movePath) {
+          this.ctx.drawImage(this.imgOnloadObj.floorTile, f.x, f.y, size, size)
+        }
+      },
+      // 加载图片
+      loadImage(imgUrl, callback) {
+        var imgObj = {}; // 保存图片资源
+        var tempImg,
+          imgLength = 0,
+          loaded = 0;
+        for (var key in imgUrl) {
+          imgLength++; // 初始化要加载图片的总数
+          tempImg = new Image();
+          tempImg.src = imgUrl[key];
+          imgObj[key] = tempImg;
+          tempImg.onload = function () {
+            loaded++; // 统计已经加载完毕的图像
+            // 所有的图片都加载完毕
+            if (loaded >= imgLength) {
+              // 把加载完毕的资源传给回调供其使用
+              callback(imgObj);
+            }
+          };
+        }
+      },
+      // 监听用户的键盘事件
+      onKeyDown() {
+        document.onkeydown = (e) => {
+          switch (e.code) {
+            case "Space": this.isPause = !this.isPause; break;
+          }
+        };
+      },
+    }
+  })
+</script>
+</html>
