@@ -57,6 +57,9 @@
           hide-required-asterisk
           class="editgameListForm"
         >
+          <el-form-item label="头像：" prop="img">
+            <UploadImg v-model="editGameList.img" />
+          </el-form-item>
           <el-form-item label="游戏名称：" prop="name">
             <el-input v-model="editGameList.name" class="popInput" maxlength="10" show-word-limit placeholder="请输入游戏名称" />
           </el-form-item>
@@ -78,10 +81,12 @@ import adminApi from "@/utils/adminApi";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import "vue-custom-scrollbar/dist/vueScrollbar.css"
 import adminPop from '@/components/adminPop/adminPop'
+import UploadImg from "@/components/uploadImg/index"
 export default {
   components: {
     vueCustomScrollbar,
-    adminPop
+    adminPop,
+    UploadImg,
   },
   data() {
     return {
@@ -91,6 +96,7 @@ export default {
       pageSize: 10,
       editGameList: {},
       gameRule: {
+        img: [{ required: true , message: '游戏图片不能为空', trigger: 'blur' }],
         name: [
             { required: true, message: '游戏名称不能为空', trigger: 'blur' },
             { min: 1, max: 15, message: '名字长度应在1 - 15位之间', trigger: 'blur' }
@@ -169,8 +175,8 @@ export default {
     save() {
       this.$refs.gameForm.validate(async (valid) => {
         if(valid) {
-          const {id, name, rules} = this.editGameList
-          const {data: res} = await adminApi.editGame({id, name, rules})
+          const {id, name, rules, img} = this.editGameList
+          const {data: res} = await adminApi.editGame({id, name, rules, img})
           if(res.code === 200) {
             this.messageShow(true, `修改成功`)
             this.$refs.myPopRef.popclose()
