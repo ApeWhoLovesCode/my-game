@@ -139,23 +139,20 @@ export default {
   },
   mounted() {
     // 刚开始获取浏览器的宽高
-    this.popWidth = parseInt(
-      (550 * 100) / document.documentElement.clientWidth
-    );
-    this.popHeight = parseInt(
-      (550 * 100) / document.documentElement.clientHeight
-    );
+    this.popWidth = parseInt((550 * 100) / document.documentElement.clientWidth);
+    this.popHeight = parseInt((550 * 100) / document.documentElement.clientHeight);
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function (e) {
-      this.windowTime = setTimeout(() => {
-        that.popWidth = parseInt((550 * 100) / e.currentTarget.innerWidth);
-        that.popHeight = parseInt((550 * 100) / e.currentTarget.innerHeight);
-      }, 50);
-    });
+    window.addEventListener("resize", this.getPopInfo);
     this.init();
   },
+  destroyed() {
+    window.removeEventListener('resize', this.getPopInfo)
+  },
   methods: {
+    getPopInfo(e) {
+      this.popWidth = parseInt((550 * 100) / e.currentTarget.innerWidth);
+      this.popHeight = parseInt((550 * 100) / e.currentTarget.innerHeight);
+    },
     // 初始化
     init() {
       setTimeout(() => {

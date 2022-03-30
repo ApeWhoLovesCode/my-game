@@ -218,8 +218,6 @@ export default {
       gOTimer: null,
       // 游戏结束显示得分
       gOScore: { score: 0, final: 0 },
-      // 监听浏览器窗口的防抖定时器
-      windowTime: null,
     };
   },
   watch: {
@@ -259,15 +257,10 @@ export default {
     );
     this.init();
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function (e) {
-      this.windowTime = setTimeout(() => {
-        // if (e.currentTarget.outerWidth >= 1200) {
-        that.popWidth = parseInt((300 * 100) / e.currentTarget.innerWidth);
-        // if (e.currentTarget.outerHeight >= 833) {
-        that.popHeight = parseInt((580 * 100) / e.currentTarget.innerHeight);
-      }, 50);
-    });
+    window.addEventListener("resize", this.getPopInfo);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.getPopInfo)
   },
   computed: {
     ...mapState(["currentKey"]),
@@ -284,6 +277,10 @@ export default {
     },
   },
   methods: {
+    getPopInfo(e) {
+      this.popWidth = parseInt((300 * 100) / e.currentTarget.innerWidth);
+      this.popHeight = parseInt((580 * 100) / e.currentTarget.innerHeight);
+    },
     // 缩小
     small() {
       // 暂停游戏

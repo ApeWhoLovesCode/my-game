@@ -132,8 +132,6 @@ export default {
       gOTimer: null,
       // 游戏结束显示得分
       gOScore: { score: 0, final: 0 },
-      // 监听浏览器窗口的防抖定时器
-      windowTime: null,
       // 是否显示 墙
       isWall: true,
       // 定时开启墙的定时器
@@ -241,28 +239,23 @@ export default {
   },
   mounted() {
     // 刚开始获取浏览器的宽高
-    this.popWidth = parseInt(
-      (450 * 100) / document.documentElement.clientWidth
-    );
-    this.popHeight = parseInt(
-      (500 * 100) / document.documentElement.clientHeight
-    );
+    this.popWidth = parseInt((450 * 100) / document.documentElement.clientWidth);
+    this.popHeight = parseInt((500 * 100) / document.documentElement.clientHeight);
     this.snake.size = this.size;
     this.snake.xSpeed = this.size * 1;
     this.egg.size = this.size;
     this.init();
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function (e) {
-      this.windowTime = setTimeout(() => {
-        // if (e.currentTarget.innerWidth <= 1125) {
-        that.popWidth = parseInt((450 * 100) / e.currentTarget.innerWidth);
-        // if (e.currentTarget.innerHeight <= 643) {
-        that.popHeight = parseInt((500 * 100) / e.currentTarget.innerHeight);
-      }, 50);
-    });
+    window.addEventListener("resize", this.getPopInfo);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.getPopInfo)
   },
   methods: {
+    getPopInfo(e) {
+      this.popWidth = parseInt((450 * 100) / e.currentTarget.innerWidth);
+      this.popHeight = parseInt((500 * 100) / e.currentTarget.innerHeight);
+    },
     // 初始化
     init() {
       setTimeout(() => {

@@ -1,30 +1,28 @@
 /**
- * 防抖函数(可用于防止重复提交)
- * 当持续触发事件时，一定时间段内没有再触发事件，事件处理函数才会执行一次，
- * 如果设定时间到来之前，又触发了事件，就重新开始延时。也就是说当一个用户一直触发这个函数，
- * 且每次触发函数的间隔小于既定时间，那么防抖的情况下只会执行一次。
- *
- * @param func 执行函数
- * @param wait 间隔时间
- * @param immediate 立即执行
+ * @param {Function} func
+ * @param {number} wait
+ * @param {boolean} immediate
+ * @return {*}
  */
-export default function debounce (fn, wait, immediate) {
-  let timer
-  return function () {
-    if (timer) clearTimeout(timer)
-    if (immediate) {
-      // 如果已经执行过，不再执行
-      var callNow = !timer
-      timer = setTimeout(() => {
-        timer = null
-      }, wait)
+ export function debounce(fn, delay, immediate) {
+  let debounceTimer
+  return function() {
+    const self = this // 事件源this
+    const args = arguments // 接收事件源的event
+    if (debounceTimer) clearTimeout(debounceTimer) // 存在就清除执行fn的定时器
+    if (immediate) { // 立即执行
+      const callNow = !debounceTimer // 执行fn的状态
+      debounceTimer = setTimeout(function() {
+        debounceTimer = null
+      }, delay)
       if (callNow) {
-        fn.apply(this, arguments)
+        fn.apply(self, args)
       }
-    } else {
-      timer = setTimeout(() => {
-        fn.apply(this, arguments)
-      }, wait)
+    } else { // 非立即执行
+      debounceTimer = setTimeout(function() { // 或者使用箭头函数将this指向dom
+        debounceTimer = null
+        fn.apply(self, args)
+      }, delay)
     }
   }
 }

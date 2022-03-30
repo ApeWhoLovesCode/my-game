@@ -199,8 +199,14 @@ export default {
   },
   destroyed() {
     clearInterval(this.timer)
+    window.removeEventListener('resize', this.getPopInfo)
   },
   methods: {
+    getPopInfo(e) {
+      let width = this.canvasWidth + 60
+      this.popWidth = parseInt((width * 100) / e.currentTarget.innerWidth);
+      this.popHeight = parseInt((width * 100) / e.currentTarget.innerHeight);
+    },
     init() {
       this.setLevelData()
       let width = this.canvasWidth + 60
@@ -212,13 +218,8 @@ export default {
         (width * 100) / document.documentElement.clientHeight
       );
       // 监听浏览器窗口大小变化
-      let that = this;
-      window.addEventListener("resize", function (e) {
-        this.windowTime = setTimeout(() => {
-          that.popWidth = parseInt((width * 100) / e.currentTarget.innerWidth);
-          that.popHeight = parseInt((width * 100) / e.currentTarget.innerHeight);
-        }, 50);
-      });
+      window.removeEventListener('resize', this.getPopInfo)
+      window.addEventListener("resize", this.getPopInfo);
       setTimeout(() => {
         this.canvas = this.$refs.canvas
         this.ctx = this.canvas.getContext("2d")

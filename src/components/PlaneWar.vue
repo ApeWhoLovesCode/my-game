@@ -246,13 +246,10 @@ export default {
     }, 800); // 动画时间是 0.6s 防止获取不准确
 
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function () {
-      clearTimeout(this.windowTime);
-      this.windowTime = setTimeout(() => {
-        that.getPopInfo();
-      }, 200);
-    });
+    window.addEventListener("resize", this.getPopInfo);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.getPopInfo)
   },
   methods: {
     // 缩小
@@ -278,12 +275,15 @@ export default {
     },
     // 获取弹出层的 宽高 和 上左距离 等信息
     getPopInfo() {
-      // 获取弹出层容器的宽度高度
-      this.windowWidth = this.$refs.planeWarPop.$el.offsetWidth - 30;
-      this.windowHeight = this.$refs.planeWarPop.$el.offsetHeight - 30;
-      // 由于 弹出层使用了 translate 50% 所有要获取回之前的 left 和 top
-      this.windowLeft = this.$refs.planeWarPop.$el.offsetLeft * (1 - this.popWidth / 100);
-      this.windowTop = this.$refs.planeWarPop.$el.offsetTop * (1 - this.popHeight / 100);
+      clearTimeout(this.windowTime)
+      this.windowTime = setTimeout(() => {
+        // 获取弹出层容器的宽度高度
+        this.windowWidth = this.$refs.planeWarPop.$el.offsetWidth - 30;
+        this.windowHeight = this.$refs.planeWarPop.$el.offsetHeight - 30;
+        // 由于 弹出层使用了 translate 50% 所有要获取回之前的 left 和 top
+        this.windowLeft = this.$refs.planeWarPop.$el.offsetLeft * (1 - this.popWidth / 100);
+        this.windowTop = this.$refs.planeWarPop.$el.offsetTop * (1 - this.popHeight / 100);
+      }, 200)
     },
     // 点击判断是否是游戏状态
     getMouse() {
@@ -401,7 +401,6 @@ export default {
       this.allEnemy = [];
       // 移除飞机跟随鼠标移动事件
       document.removeEventListener("mousemove", this.mouseMove, false);
-
       this.$nextTick(() => {
         this.$refs.gameover.popshow();
         // 发送游戏结束事件，上传最高分到数据库
@@ -415,9 +414,7 @@ export default {
         // 增加的值 控制在 1 秒
         let addScore = this.score >= 100 ? parseInt(this.score / 100) : 1;
         let addBugNum = this.bugNum >= 100 ? parseInt(this.bugNum / 100) : 1;
-        let addFinal =
-          this.finalScore >= 100 ? parseInt(this.finalScore / 100) : 1;
-
+        let addFinal = this.finalScore >= 100 ? parseInt(this.finalScore / 100) : 1;
         this.playGameOver = true;
         this.gOTimer = setInterval(() => {
           if (this.gOScore.score != this.score) {
@@ -467,6 +464,7 @@ export default {
       this.allEnemy = [];
       this.score = 0;
       this.bugNum = 0;
+      this.$emit("gameoverFn", this.gameItem.id);
     },
     // 提示信息
     promptMessage() {

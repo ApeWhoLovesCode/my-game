@@ -167,16 +167,17 @@ export default {
       (600 * 100) / document.documentElement.clientHeight
     );
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function (e) {
-      this.windowTime = setTimeout(() => {
-        that.popWidth = parseInt((600 * 100) / e.currentTarget.innerWidth);
-        that.popHeight = parseInt((600 * 100) / e.currentTarget.innerHeight);
-      }, 50);
-    });
+    window.addEventListener("resize", this.getPopInfo);
     this.init();
   },
+  destroyed() {
+    window.removeEventListener('resize', this.getPopInfo)
+  },
   methods: {
+    getPopInfo(e) {
+      this.popWidth = parseInt((600 * 100) / e.currentTarget.innerWidth);
+      this.popHeight = parseInt((600 * 100) / e.currentTarget.innerHeight);
+    },    
     // 初始化
     init() {
       setTimeout(() => {
