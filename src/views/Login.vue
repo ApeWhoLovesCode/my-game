@@ -86,13 +86,10 @@ export default {
       this.canvasOperation();
     }, 100);
     // 监听浏览器窗口大小变化
-    let that = this;
-    window.addEventListener("resize", function () {
-      clearTimeout(this.windowTime);
-      this.windowTime = setTimeout(() => {
-        that.getCanvas();
-      }, 200);
-    });
+    window.addEventListener("resize", this.getCanvas);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.getCanvas)
   },
   methods: {
     // 登录
@@ -140,8 +137,11 @@ export default {
     },
     // 重新获取canvas的信息
     getCanvas() {
-      this.canvas.width = document.documentElement.clientWidth - 30;
-      this.canvas.height = document.documentElement.clientHeight - 30;
+      clearTimeout(this.windowTime);
+      this.windowTime = setTimeout(() => {
+        this.canvas.width = document.documentElement.clientWidth - 30;
+        this.canvas.height = document.documentElement.clientHeight - 30;
+      }, 200);
     },
     // canvas 操作
     canvasOperation() {
