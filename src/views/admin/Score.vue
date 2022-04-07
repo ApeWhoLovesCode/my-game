@@ -46,7 +46,6 @@ import adminApi from "@/utils/adminApi";
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 import 'vue-custom-scrollbar/dist/vueScrollbar.css'
 import adminPop from '@/components/adminPop/adminPop'
-import {throttle} from "@/utils/debounce.js"
 export default {
   components: {
     vueCustomScrollbar,

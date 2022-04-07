@@ -289,7 +289,7 @@
       ></span>
     </template>
 
-    <!-- <EnterTx v-if="isEnterTx" /> -->
+    <EnterTx v-if="isEnterTx" />
   </el-container>
 </template>
 
