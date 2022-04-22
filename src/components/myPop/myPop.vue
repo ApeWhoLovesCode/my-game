@@ -178,6 +178,7 @@ export default {
   border-radius: 1.5vw;
   box-shadow: 0 0 20px 10px rgba(31, 31, 31, 0.3);
   min-width: 350px;
+  box-sizing: border-box;
 }
 .center {
   top: 50%;
