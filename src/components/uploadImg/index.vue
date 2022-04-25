@@ -72,6 +72,10 @@ export default {
           data: formData, 
           headers: { 'Content-Type': 'multipart/form-data' }
         })
+        if(res.code !== 200) {
+          this.$message(res.data)
+          return
+        }
         this.$emit('input', res.data)
         if(id) {
           const { data:res2 } = await api.editUser({id, avatar: res.data});

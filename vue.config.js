@@ -12,8 +12,8 @@ module.exports = {
         }
       },
       '/uploadapi': {
-        // target: 'http://localhost:9705',//源地址
-        target: 'http://120.77.241.208:9705',//源地址
+        target: 'http://localhost:9705',//源地址
+        // target: 'http://120.77.241.208:9705',//源地址
         changeOrigin: true,//是否允许跨域
         pathRewrite: {
           '^/uploadapi': '/'
