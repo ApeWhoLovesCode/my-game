@@ -187,6 +187,12 @@ export default {
         });
       }
     },
+    gameItem: {
+      handler(val) {
+        if (val.outside) this.onKeyDown();
+      },
+      deep: true,
+    },
   },
   mounted() {
     // 刚开始获取浏览器的宽高
