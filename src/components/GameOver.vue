@@ -15,7 +15,7 @@
           <div class="scorllWrap">
           <div class="rankItem" v-for="(item,index) in rankList" :key="item.id">
             <div class="ranking">{{index + 1}}</div>
-            <img :src="item.avatar"></img>
+            <img :src="item.avatar" />
             <div class="rankItemData">
               <div class="rankUser rankItemText">{{item.name}}</div>
               <div class="rankScore rankItemText">{{scoreText}}：{{item['g' + gameId]}}</div>
@@ -109,7 +109,6 @@ export default {
       return this.gameId !== 107 ? '得分' : '用时' 
     }
   },
-  watch: {},
   mounted() {
     setTimeout(() => {
       this.getRankList();
@@ -143,6 +142,10 @@ export default {
       this.$refs.gameoverPop.popclose();
     },
     share() {
+      if(!this.gameUser) {
+        this.$message('登录后才可分享得分')
+        return
+      }
       if(!this.isSuccess) {
         this.$message({type:'info',message:'游戏失败了，无法分享噢', duration: 1000})
         return
