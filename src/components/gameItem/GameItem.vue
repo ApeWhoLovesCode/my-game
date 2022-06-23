@@ -1,7 +1,6 @@
 <template>
   <div class="gameItem">
-    <!-- <img :src="gameItem.img" alt="" /> -->
-    <el-image :src="gameItem.img" fit="contain" />
+    <el-image :src="gameItem.img" fit="cover" />
     <div class="title">{{ gameItem.name }}</div>
   </div>
 </template>
@@ -16,35 +15,21 @@ export default {
         return {};
       },
     },
-  },
-  data() {
-    return {};
-  },
-  computed: {},
-  watch: {},
-  created() {},
-  methods: {},
+  }
 };
 </script>
 <style lang='scss' scoped>
-$width: 100%; /* 声明宽度变量 */
 .gameItem {
   cursor: pointer;
   position: relative;
-  width: $width;
+  width: 100%;
   // height: 17%;
   /* 实现高度为宽度的75%: padding 是根据 width 来调整的 */
   // padding-bottom: 75%;
   overflow: hidden;
-  margin-bottom: 5px;
-  img {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
   .el-image {
     width: 100%;
+    height: 100%;
   }
   .title {
     position: absolute;
@@ -54,12 +39,7 @@ $width: 100%; /* 声明宽度变量 */
     height: 20px;
     line-height: 20px;
     font-size: 14px;
-    // background: rgba(0, 0, 0, 0.5);
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.9),
-      rgba(0, 0, 0, 0)
-    );
+    background: linear-gradient(to top,rgba(0, 0, 0, 0.9),rgba(0, 0, 0, 0));
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;

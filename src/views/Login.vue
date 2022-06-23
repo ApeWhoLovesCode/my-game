@@ -24,6 +24,7 @@
             <div class="login-btn">登录<i class="el-icon--right iconfont icon-denglu1"></i></div>
           </el-button>
           <el-button @click="registered()">注册</el-button>
+          <el-button @click="$router.push('/home')">试玩</el-button>
         </el-form-item>
       </el-form>
     </div>

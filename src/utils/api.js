@@ -1,6 +1,5 @@
 import http from "./http.js"
 
-// let api = 'http://120.77.241.208:3000'  // 服务器 代理
 let api = 'api'    // 本地 vue.config.js proxy 代理
 
 export default {

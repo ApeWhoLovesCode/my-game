@@ -26,43 +26,25 @@
             </div>
           </template>
         </el-autocomplete>
-        <el-button
-          class="searchBtn"
-          type="primary"
-          icon="el-icon-search"
-        ></el-button>
+        <el-button class="searchBtn" type="primary" icon="el-icon-search"></el-button>
       </div>
       <div class="headerRight">
         <!-- 开 / 关方向键位特效 -->
-        <el-tooltip
-          effect="dark"
-          content="开 / 关方向键位特效"
-          placement="bottom"
-        >
-          <el-switch
-            v-model="isKeyShow"
-            active-color="#7052db"
-            inactive-color="#aa9cc5"
-          >
-          </el-switch>
+        <el-tooltip effect="dark" content="开 / 关方向键位特效" placement="bottom">
+          <el-switch v-model="isKeyShow" active-color="#7052db" inactive-color="#aa9cc5"></el-switch>
         </el-tooltip>
         <!-- 背景音乐 -->
         <audio ref="audio" :src="musicUrl" autoplay></audio>
         <el-tooltip effect="dark" content="播放 / 暂停歌曲" placement="bottom">
           <span
             class="iconfont music"
-            :class="
-              isMusic ? 'icon-mn_shengyin_fill' : 'icon-mn_shengyinwu_fill'
-            "
+            :class="isMusic ? 'icon-mn_shengyin_fill' : 'icon-mn_shengyinwu_fill'"
             @click="getMusic"
           ></span>
         </el-tooltip>
         <!-- 社区 -->
         <el-tooltip effect="dark" content="社区" placement="bottom">
-          <span
-            @click="toCommunity"
-            class="community iconfont icon-menu_sqhd2"
-          ></span>
+          <span @click="toCommunity" class="community iconfont icon-menu_sqhd2"></span>
         </el-tooltip>
         <el-tooltip effect="dark" content="全屏 / 退出全屏" placement="bottom">
           <div v-if="!isFullScreen" class="full-screen iconfont icon-quanping" @click="fullScreen(true)"></div>
@@ -76,14 +58,12 @@
           trigger="hover"
         >
           <div class="logout-wrap">
-            <el-button class="userInfo" size="small" @click="editUser"
-              >个人信息</el-button
-            >
-            <el-button class="logout" @click="logout" size="small"
-              >退出登录</el-button
-            >
+            <template v-if="gameUser">
+              <el-button class="userInfo" size="small" @click="editUser">个人信息</el-button>
+              <el-button class="logout" @click="logout" size="small">退出登录</el-button>
+            </template>
+            <el-button v-else @click="$router.push('/login')">去登录</el-button>
           </div>
-          <!-- <i slot="reference" class="iconfont icon-denglu"></i> -->
           <div slot="reference" class="avatar">
             <img v-if="gameUser && gameUser.avatar" :src="gameUser.avatar" />
             <img v-else src="@/assets/img/user.png" alt="">
@@ -101,17 +81,13 @@
           @click="isFold = !isFold"
         ></el-button>
         <vue-custom-scrollbar class="scroll-area">
-          <el-tooltip
-            placement="right"
-            v-for="(item, i) in tabGamesList"
-            :key="item.id"
-          >
+          <el-tooltip placement="right" v-for="(item, i) in tabGamesList" :key="item.id">
             <!-- 鼠标移过去显示的游戏规则 -->
             <div slot="content">
               <div class="rules">规则：{{ item.rules }}</div>
             </div>
             <Game-item
-              :style="{ height: isFold ? '' : '17%' }"
+              :style="{ height: isFold ? '' : '16%' }"
               :gameItem="item"
               @click.native="gameItemClick(item.id)"
             />
@@ -248,7 +224,6 @@
         @restartFn="restartFn"
         @small="small"
         @click.native="popClick(gamesList[5].id)"
-        @updateScore="updateScore(arguments)"
       />
       <!-- 扫雷 -->
       <MineSweeper
@@ -409,7 +384,7 @@ export default {
         this.gamesList = res;
         this.tabGamesList = res.filter(item => item.isban === 0)
       } catch (error) {
-        this.$message({type:'error',message: '获取游戏数据失败'})
+        console.log('error', error);
       }
     },
     // 点击了游戏
@@ -558,6 +533,10 @@ export default {
     },
     // 游戏结束上传得分
     async updateScore(params) {
+      if(!this.gameUser) {
+        this.$message('登录后才可参与排名')
+        return
+      }
       let userId = this.gameUser.id;
       let gameId = params[0];
       let score = params[1];
@@ -567,6 +546,10 @@ export default {
 
     // 跳转到社区
     toCommunity() {
+      if(!this.gameUser) {
+        this.$message('登录后才可查看社区')
+        return
+      }
       let curPath = this.$route.path;
       if (curPath == "/home") {
         this.isCommunityShow = true;
@@ -890,12 +873,12 @@ export default {
     width: 5%;
   }
   100% {
-    width: 12%;
+    width: 11%;
   }
 }
 @keyframes asideNotFold {
   0% {
-    width: 12%;
+    width: 11%;
   }
   100% {
     width: 5%;

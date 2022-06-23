@@ -3,6 +3,7 @@
 import axios from 'axios'
 // 使用element-ui Message做消息提醒
 import { Message } from 'element-ui';
+import router from '../router';
 //1. 创建新的axios实例，
 const service = axios.create({
   // 公共接口--这里注意后面会讲
@@ -31,8 +32,23 @@ service.interceptors.request.use(config => {
 
 // 3.响应拦截器
 service.interceptors.response.use(response => {
-  //接收到响应数据并成功后的一些共有的处理，关闭loading等
-
+  //接收到响应数据并成功后的一些共有的处理
+  const code = response.data?.code
+  // 失败的请求
+  if(code !== 200) {
+    let errMsg = ''
+    switch (code) {
+      case -1: errMsg = '请求错误'; break;
+      case 401: {
+        errMsg = '登录凭证过期，请重新登录'
+        router.push('/login')
+        break;
+      }
+      default: errMsg = `连接错误${response.data.data}`
+    }
+    Message.error(errMsg)
+    return Promise.reject(errMsg)
+  }
   return response
 }, error => {
   /***** 接收到异常响应的处理开始 *****/
@@ -44,8 +60,9 @@ service.interceptors.response.use(response => {
         error.message = '错误请求'
         break;
       case 401:
-        error.message = '未授权，请重新登录'
-        break;
+        Message.error('未授权，请重新登录')
+        this.$router.push('/login')
+        return
       case 403:
         error.message = '拒绝访问'
         break;
