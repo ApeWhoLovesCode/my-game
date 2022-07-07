@@ -389,9 +389,11 @@ export default {
     },
     // 点击了游戏
     gameItemClick(id) {
-      // if (this.$route.path == "/home/community") {
-      //   this.hideCommunity();
-      // }
+      // 点击了保卫大司马
+      if(id === 108) {
+        window.open('http://codeape.site:8181/#/protectTheHorse/0')
+        return
+      }
       for (let item of this.gamesList) {
         if (id == item.id) {
           item.begin = true;
