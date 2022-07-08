@@ -65,7 +65,7 @@ export default {
         formData.append('img', file)
         const id = this.gameUser?.id ?? ''
         formData.append('id', id)
-        formData.append('pass', 'lhh_970519495_30624700')
+        formData.append('pass', '')
         const {data:res} = await axios({ 
           method: 'post', 
           url: '/uploadapi/upload',
