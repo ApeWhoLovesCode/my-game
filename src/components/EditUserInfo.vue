@@ -146,12 +146,12 @@ export default {
     },
     // 调用修改用户信息的接口
     async editUser(params) {
-      const { data:res } = await api.editUser(params);
-      if(res.code === 200) {
+      try {
+        const { data:res } = await api.editUser(params);
         this.$store.commit("setUserInfo", res.data);
-        this.$message({type: "success",message: "修改成功",duration: 1000,});
-      } else {
-        this.$message({type: "warning",message: res.data, duration: 1000,});
+        this.$message({type: "success",message: "修改成功",duration: 1000});
+      } catch (error) {
+        console.log('error: ', error);
       }
     },
     // 修改姓名
@@ -206,32 +206,18 @@ export default {
     },
     async newPassOK() {
       // 原密码 和 新密码 的验证规则通过后才可以修改
-      if (
-        !this.userRules.pass ||
-        !this.userRules.newPass ||
-        !this.userInfo.pass
-      ) {
+      const {pass, newPass} = this.userRules
+      const {pass: password, newPass: newPassword} = this.userInfo
+      if (!pass || !newPass || !password || !newPassword) {
         return;
       }
       let id = this.gameUser.id;
-      let password = this.userInfo.pass;
-      let newPassword = this.userInfo.newPass;
-      const { data } = await api.editPass({ id, password, newPassword });
-      if (data.code == 200) {
-        this.$message({
-          type: "success",
-          message: "修改密码成功",
-          duration: 1000,
-        });
+      try {
+        await api.editPass({ id, password, newPassword });
+        this.$message({type: "success",message: "修改密码成功",duration: 1000,});
         this.userInfo.pass = "";
         this.userInfo.newPass = "";
-      } else {
-        this.$message({
-          type: "error",
-          message: "原密码错误",
-          duration: 1000,
-        });
-      }
+      } catch (error) {}
     },
   },
 };

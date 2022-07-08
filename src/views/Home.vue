@@ -542,7 +542,11 @@ export default {
       let userId = this.gameUser.id;
       let gameId = params[0];
       let score = params[1];
-      await api.updateScore({ userId, gameId, score });
+      try {
+        await api.updateScore({ userId, gameId, score });
+      } catch (error) {
+        // console.log('error: ', error);
+      }
     },
     //#endregion
 
